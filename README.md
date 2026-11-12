@@ -55,66 +55,97 @@ instead of aborting its setup. Every other kind of error passes through untouche
 
 ## Settings (`BepInEx\config\local.compatshield.cfg`, created on first launch)
 
+Settings are grouped into eight numbered sections, the order the mod manager's config editor shows them in.
+
+Updating from a version before 1.4.43: the first launch moves each saved value to its new section, so nothing resets. Six groups of similar switches became one switch each; a merged switch stays on only if every switch it replaced was on. The old file is kept as `local.compatshield.cfg.before-categories`. The new sections show in the editor after that launch.
+
+### 1. Spawns and Enemies
+
 | Setting | Default | What it controls |
 |---|---|---|
+| `SpawnCreditMultiplier` | 1 (off) | The stage's regular spawners earn this many times the credits, so waves come sooner (see below) |
+| `MonsterLimit` | 0 (off) | Most enemies alive at once with Multitudes No Price Scale installed (see below) |
+| `PrinterSpawnMultiplier` | 1 (off) | Each stage spawn pick is this many times as likely to be a 3D printer. Host only |
+| `ScrapperSpawnMultiplier` | 1 (off) | Same for scrappers. Host only |
+| `DroneSpawnMultiplier` | 1 (off) | Each stage spawn pick is this many times as likely to be a broken drone or turret. Host only |
+| `DroneCombinerSpawnMultiplier` | 1 (off) | Each stage spawn pick is this many times as likely to be a Drone Combiner, as a total versus the unmodded game. Host only |
+| `DroneNoMinimumStage` | false | Every broken drone and turret can spawn from stage 1. Host only |
+| `DroneHealthMultiplier` | 1 (off) | Allied drones and gunner turrets get this many times the max health; enemy drones are left alone. Host only |
+
+### 2. Artifact of Sacrifice
+
+| Setting | Default | What it controls |
+|---|---|---|
+| `DropChanceMultiplier` | 1 (off) | Multiplies each kill's Artifact of Sacrifice item drop chance, after RiskyMod/ShareSuite (0.7 = 30% fewer) |
+| `KeepInteractables` | empty (off) | Spawn cards that still appear under Artifact of Sacrifice, comma-separated. A name also covers longer ones starting with it, so `iscShrineChance` includes the Sandy and Snowy versions. `iscShrineChance` = Shrine of Chance, `iscCasinoChest` = Adaptive Chest, `iscEquipmentBarrel` = Equipment Barrel, `iscLunarChest` = Lunar Pod. Host only |
+| `KeptInteractableWeight` | 1 (the game's own math) | Scales a spawn category that keeps some `KeepInteractables` cards and loses others, such as Chests. At 1 the kept cards get the whole category's share; 0.5 is half that, 0 is none. Host only |
+| `ShareSuiteSacrificeCreditFix` | true | Sacrifice stages are halved once (by the game), not twice (by the game and ShareSuite), so they get twice the interactables, drones included. Off = both halve. Host only |
+
+### 3. Balance
+
+| Setting | Default | What it controls |
+|---|---|---|
+| `AcolyteAttackSpeedMultiplier` | 1.5 | Multiplies Acolyte's attack speed, in the normal and the transformed form (1 = game default, 0 or below is ignored). Enemy copies of the same body get it too, and a move set not to speed up above 1 attack speed stays as it is. Every PC: each player's own Acolyte uses the value on that player's PC |
+| `RouletteSpinCost` | true | A paid ItemRoulette spin also comes out of ShareSuite's shared gold, so spins really cost money in multiplayer. Does nothing with shared money off or in single player. Host only |
+| `DisableGenetics` | true | Keeps the Artifact of Genetics off (a vote for it is ignored, it is hidden from the lobby list) while the GeneticArtifact mod stays installed. Host decides the force-off; every PC hides it |
+
+### 4. Lag and Hang Protection
+
+| Setting | Default | What it controls |
+|---|---|---|
+| `PhysicsCatchUpCap` | 0.1 | Caps Unity's physics catch-up (Time.maximumDeltaTime, seconds) at each run start. The game's default 0.333 lets one slow frame run up to 20 physics steps on the next, each ticking every body, AI and state machine; 0.1 allows at most 6, so under heavy load game time slows a little instead of the frame rate collapsing. 0.05 = at most 3 steps. 0 = off. Each PC for itself |
+| `DamageChainGuard` | true | A hit nested more than 3 deep inside other hits (on-hit and on-death effects damaging from inside the hit they react to) runs after the outer hit instead, so a kill chain can't overflow the stack (one hit is 260 frames deep on this profile; crashed with exit code 0xC0000409 on 2026-10-19). Also runs Gasoline chain reactions one blast at a time instead of nesting (was `GasolineChainFix`). Host |
+| `DamageChainQueueLimit` | 256 | How many hits from a proc chain may wait in line at once. Once this many are waiting, further hits nested more than 3 deep are dropped; direct hits and the first 3 links always land. The old fixed limit of 4096 let one chain freeze the game for 12-17 seconds on 2026-11-08. One backlog also stops taking new hits after 1024, so a chain can't feed itself forever. Host |
+| `DamageChainDrainMs` | 4 | Milliseconds of waiting hits that may run per physics tick (about 60 per second). The rest run on the next tick, so a huge chain lands over a few seconds instead of freezing the game. 0 = no time limit: the whole line runs in one frame. Host |
+| `BlastChainCap` | true | A blast set off from inside other blasts stops firing once `BlastChainMaxDepth` are running inside each other or a shared time allowance (`BlastChainBudgetMs`) runs out, so item combos can't hang the game (they can still stutter). A stopped blast deals no damage and sets off nothing. Host |
+| `BlastChainMaxDepth` | 4 | How many blasts may run inside each other at once. Minimum 1 (any blast inside a blast is stopped). The loop that hung the game on 2026-11-08 reached 6 or 7. Host |
+| `BlastChainBudgetMs` | 100 | Time allowance, in milliseconds, for blasts inside blasts, shared by every chain. It refills at a quarter of the time that passes between chains. Blasts 2 or more deep stop when it runs out; a blast directly inside the outermost one keeps going until it is 3 times overdrawn, so a big one-level explosion isn't cut. Blasts already running finish, so a chain can overrun it, and the overrun is paid back. 0 = no time limit. Host |
+
+### 5. Error and Crash Protection
+
+| Setting | Default | What it controls |
+|---|---|---|
+| `ErrorLoopGuards` | true | One error no longer makes the game repeat the same code every physics tick. Covers five places that used to be separate switches: one target's error no longer ends a blast (`BlastTargetGuard`), a melee hit or damage zone tick (`OverlapHitGuard`), a damage-over-time tick (`DotTickGuard`) or a bullet (`BulletHitGuard`), and a character whose stat update keeps failing waits 0.25 to 8 seconds between tries (`StatsRetryGuard`). Each new kind of failure logs one line (at most 30, and a new throw site still gets a line after that), and the running total shows at 10, 100, 1000 and so on. Host for the hit guards; each PC for its own stat updates |
 | `OutdatedHookGuard` | true | The generic hook guard above (TinkersSatchel, Inferno, and any other mod that hits it) |
-| `TinkersSatchelItemIsolation` | true | Each TinkersSatchel item sets up on its own |
-| `TinkersSatchelLanguageFix` | true | TinkersSatchel item names and descriptions show as text instead of `TINKERSSATCHEL_..._RENDERED` |
 | `MovedAssetRedirect` | true | Old asset paths load from their new location |
-| `AudioOverlapStopFix` | true | AudioOverlapFix never blocks Stop events |
-| `ZetAspectsDropFix` | true | ZetAspects' kill hook no longer crashes on elites without an equipment slot |
-| `GasolineChainFix` | true | Gasoline chain reactions run one blast at a time in the same frame instead of nesting |
 | `BrokenHandlerGuard` | true | The Strange Can, Relic of Force, DamageLog and Artifact of Genetics crashes no longer break the events and damage chains around them |
+| `StunDurationFix` | true | A freeze/stun/shock on an enemy that has only just spawned no longer crashes the hit |
+| `NullDccsPoolEntryFix` | true | Removes interactable pool entries that have no dccs, so Chen's drones, Tinker's Satchel and QoLChests stop throwing at them. MSU's separate error isn't covered. Logs one line per pool it cleans, with the evidence for what made the hole. Host only |
+| `HookChurnFixes` | true | Inferno's enemy-skill hooks and PlayerRespawnSystem's respawn system stay in between runs instead of being removed and re-added every run (that re-add crashed the game). Inferno's come out only when a run on another difficulty starts; the respawn system's per-run state is reset at each run start, and it is destroyed only when a run in a game mode it ignores (Simulacrum) starts. Was `InfernoHookChurnFix` and `RespawnHookChurnFix`. Every PC |
+| `StuckSoundFixes` | true | Looping sounds stop when they should: AudioOverlapFix never blocks Stop events, a loop whose object is destroyed before it was stopped stops with its object instead of playing on into the lobby, and the Lunar Cauldron / Cleansing Pool hum WolfoFixes restores stops when its pool goes away. Was `AudioOverlapStopFix`, `OrphanLoopGuard` and `LunarPoolLoopStopFix`. Every PC |
+
+### 6. Item Mod Fixes
+
+| Setting | Default | What it controls |
+|---|---|---|
+| `BubbetsItemsFix` | true | Repairs Bubbets Items 1.8.20 for game 1.5.0, see above. Every PC needs it, as every PC needs the mod. |
+| `TinkersSatchelFixes` | true | Each TinkersSatchel item sets up on its own, and item names and descriptions show as text instead of `TINKERSSATCHEL_..._RENDERED`. Was `TinkersSatchelItemIsolation` and `TinkersSatchelLanguageFix`. Every PC |
+| `LinearDamageFocusCrystalFix` | true | Stops Focus Crystal counting twice with LinearDamage and Bubbets Items. Host only. |
+| `DaggerOfFrenzyGuard` | true | Stops Smite Items' Dagger of Frenzy breaking skills on bodies with no skill locator or primary skill. Every PC. |
+| `ZetAspectsDropFix` | true | ZetAspects' kill hook no longer crashes on elites without an equipment slot |
+| `HypercritNullFix` | true | Hypercrit2's crit roll sometimes throws on a hit, which cancelled the whole hit; it now counts as no crit and the hit lands. Host |
 | `PrintToInventoryScrappers` | true | With ShareSuite installed, scrappers put scrap straight into your inventory (PrintToInventory's scrapper part only) |
+
+### 7. Enemy and Survivor Mod Fixes
+
+| Setting | Default | What it controls |
+|---|---|---|
 | `InfernoMithrixFix` | true | Mithrix's hammer slam works again on Inferno, his dash shards stop multiplying every run, and leftover reset hooks can't shrink his pillar |
 | `InfernoLevelBoostFix` | true | Inferno's Level and Difficulty Boost reaches monster level again alongside RiskyTweaks' Raise Level Cap (all PCs need it, or friends see wrong health bars) |
 | `InfernoCooldownScalingFix` | true | Inferno's Enemy Cooldown Reduction Scaling shortens enemy cooldowns each stage instead of lengthening them (host only) |
-| `InfernoHookChurnFix` | true | Inferno's enemy-skill hooks stay in between Inferno runs instead of being removed and re-added every run (that re-add crashed the game); they come out only when a run on another difficulty starts (every PC) |
-| `RespawnHookChurnFix` | true | PlayerRespawnSystem's respawn system and its 35 hooks stay in between runs instead of being destroyed and rebuilt every run; its per-run state is reset at each run start, and it is destroyed only when a run in a game mode the mod ignores (Simulacrum) starts (every PC) |
-| `LunarPoolLoopStopFix` | true | The Lunar Cauldron / Cleansing Pool hum WolfoFixes restores stops when its pool goes away instead of following you into the lobby (every PC) |
-| `ShamanModelFix` | true | Shaman 1.2.0's character-model setup works on game 1.5.0 (its `invisibilityCount` field became a property) and its Acolyte body is registered as `ShamanAcolyteBody` so it can't collide with the game's new Acolyte enemy (which stalled loading at 99%); the Shaman and its Acolytes load (every PC; every player needs the mod) |
-| `SwiftImpactFix` | true | EnemiesReturns' Swift no longer breaks the Beetle Guard impact effect for the session (error floods, run-end crash) |
-| `ShareSuiteSacrificeCreditFix` | true | Sacrifice stages are halved once (by the game), not twice (by the game and ShareSuite), so they get twice the interactables, drones included. Off = both halve. Host only |
-| `FlowerRootFix` | true | An expiring REX flower unroots every enemy it caught, even when one of them is already gone |
-| `ScepterFlowerOwnerFix` | true | REX flowers keep working after their owner's body is gone (StandaloneAncientScepter) |
-| `StunDurationFix` | true | A freeze/stun/shock on an enemy that has only just spawned no longer crashes the hit |
-| `PaladinMaterialsFix` | false | Only for PaladinMod 2.1.0; 2.2.0 fixed the crash itself |
-| `MonsterLimit` (section `[Multitudes]`) | 0 (off) | Most enemies alive at once with Multitudes No Price Scale installed (see below) |
-| `SpawnCreditMultiplier` (section `[Spawns]`) | 1 (off) | The stage's regular spawners earn this many times the credits, so waves come sooner (see below) |
-| `PrinterSpawnMultiplier` (section `[Spawns]`) | 1 (off) | Each stage spawn pick is this many times as likely to be a 3D printer. Host only |
-| `ScrapperSpawnMultiplier` (section `[Spawns]`) | 1 (off) | Same for scrappers. Host only |
-| `DroneCombinerSpawnMultiplier` (section `[Spawns]`) | 1 (off) | Each stage spawn pick is this many times as likely to be a Drone Combiner, as a total versus the unmodded game. Host only |
-| `DroneNoMinimumStage` (section `[Spawns]`) | false | Every broken drone and turret can spawn from stage 1. Host only |
-| `DroneSpawnMultiplier` (section `[Spawns]`) | 1 (off) | Each stage spawn pick is this many times as likely to be a broken drone or turret. Host only |
-| `DroneHealthMultiplier` (section `[Spawns]`) | 1 (off) | Allied drones and gunner turrets get this many times the max health; enemy drones are left alone. Host only |
-| `DropChanceMultiplier` (section `[Sacrifice]`) | 1 (off) | Multiplies each kill's Artifact of Sacrifice item drop chance, after RiskyMod/ShareSuite (0.7 = 30% fewer) |
-| `KeepInteractables` (section `[Sacrifice]`) | empty (off) | Spawn cards that still appear under Artifact of Sacrifice, comma-separated. A name also covers longer ones starting with it, so `iscShrineChance` includes the Sandy and Snowy versions. `iscShrineChance` = Shrine of Chance, `iscCasinoChest` = Adaptive Chest, `iscEquipmentBarrel` = Equipment Barrel, `iscLunarChest` = Lunar Pod. Host only |
-| `KeptInteractableWeight` (section `[Sacrifice]`) | 1 (the game's own math) | Scales a spawn category that keeps some `KeepInteractables` cards and loses others, such as Chests. At 1 the kept cards get the whole category's share; 0.5 is half that, 0 is none. Host only |
-| `DamageChainGuard` | true | A hit nested more than 3 deep inside other hits (on-hit and on-death effects damaging from inside the hit they react to) runs after the outer hit instead, so a kill chain can't overflow the stack (one hit is 260 frames deep on this profile; crashed with exit code 0xC0000409 on 2026-10-19). Host |
-| `BlastChainCap` | true | A blast set off from inside other blasts stops firing once `BlastChainMaxDepth` are running inside each other or a shared time allowance (`BlastChainBudgetMs`) runs out, so item combos can't hang the game (they can still stutter). A stopped blast deals no damage and sets off nothing. Host |
-| `BlastTargetGuard` | true | One target's error no longer ends a whole blast, so a failed target can't make it go off again every tick. Each new kind of failure logs one line (at most 30, and a new throw site still gets a line after that), and the running total shows at 10, 100, 1000 and so on. Host only |
-| `StatsRetryGuard` | true | A character whose stat update keeps failing waits 0.25 to 8 seconds between tries instead of repeating it every physics tick. Each new kind of failure logs one line (at most 30, and a new throw site still gets a line after that), and the running total shows at 10, 100, 1000 and so on. Every PC |
-| `OverlapHitGuard` | true | One target's error no longer ends a melee hit or a damage zone tick, so a failed target can't make a zone fire again every tick. Each new kind of failure logs one line (at most 30, and a new throw site still gets a line after that), and the running total shows at 10, 100, 1000 and so on. Host only |
-| `DotTickGuard` | true | One attacker's error no longer ends a damage-over-time tick, so a failed tick can't run again every physics tick. Logs the same way as `OverlapHitGuard`. Host only |
-| `BulletHitGuard` | true | One target's error no longer ends a bullet, so an item that fires on a timer can't fire again every physics tick. Logs the same way as `OverlapHitGuard`. Host only |
-| `RouletteSpinCost` | true | A paid ItemRoulette spin also comes out of ShareSuite's shared gold, so spins really cost money in multiplayer. Does nothing with shared money off or in single player. Host only |
-| `BubbetsItemsFix` | true | Repairs Bubbets Items 1.8.20 for game 1.5.0, see above. Every PC needs it, as every PC needs the mod. |
-| `LinearDamageFocusCrystalFix` | true | Stops Focus Crystal counting twice with LinearDamage and Bubbets Items. Host only. |
-| `ExtraSkillSlotsHudFix` | true | Builds ExtraSkillSlots' four extra icons to fit a replacement HUD such as RiskUI. Every PC. |
-| `DaggerOfFrenzyGuard` | true | Stops Smite Items' Dagger of Frenzy breaking skills on bodies with no skill locator or primary skill. Every PC. |
 | `ThetaShieldLoopFix` | true | Stops Sandswept's Theta Constructs repeating a failed shield cast every tick, which drops the frame rate and loops a sound. Host only in effect. |
-| `AcolyteAttackSpeedMultiplier` (section `[Survivors]`) | 1.5 | Multiplies Acolyte's attack speed, in the normal and the transformed form (1 = game default, 0 or below is ignored). Enemy copies of the same body get it too, and a move set not to speed up above 1 attack speed stays as it is. Every PC: each player's own Acolyte uses the value on that player's PC |
-| `NullDccsPoolEntryFix` | true | Removes interactable pool entries that have no dccs, so Chen's drones, Tinker's Satchel and QoLChests stop throwing at them. MSU's separate error isn't covered. Logs one line per pool it cleans, with the evidence for what made the hole. Host only |
-| `DisableGenetics` (section `[Artifacts]`) | true | Keeps the Artifact of Genetics off (a vote for it is ignored, it is hidden from the lobby list) while the GeneticArtifact mod stays installed. Host decides the force-off; every PC hides it |
-| `HypercritNullFix` | true | Hypercrit2's crit roll sometimes throws on a hit, which cancelled the whole hit; it now counts as no crit and the hit lands. Host |
-| `OrphanLoopGuard` | true | A looping sound whose object is destroyed before it was stopped (an enemy mid-attack when the run ends) stops with its object instead of playing on into the lobby (every PC) |
-| `SoundTracer` (section `[Diagnostics]`) | true | Diagnostic: at each run end, logs the loop-type sounds that were started on objects that no longer exist and never got their stop (to name an audio loop that follows you into the lobby), the last sounds before the run ended, and who calls `AkSoundEngine.StopAll`. Turn off once the loop is found |
-| `PhysicsCatchUpCap` (section `[Performance]`) | 0.1 | Caps Unity's physics catch-up (Time.maximumDeltaTime, seconds) at each run start. The game's default 0.333 lets one slow frame run up to 20 physics steps on the next, each ticking every body, AI and state machine; 0.1 allows at most 6, so under heavy load game time slows a little instead of the frame rate collapsing. 0.05 = at most 3 steps. 0 = off. Each PC for itself |
-| `DamageChainQueueLimit` (section `[Performance]`) | 256 | How many hits from a proc chain may wait in line at once. Once this many are waiting, further hits nested more than 3 deep are dropped; direct hits and the first 3 links always land. The old fixed limit of 4096 let one chain freeze the game for 12-17 seconds on 2026-11-08. One backlog also stops taking new hits after 1024, so a chain can't feed itself forever. Host |
-| `DamageChainDrainMs` (section `[Performance]`) | 4 | Milliseconds of waiting hits that may run per physics tick (about 60 per second). The rest run on the next tick, so a huge chain lands over a few seconds instead of freezing the game. 0 = no time limit: the whole line runs in one frame. Host |
-| `BlastChainMaxDepth` (section `[Performance]`) | 4 | How many blasts may run inside each other at once. Minimum 1 (any blast inside a blast is stopped). The loop that hung the game on 2026-11-08 reached 6 or 7. Host |
-| `BlastChainBudgetMs` (section `[Performance]`) | 100 | Time allowance, in milliseconds, for blasts inside blasts, shared by every chain. It refills at a quarter of the time that passes between chains. Blasts 2 or more deep stop when it runs out; a blast directly inside the outermost one keeps going until it is 3 times overdrawn, so a big one-level explosion isn't cut. Blasts already running finish, so a chain can overrun it, and the overrun is paid back. 0 = no time limit. Host |
-| `LagTracer` (section `[Diagnostics]`) | true | Diagnostic: during a run, every 10 s logs the average fps, the worst frame, frames over 100 ms, live enemies (Monster + Lunar + Void teams, logged as `monsters`) / bodies / projectiles, the time spent in the paths item mods hook (RecalculateStats, TakeDamage, OnHitEnemy, OnCharacterDeath, OnInventoryChanged, BulletAttack.Fire, FireProjectile, Heal), the per-frame paths (body ticks, AI, state machines, overlays, HUD, mods' per-frame subscribers), Unity's CPU vs GPU frame time, physics steps per frame and GC collections; laggy windows at Info, smooth ones at Debug; a frame over 250 ms is logged at once; a run-end `Lag summary` names the worst moment. The Mod Watcher's report turns these into a Performance section. About 6 lines a minute |
+| `SwiftImpactFix` | true | EnemiesReturns' Swift no longer breaks the Beetle Guard impact effect for the session (error floods, run-end crash) |
+| `RexFlowerFixes` | true | An expiring REX flower unroots every enemy it caught, even when one of them is already gone, and REX flowers keep working after their owner's body is gone (StandaloneAncientScepter). Was `FlowerRootFix` and `ScepterFlowerOwnerFix`. Host only |
+| `ShamanModelFix` | true | Shaman 1.2.0's character-model setup works on game 1.5.0 (its `invisibilityCount` field became a property) and its Acolyte body is registered as `ShamanAcolyteBody` so it can't collide with the game's new Acolyte enemy (which stalled loading at 99%); the Shaman and its Acolytes load (every PC; every player needs the mod) |
+| `ExtraSkillSlotsHudFix` | true | Builds ExtraSkillSlots' four extra icons to fit a replacement HUD such as RiskUI. Every PC. |
+| `PaladinMaterialsFix` | false | Only for PaladinMod 2.1.0; 2.2.0 fixed the crash itself |
+
+### 8. Diagnostics
+
+| Setting | Default | What it controls |
+|---|---|---|
+| `LagTracer` | true | Diagnostic: during a run, every 10 s logs the average fps, the worst frame, frames over 100 ms, live enemies (Monster + Lunar + Void teams, logged as `monsters`) / bodies / projectiles, the time spent in the paths item mods hook (RecalculateStats, TakeDamage, OnHitEnemy, OnCharacterDeath, OnInventoryChanged, BulletAttack.Fire, FireProjectile, Heal), the per-frame paths (body ticks, AI, state machines, overlays, HUD, mods' per-frame subscribers), Unity's CPU vs GPU frame time, physics steps per frame and GC collections; laggy windows at Info, smooth ones at Debug; a frame over 250 ms is logged at once; a run-end `Lag summary` names the worst moment. The Mod Watcher's report turns these into a Performance section. About 6 lines a minute |
+| `SoundTracer` | true | Diagnostic: at each run end, logs the loop-type sounds that were started on objects that no longer exist and never got their stop (to name an audio loop that follows you into the lobby), the last sounds before the run ended, and who calls `AkSoundEngine.StopAll`. Turn off once the loop is found |
 
 ### Spawn speed (`SpawnCreditMultiplier`)
 
@@ -174,7 +205,7 @@ and `Level and Difficulty Boost` (1.25 by default) values.
 - **Respawn hook churn fix:** PlayerRespawnSystem's hooks used to be re-added at every run start, so they sat outermost
   around any other mod's per-run hooks on the same methods; kept, they now sit inside hooks added later. No mod on this
   profile hooks the same methods per run (`Stage.GetPlayerSpawnTransform` would be the one that matters), so nothing
-  changes today; if one is added and respawn positions look wrong, switch `RespawnHookChurnFix` off.
+  changes today; if one is added and respawn positions look wrong, switch `HookChurnFixes` off (that also turns off Inferno's half).
 - **Archaic Wisp 1.1.9:** setting its `Stage List = none` (and `Remove Greater Wisps = none`) takes Archaic Wisps off
   the stage spawn lists and brings Greater Wisps back. They can still come in through Artifact of Dissonance, Wisp
   family events and Artifact of Universe, where they float around and never attack (their charge, fire and death
@@ -199,7 +230,8 @@ and `Level and Difficulty Boost` (1.25 by default) values.
 - `Lag: <scene> (stage N t=m:ss) | 38 fps avg, worst frame 212 ms, 3 frame(s) over 100 ms | monsters 58, bodies 73, projectiles 140 | RecalculateStats 1240x 310 ms, TakeDamage 2100x 95 ms, OnHitEnemy 2100x 180 ms | GC 4 collection(s), heap 1200 MB` (Info when laggy, Debug otherwise), `Lag: 312 ms frame in <scene> (...)`, and `Lag summary: ...` at run end.
 
 - `Outdated-hook guard installed`
-- `Enabled fixes: OutdatedHookGuard=..., PaladinMaterialsFix=..., TinkersSatchelItemIsolation=..., TinkersSatchelLanguageFix=..., MovedAssetRedirect=..., AudioOverlapStopFix=..., ZetAspectsDropFix=..., GasolineChainFix=..., BrokenHandlerGuard=..., StunDurationFix=..., PrintToInventoryScrappers=..., InfernoMithrixFix=..., InfernoLevelBoostFix=..., InfernoCooldownScalingFix=..., InfernoHookChurnFix=..., RespawnHookChurnFix=..., LunarPoolLoopStopFix=..., ShamanModelFix=..., FlowerRootFix=..., ScepterFlowerOwnerFix=..., SwiftImpactFix=..., ShareSuiteSacrificeCreditFix=..., MonsterLimit=..., SpawnCreditMultiplier=..., SacrificeDropChanceMultiplier=..., KeepInteractables=[...], KeptInteractableWeight=...`
+- `Enabled fixes: ErrorLoopGuards=..., StuckSoundFixes=..., HookChurnFixes=..., TinkersSatchelFixes=..., RexFlowerFixes=..., ...`: every setting and its value, at startup.
+- `Config: moved 58 settings into the new categories and kept their values (old file saved as local.compatshield.cfg.before-categories)`: once, on the first launch after updating from a version before 1.4.43.
 - `Assets: moved game asset paths now load from their new location`, then `Assets: indexed N catalog keys...` on the
   first game-asset load, and up to 25 `Assets: '<old path>' moved to '<new path>'`
 - `ZetAspects: elite kills without an equipment slot no longer crash its drop hook`, or the warning
