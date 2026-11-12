@@ -9,6 +9,7 @@ import sys
 
 reference_path, versions_path, out_path = sys.argv[1:4]
 BASE = "https://github.com/IsaiahAnson/compatshield"
+STORE = "https://thunderstore.io/c/riskofrain2/p/Mentalize/CompatShield/"
 REF = "docs/REFERENCE.md"
 
 with open(reference_path, encoding="utf-8-sig") as f:
@@ -91,6 +92,7 @@ page = f"""<p align="center">
 
 <p align="center">
   <a href="{BASE}/releases/latest"><img src="assets/btn-download.svg" height="34" alt="Download latest"></a>&nbsp;
+  <a href="{STORE}">{themed("btn-thunderstore", 'height="34" alt="Get it on Thunderstore"')}</a>&nbsp;
   <a href="VERSIONS.md">{themed("btn-versions", 'height="34" alt="All versions"')}</a>&nbsp;
   <a href="{REF}">{themed("btn-reference", 'height="34" alt="Full reference"')}</a>
 </p>
@@ -127,11 +129,15 @@ Each entry in the [full reference]({REF}#what-it-fixes) says what broke and what
 
 {heading("install", "Install")}
 
+**From Thunderstore:** install [CompatShield by Mentalize]({STORE}) in Thunderstore Mod Manager, r2modman or Gale, then start the game from the mod manager. If you have an earlier copy installed from the zip, delete its `Local-CompatShield` folder under `BepInEx\\patchers` first, so the patcher doesn't load twice.
+
+**From the zip:**
+
 1. Download the zip from the [latest release]({BASE}/releases/latest).
 2. In Thunderstore Mod Manager or r2modman, import the zip as a local mod. It replaces any earlier CompatShield.
 3. Start the game from the mod manager. The settings file is created on that first launch.
 
-To remove it, delete the `Local-CompatShield` folder under `BepInEx\\patchers` in your profile. CompatShield never edits mod files, so that undoes every fix.
+To remove it, uninstall it in the mod manager. For a zip install, delete the `Local-CompatShield` folder under `BepInEx\\patchers` in your profile. CompatShield never edits mod files, so that undoes every fix.
 
 {heading("settings", "Settings")}
 

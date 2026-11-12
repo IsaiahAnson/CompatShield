@@ -514,7 +514,7 @@ GRAD = ('<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="
         '<stop offset="1" stop-color="#9a3d08"/></linearGradient></defs>')
 text, sizes["btn-download"] = button("Download latest", "url(#g)", "#ffffff", defs=GRAD, arrow=True)
 write("btn-download.svg", text)
-for slug, label in [("versions", "All versions"), ("reference", "Full reference")]:
+for slug, label in [("thunderstore", "Get it on Thunderstore"), ("versions", "All versions"), ("reference", "Full reference")]:
     text, sizes[f"btn-{slug}"] = button(label, "#21262d", "#e6edf3", stroke="#3d444d")
     write(f"btn-{slug}-dark.svg", text)
     text, _ = button(label, "#f6f8fa", "#1f2328", stroke="#d0d7de")

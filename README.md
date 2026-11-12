@@ -4,6 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/IsaiahAnson/compatshield/releases/latest"><img src="assets/btn-download.svg" height="34" alt="Download latest"></a>&nbsp;
+  <a href="https://thunderstore.io/c/riskofrain2/p/Mentalize/CompatShield/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/btn-thunderstore-dark.svg"><img src="assets/btn-thunderstore-light.svg" height="34" alt="Get it on Thunderstore"></picture></a>&nbsp;
   <a href="VERSIONS.md"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/btn-versions-dark.svg"><img src="assets/btn-versions-light.svg" height="34" alt="All versions"></picture></a>&nbsp;
   <a href="docs/REFERENCE.md"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/btn-reference-dark.svg"><img src="assets/btn-reference-light.svg" height="34" alt="Full reference"></picture></a>
 </p>
@@ -92,11 +93,15 @@ Each entry in the [full reference](docs/REFERENCE.md#what-it-fixes) says what br
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icon-install-dark.svg"><img src="assets/icon-install-light.svg" width="30" height="30" align="absmiddle" alt=""></picture> Install
 
+**From Thunderstore:** install [CompatShield by Mentalize](https://thunderstore.io/c/riskofrain2/p/Mentalize/CompatShield/) in Thunderstore Mod Manager, r2modman or Gale, then start the game from the mod manager. If you have an earlier copy installed from the zip, delete its `Local-CompatShield` folder under `BepInEx\patchers` first, so the patcher doesn't load twice.
+
+**From the zip:**
+
 1. Download the zip from the [latest release](https://github.com/IsaiahAnson/compatshield/releases/latest).
 2. In Thunderstore Mod Manager or r2modman, import the zip as a local mod. It replaces any earlier CompatShield.
 3. Start the game from the mod manager. The settings file is created on that first launch.
 
-To remove it, delete the `Local-CompatShield` folder under `BepInEx\patchers` in your profile. CompatShield never edits mod files, so that undoes every fix.
+To remove it, uninstall it in the mod manager. For a zip install, delete the `Local-CompatShield` folder under `BepInEx\patchers` in your profile. CompatShield never edits mod files, so that undoes every fix.
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icon-settings-dark.svg"><img src="assets/icon-settings-light.svg" width="30" height="30" align="absmiddle" alt=""></picture> Settings
 
