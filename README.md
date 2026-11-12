@@ -141,6 +141,10 @@ The build that ships is `bin\Release\netstandard2.1\CompatShield.dll`. To use it
 
 45 packaged builds are kept, from 1.4.2 to 1.4.54, each with its zip: see [VERSIONS.md](VERSIONS.md) or the [releases page](https://github.com/IsaiahAnson/compatshield/releases). The source code here is the latest version. Each older version has a tag that holds the README shipped with that build.
 
+## License
+
+[PolyForm Noncommercial 1.0.0](LICENSE). You can use, change and share CompatShield for free, for any purpose that does not make money. Selling it, or using it in paid work, needs my written permission.
+
 <img src="assets/divider.svg" width="100%" height="8" alt="">
 
 <p align="center"><sub>An unofficial fan project. Not affiliated with the makers of Risk of Rain 2 or with the authors of the mods named here.</sub></p>
