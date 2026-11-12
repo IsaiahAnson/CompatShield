@@ -49,6 +49,8 @@ It doesn't edit any mod files. It's one BepInEx patcher DLL, so deleting it undo
 | **PrintToInventory 1.3.1 + ShareSuite** | PrintToInventory turns itself off when ShareSuite is installed ("ShareSuite detected! PrintToInventory will be disabled"), because both would hand out printer and cauldron items. So scrappers drop scrap on the ground. | Lets PrintToInventory load, but keeps only its scrapper part: scrap goes straight into the scrapping player's inventory (host-side; multiplayer only by its own default). Printers, cauldrons, cleansing pools and the Wandering Chef stay as they are, whatever its config says. ShareSuite never hooks scrappers, so nothing gets handed out twice. Scrap given this way isn't shared by ShareSuite. |
 | **PaladinMod 2.1.0** | `Asset.GatherMaterials` crashes because Mercenary's `EvisProjectile` no longer has a `ProjectileController`, which aborts Paladin's whole setup, so the survivor never gets added. | Makes each material lookup in that method independent (one failure no longer stops the rest), then fills the missing `matMercSwipe` from the Eviscerate ghost prefab directly. |
 | **Rapid stat changes** (Aetherium Shielding Core, buff wards and anything else that keeps changing a character) | The game redoes a character's full stat calculation on any physics tick that finds its stats marked changed, about 1.25 ms each with this pack. A shield sitting at zero or a stream of ward buffs marked them changed nearly every tick: Goolake ran at 8-13 fps with few enemies, 3.5 s of every 10 s spent here. | `StatUpdateInterval` allows one automatic update per character per 0.1 s. A single change still applies at once; repeats wait at most 0.1 s and none is lost. |
+| **Enemy counts running away** (summons that ignore the game's team limit) | `MonsterLimit` only reaches normal spawns. Anything flagged to ignore the team limit, plus the Void Infestors and Malachite urchins that elites leave on death, passes it. On Goolake the count went from 16 to 319 enemies in 10 game seconds, with 9349 projectiles, and the game stopped advancing. | `HardEnemyCap` refuses new enemy spawns once 80 are alive, those included. Boss characters, scripted boss parts and the skills that can't take a refusal (Engineer turrets, Goobo clones, Nemesis events) still spawn. It only stops new spawns. Host only. |
+| **Run timer freezing after Hallowed Ichor** (Sandswept) | Once anyone picks it up, the item takes over the run timer for the rest of the run and expects a text effect this HUD doesn't have. It threw an error every frame (49,400 in nine minutes) and the timer stopped. | `HallowedIchorTimerFix` runs the game's own timer when the text effect is missing. Every PC. |
 
 The hook guard is generic: any mod whose `On.` hook fails *only* because a game method's signature changed, or
 because the hook type it was built against no longer exists, gets that one hook skipped (logged as a warning)
@@ -66,6 +68,7 @@ Updating from a version before 1.4.43: the first launch moves each saved value t
 |---|---|---|
 | `SpawnCreditMultiplier` | 1 (off) | The stage's regular spawners earn this many times the credits, so waves come sooner (see below) |
 | `MonsterLimit` | 0 (off) | Most enemies alive at once with Multitudes No Price Scale installed (see below) |
+| `HardEnemyCap` | 80 | The most enemies alive at once, counting every enemy team. Unlike `MonsterLimit` it also stops summons that ignore the game's team limit, such as death effects, clones and mods' minions. Boss characters, scripted boss parts, Engineer turrets, Goobo clones and Nemesis events still spawn, and nothing already alive is removed. Projectiles are not capped. 0 = off. Host only |
 | `PrinterSpawnMultiplier` | 1 (off) | Each stage spawn pick is this many times as likely to be a 3D printer. Host only |
 | `ScrapperSpawnMultiplier` | 1 (off) | Same for scrappers. Host only |
 | `DroneSpawnMultiplier` | 1 (off) | Each stage spawn pick is this many times as likely to be a broken drone or turret. Host only |
@@ -121,6 +124,7 @@ Updating from a version before 1.4.43: the first launch moves each saved value t
 | Setting | Default | What it controls |
 |---|---|---|
 | `BubbetsItemsFix` | true | Repairs Bubbets Items 1.8.20 for game 1.5.0, see above. Every PC needs it, as every PC needs the mod. |
+| `HallowedIchorTimerFix` | true | Sandswept: stops Hallowed Ichor throwing an error every frame and freezing the run timer on a HUD without its text effect. Every PC |
 | `TinkersSatchelFixes` | true | Each TinkersSatchel item sets up on its own, and item names and descriptions show as text instead of `TINKERSSATCHEL_..._RENDERED`. Was `TinkersSatchelItemIsolation` and `TinkersSatchelLanguageFix`. Every PC |
 | `LinearDamageFocusCrystalFix` | true | Stops Focus Crystal counting twice with LinearDamage and Bubbets Items. Host only. |
 | `DaggerOfFrenzyGuard` | true | Stops Smite Items' Dagger of Frenzy breaking skills on bodies with no skill locator or primary skill. Every PC. |
@@ -197,6 +201,8 @@ components itself). The **cauldron hum fix** is per PC too (each game plays the 
 (each game builds the survivor; Shaman is network-compatibility flagged, so every player must also have the mod). The REX
 flower, Ancient Scepter flower, freeze/stun, Gasoline, crash-guard, blast chain cap, null dccs pool entry, Inferno cooldown, Sacrifice and ShareSuite Sacrifice credit fixes only need the host.
 The **stat update limit** is per PC: each game updates its own copies of the characters, so only PCs that have it run faster, and players with and without it can mix.
+The **hard enemy cap** only needs the host, because enemies are spawned there.
+The **Hallowed Ichor timer fix** is per PC, because each game runs its own timer.
 
 **Difficulty scaling** must match on every PC: each game computes monster level itself, so friends with a different
 Inferno `Difficulty Scaling` or without `InfernoLevelBoostFix` see enemies at the wrong level on their health bars
@@ -204,6 +210,7 @@ Inferno `Difficulty Scaling` or without `InfernoLevelBoostFix` see enemies at th
 and `Level and Difficulty Boost` (1.25 by default) values.
 
 ## Known limits
+- `HardEnemyCap`: a mod that assumes its limit-ignoring summon always worked may log a NullReference once 80 enemies are alive. The game's own limit refuses spawns the same way, so most code already handles it. A summon that asks again from inside its own failure callback gets through on the fourth ask, because only that ends the recursion, so it can pass the cap by a few.
 
 - **Respawn hook churn fix:** PlayerRespawnSystem's hooks used to be re-added at every run start, so they sat outermost
   around any other mod's per-run hooks on the same methods; kept, they now sit inside hooks added later. No mod on this
@@ -215,6 +222,9 @@ and `Level and Difficulty Boost` (1.25 by default) values.
   states are unregistered in game 1.5.0), and log a FireCannons "The Object you want to instantiate is null" error.
 
 ## What it logs (source `CompatShield`)
+- `Sandswept: Hallowed Ichor no longer stops the run timer on a HUD without its text effect` at the first run start; `Hallowed Ichor: this HUD has no text effect to distort, so the run timer keeps counting normally` the first time it matters; `Hallowed Ichor timer fix: ... not applied` if the mod's code is not the expected shape.
+- `Config: BepInEx's save didn't update the file, so CompatShield wrote it itself (patches on the save: ...)`: when BepInEx leaves the settings file out of date. `Config: couldn't tidy the settings file...` if that fails too. Values apply either way.
+- `Enemy cap: at most 80 enemies alive at once, summons that ignore the team limit included; boss characters and scripted boss parts still spawn` at the first run start; `Enemy cap: N enemies alive in <stage> (cap 80). Most: <body> n, ...` when the count reaches the cap and each time it doubles; `Enemy cap: last stage stopped N spawn(s), most alive at once P (cap 80); stopped: ...; asked for by: ...; let through: ...` when a stage ends, only if the cap mattered (`asked for by` samples one ordinary spawn in 8, so its counts run lower than `stopped`); `...; nothing was stopped, so these came by a route the cap doesn't cover` if the count passed the cap with nothing refused or exempted; `Enemy cap: ... not applied: ...` if the game's code is not the expected shape.
 - `Stat limit: one character's automatic stat update now runs at most once every 0.1 s; a single change still applies at once` at the first run start; `Stat limit: last stage ran N automatic stat updates; physics ticks that waited: W, most waiting: <body> N, ...` when a stage or run ends; `Stat limit: ... not applied: ...` if the game's code is not the expected shape.
 - `Blast chain cap: a blast set off from inside other blasts stops firing once N are running inside each other ...` at the first run start; `Blast chain: stopped N nested blasts (X too deep, Y too late); Z ran, the chain took M ms, and the first one stopped came from <body>` after each chain that lost blasts (at most 200 lines).
 - `Blast guard: one target's error no longer ends a blast ...` at the first run start; `Blast guard: a hit failed and the blast carried on (NullReferenceException: ...). Victim <body>: body ok, inventory null, master ok, shield 4/10, barrier 0, health 50/100. Attacker <body>: body ok, inventory ok, input bank ok. Inflictor <object>. Failed hit N this session. Thrown at: ...` once per kind of failure (at most 30 kinds, and a new throw site still gets a line after that); `Blast guard: N failed hits caught so far` at 10, 100, 1000 and so on.
