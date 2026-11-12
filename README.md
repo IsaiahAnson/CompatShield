@@ -63,6 +63,7 @@ instead of aborting its setup. Every other kind of error passes through untouche
 | `MonsterLimit` (section `[Multitudes]`) | 0 (off) | Most enemies alive at once with Multitudes No Price Scale installed (see below) |
 | `SpawnCreditMultiplier` (section `[Spawns]`) | 1 (off) | The stage's regular spawners earn this many times the credits, so waves come sooner (see below) |
 | `DropChanceMultiplier` (section `[Sacrifice]`) | 1 (off) | Multiplies each kill's Artifact of Sacrifice item drop chance, after RiskyMod/ShareSuite (0.7 = 30% fewer) |
+| `SoundTracer` (section `[Diagnostics]`) | true | Diagnostic: at each run end, logs the loop-type sounds that were started on objects that no longer exist and never got their stop (to name an audio loop that follows you into the lobby), the last sounds before the run ended, and who calls `AkSoundEngine.StopAll`. Turn off once the loop is found |
 
 ### Spawn speed (`SpawnCreditMultiplier`)
 
@@ -170,6 +171,11 @@ and `Level and Difficulty Boost` (1.25 by default) values.
 - `Lunar Cauldron / Cleansing Pool: the idle hum WolfoFixes restores now stops when its pool goes away, instead of following
   you into the lobby`, then at the first stage end with a pool `Lunar Cauldron / Cleansing Pool: stopped its idle hum as the
   pool went away (shown once)`
+- `Sound tracer: watching 8 PostEvent overloads; at each run end it names loop sounds left on objects that are gone`, then at
+  each run end `Sound tracer: run ended; N loop-type sound(s) were started on objects that are now gone and never got a Stop
+  on that object:` followed by one line per sound (`<event> on '<object>' (last started X s before the run ended, Nx)`) and
+  `last sounds around the run end: ...`; at each run start `Sound tracer: run start, N started sound(s) from before this run
+  still on live objects`; and `Sound tracer: AkSoundEngine.StopAll() was called (shown 3x), from: ...`
 - `Shaman: its character-model setup now sets invisibilityCount through game 1.5.0's property, so the Shaman and its Acolytes
   load again` and `Shaman: a summon body named like one of the game's own (AcolyteBody, new in 1.5.0) will be registered as
   Shaman<name> instead ...`, then during its startup `Shaman: registered its 'AcolyteBody' as 'ShamanAcolyteBody' (the game
