@@ -34,6 +34,7 @@ It doesn't edit any mod files. It's one BepInEx patcher DLL, so deleting it undo
 | **Freeze/stun/shock (vanilla)** | `SetStateOnHurt` fills its duration-modifier list only in `Start()`, but it can be hit before that runs (an enemy spawned earlier in the same laggy frame, e.g. a Multitudes copy). A freeze, stun or shock on it then crashes `GetModifiedDuration` inside the damage function, so the rest of the hit is lost: damage numbers, on-hit effects and, on a killing blow, the gold, XP and on-kill procs. | Fills the list early the same way `Start()` does; if that isn't possible, uses the unmodified duration. |
 | **Artifact of Sacrifice drop rate** | RiskyMod's `Sacrifice - No Drop Chance Scaling` makes every eligible kill a flat 8% (with Classic Items Returns installed) and overrides ShareSuite's divide-by-player-count, so with Multitudes copies and faster spawns, drops pile up. | Optional `[Sacrifice] DropChanceMultiplier` scales the final chance right before the game's roll, after RiskyMod and ShareSuite (0.7 = 5.6% per kill). |
 | **Artifact of Sacrifice interactables** | The artifact removes chests, shops, Shrines of Chance and similar from every stage, with no way to keep one kind. | Optional `[Sacrifice] KeepInteractables` names the spawn cards that stay on (empty by default, so nothing changes), and the log lists every card Sacrifice blocks so the names are there to copy. `KeptInteractableWeight` stops a few kept cards taking over a category whose other cards are gone. Host only. |
+| **ShareSuite 2.12.0 + Artifact of Sacrifice (interactable credits)** | ShareSuite replaces the interactable credits of each stage and halves them when Sacrifice is on. That made up for older game code that halved them before ShareSuite ran. Game 1.5.0 halves them later, so both apply and a Sacrifice stage spends a quarter of its credits (220 announced, 55 spent on stage 1 solo). | `[Fixes] ShareSuiteSacrificeCreditFix` (on by default) cancels the ShareSuite halving, so only the game halves them and Sacrifice stages get twice the interactables, drones included. Stages that opt out of Sacrifice scaling get their full credits. Host only. |
 | **PrintToInventory 1.3.1 + ShareSuite** | PrintToInventory turns itself off when ShareSuite is installed ("ShareSuite detected! PrintToInventory will be disabled"), because both would hand out printer and cauldron items. So scrappers drop scrap on the ground. | Lets PrintToInventory load, but keeps only its scrapper part: scrap goes straight into the scrapping player's inventory (host-side; multiplayer only by its own default). Printers, cauldrons, cleansing pools and the Wandering Chef stay as they are, whatever its config says. ShareSuite never hooks scrappers, so nothing gets handed out twice. Scrap given this way isn't shared by ShareSuite. |
 | **PaladinMod 2.1.0** | `Asset.GatherMaterials` crashes because Mercenary's `EvisProjectile` no longer has a `ProjectileController`, which aborts Paladin's whole setup, so the survivor never gets added. | Makes each material lookup in that method independent (one failure no longer stops the rest), then fills the missing `matMercSwipe` from the Eviscerate ghost prefab directly. |
 
@@ -62,6 +63,7 @@ instead of aborting its setup. Every other kind of error passes through untouche
 | `LunarPoolLoopStopFix` | true | The Lunar Cauldron / Cleansing Pool hum WolfoFixes restores stops when its pool goes away instead of following you into the lobby (every PC) |
 | `ShamanModelFix` | true | Shaman 1.2.0's character-model setup works on game 1.5.0 (its `invisibilityCount` field became a property) and its Acolyte body is registered as `ShamanAcolyteBody` so it can't collide with the game's new Acolyte enemy (which stalled loading at 99%); the Shaman and its Acolytes load (every PC; every player needs the mod) |
 | `SwiftImpactFix` | true | EnemiesReturns' Swift no longer breaks the Beetle Guard impact effect for the session (error floods, run-end crash) |
+| `ShareSuiteSacrificeCreditFix` | true | Sacrifice stages are halved once (by the game), not twice (by the game and ShareSuite), so they get twice the interactables, drones included. Off = both halve. Host only |
 | `FlowerRootFix` | true | An expiring REX flower unroots every enemy it caught, even when one of them is already gone |
 | `ScepterFlowerOwnerFix` | true | REX flowers keep working after their owner's body is gone (StandaloneAncientScepter) |
 | `StunDurationFix` | true | A freeze/stun/shock on an enemy that has only just spawned no longer crashes the hit |
@@ -137,7 +139,7 @@ needs every PC for the same reason: each game adds and removes Inferno's hooks i
 crash when a new run starts, and so does the **respawn hook churn fix** (each game builds and destroys PlayerRespawnSystem's
 components itself). The **cauldron hum fix** is per PC too (each game plays the loop itself), and so is the **Shaman fix**
 (each game builds the survivor; Shaman is network-compatibility flagged, so every player must also have the mod). The REX
-flower, Ancient Scepter flower, freeze/stun, Gasoline, crash-guard, blast chain cap, Inferno cooldown and Sacrifice fixes only need the host.
+flower, Ancient Scepter flower, freeze/stun, Gasoline, crash-guard, blast chain cap, Inferno cooldown, Sacrifice and ShareSuite Sacrifice credit fixes only need the host.
 
 **Difficulty scaling** must match on every PC: each game computes monster level itself, so friends with a different
 Inferno `Difficulty Scaling` or without `InfernoLevelBoostFix` see enemies at the wrong level on their health bars
@@ -162,7 +164,7 @@ and `Level and Difficulty Boost` (1.25 by default) values.
 - `Lag: <scene> (stage N t=m:ss) | 38 fps avg, worst frame 212 ms, 3 frame(s) over 100 ms | monsters 58, bodies 73, projectiles 140 | RecalculateStats 1240x 310 ms, TakeDamage 2100x 95 ms, OnHitEnemy 2100x 180 ms | GC 4 collection(s), heap 1200 MB` (Info when laggy, Debug otherwise), `Lag: 312 ms frame in <scene> (...)`, and `Lag summary: ...` at run end.
 
 - `Outdated-hook guard installed`
-- `Enabled fixes: OutdatedHookGuard=..., PaladinMaterialsFix=..., TinkersSatchelItemIsolation=..., TinkersSatchelLanguageFix=..., MovedAssetRedirect=..., AudioOverlapStopFix=..., ZetAspectsDropFix=..., GasolineChainFix=..., BrokenHandlerGuard=..., StunDurationFix=..., PrintToInventoryScrappers=..., InfernoMithrixFix=..., InfernoLevelBoostFix=..., InfernoCooldownScalingFix=..., InfernoHookChurnFix=..., RespawnHookChurnFix=..., LunarPoolLoopStopFix=..., ShamanModelFix=..., FlowerRootFix=..., ScepterFlowerOwnerFix=..., SwiftImpactFix=..., MonsterLimit=..., SpawnCreditMultiplier=..., SacrificeDropChanceMultiplier=..., KeepInteractables=[...], KeptInteractableWeight=...`
+- `Enabled fixes: OutdatedHookGuard=..., PaladinMaterialsFix=..., TinkersSatchelItemIsolation=..., TinkersSatchelLanguageFix=..., MovedAssetRedirect=..., AudioOverlapStopFix=..., ZetAspectsDropFix=..., GasolineChainFix=..., BrokenHandlerGuard=..., StunDurationFix=..., PrintToInventoryScrappers=..., InfernoMithrixFix=..., InfernoLevelBoostFix=..., InfernoCooldownScalingFix=..., InfernoHookChurnFix=..., RespawnHookChurnFix=..., LunarPoolLoopStopFix=..., ShamanModelFix=..., FlowerRootFix=..., ScepterFlowerOwnerFix=..., SwiftImpactFix=..., ShareSuiteSacrificeCreditFix=..., MonsterLimit=..., SpawnCreditMultiplier=..., SacrificeDropChanceMultiplier=..., KeepInteractables=[...], KeptInteractableWeight=...`
 - `Assets: moved game asset paths now load from their new location`, then `Assets: indexed N catalog keys...` on the
   first game-asset load, and up to 25 `Assets: '<old path>' moved to '<new path>'`
 - `ZetAspects: elite kills without an equipment slot no longer crash its drop hook`, or the warning
@@ -218,6 +220,9 @@ and `Level and Difficulty Boost` (1.25 by default) values.
 - `Swift: its impact-effect load keeps its handle, so the Beetle Guard impact effect can't lose its prefab mid-session` and
   `Swift: a corpse counts as landed before its impact effect spawns, so a broken effect can't throw every tick`, or a
   `Swift impact fix: ...` warning if EnemiesReturns changed
+- `ShareSuite: its extra Sacrifice halving of stage interactable credits is off, so only the game halves them` at startup, then
+  `ShareSuite: cancelled its extra Sacrifice credit halving on this stage (logged once per launch)` on the first Sacrifice stage, or a
+  `ShareSuite Sacrifice credit fix: ... not applied` warning if ShareSuite changed
 - `REX flower: an expiring flower now unroots every enemy it caught, even when one of them is already gone`, then
   `REX flower: skipped unrooting an enemy that was already gone (shown once)`
 - `Ancient Scepter: REX flowers keep working after their owner's body is gone`, then
