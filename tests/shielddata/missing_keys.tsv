@@ -1,0 +1,927 @@
+RoR2/Base/Beetle/BeetleAcidImpact.prefab	RoR2/Base/BeetleQueen/BeetleAcidImpact.prefab
+RoR2/Base/Beetle/BeetleGuardBody.png	RoR2/Base/BeetleGuard/BeetleGuardBody.png
+RoR2/Base/Beetle/BeetleGuardBody.prefab	RoR2/Base/BeetleGuard/BeetleGuardBody.prefab
+RoR2/Base/Beetle/BeetleGuardBodyDefenseUp.asset	RoR2/Base/BeetleGuard/BeetleGuardBodyDefenseUp.asset
+RoR2/Base/Beetle/BeetleGuardBodyGroundSlam.asset	RoR2/Base/BeetleGuard/BeetleGuardBodyGroundSlam.asset
+RoR2/Base/Beetle/BeetleGuardBodyPrimaryFamily.asset	RoR2/Base/BeetleGuard/BeetleGuardBodyPrimaryFamily.asset
+RoR2/Base/Beetle/BeetleGuardBodySecondaryFamily.asset	RoR2/Base/BeetleGuard/BeetleGuardBodySecondaryFamily.asset
+RoR2/Base/Beetle/BeetleGuardBodySunder.asset	RoR2/Base/BeetleGuard/BeetleGuardBodySunder.asset
+RoR2/Base/Beetle/BeetleGuardBodyUtilityFamily.asset	RoR2/Base/BeetleGuard/BeetleGuardBodyUtilityFamily.asset
+RoR2/Base/Beetle/BeetleGuardDeathImpact.prefab	RoR2/Base/BeetleGuard/BeetleGuardDeathImpact.prefab
+RoR2/Base/Beetle/BeetleGuardDefenseUp.prefab	RoR2/Base/BeetleGuard/BeetleGuardDefenseUp.prefab
+RoR2/Base/Beetle/BeetleGuardGroundSlam.prefab	RoR2/Base/BeetleGuard/BeetleGuardGroundSlam.prefab
+RoR2/Base/Beetle/BeetleGuardMaster.prefab	RoR2/Base/BeetleGuard/BeetleGuardMaster.prefab
+RoR2/Base/Beetle/BeetleGuardStep.prefab	RoR2/Base/BeetleGuard/BeetleGuardStep.prefab
+RoR2/Base/Beetle/BeetleGuardSunderPop.prefab	RoR2/Base/BeetleGuard/BeetleGuardSunderPop.prefab
+RoR2/Base/Beetle/BeetleImpact.prefab	RoR2/Base/BeetleGuard/BeetleImpact.prefab
+RoR2/Base/Beetle/BeetleQueen2Body.png	RoR2/Base/BeetleQueen/BeetleQueen2Body.png
+RoR2/Base/Beetle/BeetleQueen2Body.prefab	RoR2/Base/BeetleQueen/BeetleQueen2Body.prefab
+RoR2/Base/Beetle/BeetleQueen2BodyPrimaryFamily.asset	RoR2/Base/BeetleQueen/BeetleQueen2BodyPrimaryFamily.asset
+RoR2/Base/Beetle/BeetleQueen2BodySecondaryFamily.asset	RoR2/Base/BeetleQueen/BeetleQueen2BodySecondaryFamily.asset
+RoR2/Base/Beetle/BeetleQueen2BodySpawnWards.asset	RoR2/Base/BeetleQueen/BeetleQueen2BodySpawnWards.asset
+RoR2/Base/Beetle/BeetleQueen2BodySpecialFamily.asset	RoR2/Base/BeetleQueen/BeetleQueen2BodySpecialFamily.asset
+RoR2/Base/Beetle/BeetleQueen2BodySpit.asset	RoR2/Base/BeetleQueen/BeetleQueen2BodySpit.asset
+RoR2/Base/Beetle/BeetleQueen2BodySummonEggs.asset	RoR2/Base/BeetleQueen/BeetleQueen2BodySummonEggs.asset
+RoR2/Base/Beetle/BeetleQueenAcid.prefab	RoR2/Base/BeetleQueen/BeetleQueenAcid.prefab
+RoR2/Base/Beetle/BeetleQueenBurrow.prefab	RoR2/Base/BeetleQueen/BeetleQueenBurrow.prefab
+RoR2/Base/Beetle/BeetleQueenDeathImpact.prefab	RoR2/Base/BeetleQueen/BeetleQueenDeathImpact.prefab
+RoR2/Base/Beetle/BeetleQueenMaster.prefab	RoR2/Base/BeetleQueen/BeetleQueenMaster.prefab
+RoR2/Base/Beetle/BeetleQueenScream.prefab	RoR2/Base/BeetleQueen/BeetleQueenScream.prefab
+RoR2/Base/Beetle/BeetleQueenScreamDeath.prefab	RoR2/Base/BeetleQueen/BeetleQueenScreamDeath.prefab
+RoR2/Base/Beetle/BeetleQueenSpit.prefab	RoR2/Base/BeetleQueen/BeetleQueenSpit.prefab
+RoR2/Base/Beetle/BeetleQueenSpitGhost.prefab	RoR2/Base/BeetleQueen/BeetleQueenSpitGhost.prefab
+RoR2/Base/Beetle/BeetleSlamCharge.prefab	RoR2/Base/BeetleGuard/BeetleSlamCharge.prefab
+RoR2/Base/Beetle/BeetleSpitExplosion.prefab	RoR2/Base/BeetleQueen/BeetleSpitExplosion.prefab
+RoR2/Base/Beetle/BeetleWard.prefab	RoR2/Base/BeetleGroup/BeetleWard/BeetleWard.prefab
+RoR2/Base/Beetle/BeetleWardDeathEffect.prefab	RoR2/Base/BeetleGroup/BeetleWard/BeetleWardDeathEffect.prefab
+RoR2/Base/Beetle/BeetleWardOrbEffect.prefab	RoR2/Base/BeetleGroup/BeetleWard/BeetleWardOrbEffect.prefab
+RoR2/Base/Beetle/ChargeBeetleSpit.prefab	RoR2/Base/BeetleQueen/ChargeBeetleSpit.prefab
+RoR2/Base/Beetle/EntityStates.BeetleGuardMonster.DefenseUp.asset	RoR2/Base/BeetleGuard/EntityStates.BeetleGuardMonster.DefenseUp.asset
+RoR2/Base/Beetle/EntityStates.BeetleGuardMonster.FireSunder.asset	RoR2/Base/BeetleGuard/EntityStates.BeetleGuardMonster.FireSunder.asset
+RoR2/Base/Beetle/EntityStates.BeetleGuardMonster.GroundSlam.asset	RoR2/Base/BeetleGuard/EntityStates.BeetleGuardMonster.GroundSlam.asset
+RoR2/Base/Beetle/EntityStates.BeetleGuardMonster.SpawnState.asset	RoR2/Base/BeetleGuard/EntityStates.BeetleGuardMonster.SpawnState.asset
+RoR2/Base/Beetle/EntityStates.BeetleQueenMonster.BeetleWardDeath.asset	RoR2/Base/BeetleGroup/BeetleWard/EntityStates.BeetleQueenMonster.BeetleWardDeath.asset
+RoR2/Base/Beetle/EntityStates.BeetleQueenMonster.ChargeSpit.asset	RoR2/Base/BeetleQueen/EntityStates.BeetleQueenMonster.ChargeSpit.asset
+RoR2/Base/Beetle/EntityStates.BeetleQueenMonster.FireSpit.asset	RoR2/Base/BeetleQueen/EntityStates.BeetleQueenMonster.FireSpit.asset
+RoR2/Base/Beetle/EntityStates.BeetleQueenMonster.SpawnState.asset	RoR2/Base/BeetleQueen/EntityStates.BeetleQueenMonster.SpawnState.asset
+RoR2/Base/Beetle/EntityStates.BeetleQueenMonster.SpawnWards.asset	RoR2/Base/BeetleQueen/EntityStates.BeetleQueenMonster.SpawnWards.asset
+RoR2/Base/Beetle/EntityStates.BeetleQueenMonster.SummonEggs.asset	RoR2/Base/BeetleQueen/EntityStates.BeetleQueenMonster.SummonEggs.asset
+RoR2/Base/Beetle/Logs.BeetleGuardBody.0.asset	RoR2/Base/BeetleGuard/Logs.BeetleGuardBody.0.asset
+RoR2/Base/Beetle/Logs.BeetleQueenBody.0.asset	RoR2/Base/BeetleQueen/Logs.BeetleQueenBody.0.asset
+RoR2/Base/Beetle/MuzzleFlashBeetleSpit.prefab	RoR2/Base/BeetleQueen/MuzzleFlashBeetleSpit.prefab
+RoR2/Base/Beetle/Sunder.prefab	RoR2/Base/BeetleGuard/Sunder.prefab
+RoR2/Base/Beetle/SunderGhost.prefab	RoR2/Base/BeetleGuard/SunderGhost.prefab
+RoR2/Base/Beetle/animBeetleGuard.controller	RoR2/Base/BeetleGuard/animBeetleGuard.controller
+RoR2/Base/Beetle/animBeetleQueen.controller	RoR2/Base/BeetleQueen/animBeetleQueen.controller
+RoR2/Base/Beetle/animBeetleQueen3.controller	RoR2/Base/BeetleQueen/animBeetleQueen3.controller
+RoR2/Base/Beetle/animBeetleWard.controller	RoR2/Base/BeetleGroup/BeetleWard/animBeetleWard.controller
+RoR2/Base/Beetle/bdBeetleJuice.asset	RoR2/Base/BeetleGroup/bdBeetleJuice.asset
+RoR2/Base/Beetle/cscBeetleGuard.asset	RoR2/Base/BeetleGuard/cscBeetleGuard.asset
+RoR2/Base/Beetle/cscBeetleGuardSulfur.asset	RoR2/Base/BeetleGuard/cscBeetleGuardSulfur.asset
+RoR2/Base/Beetle/cscBeetleQueen.asset	RoR2/Base/BeetleQueen/cscBeetleQueen.asset
+RoR2/Base/Beetle/cscBeetleQueenSulfur.asset	RoR2/Base/BeetleQueen/cscBeetleQueenSulfur.asset
+RoR2/Base/Beetle/dtBossBeetleQueen.asset	RoR2/Base/BeetleQueen/dtBossBeetleQueen.asset
+RoR2/Base/Beetle/idrsBeetleGuard.asset	RoR2/Base/BeetleGuard/idrsBeetleGuard.asset
+RoR2/Base/Beetle/idrsBeetleQueen.asset	RoR2/Base/BeetleQueen/idrsBeetleQueen.asset
+RoR2/Base/Beetle/matAuraPulse.mat	RoR2/Base/BeetleGuard/matAuraPulse.mat
+RoR2/Base/Beetle/matBeetleBreath.mat	
+RoR2/Base/Beetle/matBeetleBugs1.mat	RoR2/Base/BeetleQueen/matBeetleBugs1.mat
+RoR2/Base/Beetle/matBeetleBugs2.mat	RoR2/Base/BeetleQueen/matBeetleBugs2.mat
+RoR2/Base/Beetle/matBeetleGuard.mat	RoR2/Base/BeetleGuard/matBeetleGuard.mat
+RoR2/Base/Beetle/matBeetleGuardCharge.mat	RoR2/Base/BeetleGuard/matBeetleGuardCharge.mat
+RoR2/Base/Beetle/matBeetleGuardSlamDecal.mat	RoR2/Base/BeetleGroup/matBeetleGuardSlamDecal.mat
+RoR2/Base/Beetle/matBeetleGuardTrail.mat	RoR2/Base/BeetleGuard/matBeetleGuardTrail.mat
+RoR2/Base/Beetle/matBeetleImpact.mat	RoR2/Base/BeetleGroup/matBeetleImpact.mat
+RoR2/Base/Beetle/matBeetleJuice.mat	RoR2/Base/BeetleGroup/BeetleWard/matBeetleJuice.mat
+RoR2/Base/Beetle/matBeetleQueen 1.mat	RoR2/Base/BeetleQueen/matBeetleQueen 1.mat
+RoR2/Base/Beetle/matBeetleQueen.mat	
+RoR2/Base/Beetle/matBeetleQueenAcidDecal.mat	RoR2/Base/BeetleQueen/matBeetleQueenAcidDecal.mat
+RoR2/Base/Beetle/matBeetleQueenAcidFizz.mat	RoR2/Base/BeetleQueen/matBeetleQueenAcidFizz.mat
+RoR2/Base/Beetle/matBeetleQueenSphere.mat	RoR2/Base/BeetleGroup/BeetleWard/matBeetleQueenSphere.mat
+RoR2/Base/Beetle/matBeetleSpit.mat	RoR2/Base/BeetleQueen/matBeetleSpit.mat
+RoR2/Base/Beetle/matBeetleSpitLarge.mat	RoR2/Base/BeetleQueen/matBeetleSpitLarge.mat
+RoR2/Base/Beetle/matBeetleSpitShockwave.mat	RoR2/Base/BeetleQueen/matBeetleSpitShockwave.mat
+RoR2/Base/Beetle/matBeetleSpitTrail1.mat	RoR2/Base/BeetleQueen/matBeetleSpitTrail1.mat
+RoR2/Base/Beetle/matBeetleSpitTrail2.mat	RoR2/Base/BeetleQueen/matBeetleSpitTrail2.mat
+RoR2/Base/Beetle/matDefenseUpShield.mat	RoR2/Base/BeetleGuard/matDefenseUpShield.mat
+RoR2/Base/Beetle/matGroundSlamIndicator.mat	RoR2/Base/BeetleGroup/matGroundSlamIndicator.mat
+RoR2/Base/Beetle/matSulfurBeetleGuard.mat	RoR2/Base/BeetleGuard/matSulfurBeetleGuard.mat
+RoR2/Base/Beetle/matSulfurBeetleQueen.mat	RoR2/Base/BeetleQueen/matSulfurBeetleQueen.mat
+RoR2/Base/Beetle/mdlBeetleGuard.fbx	RoR2/Base/BeetleGuard/mdlBeetleGuard.fbx
+RoR2/Base/Beetle/mdlBeetleGuardRock.fbx	RoR2/Base/BeetleGroup/mdlBeetleGuardRock.fbx
+RoR2/Base/Beetle/mdlBeetleQueen.fbx	
+RoR2/Base/Beetle/mdlBeetleWard.fbx	RoR2/Base/BeetleGroup/BeetleWard/mdlBeetleWard.fbx
+RoR2/Base/Beetle/mskBeetleQueenNoIK.mask	
+RoR2/Base/Beetle/sdBeetleGuard.asset	RoR2/Base/BeetleGuard/sdBeetleGuard.asset
+RoR2/Base/Beetle/sdBeetleQueen.asset	RoR2/Base/BeetleQueen/sdBeetleQueen.asset
+RoR2/Base/Beetle/skinBeetleGuardDefault.asset	RoR2/Base/BeetleGuard/skinBeetleGuardDefault.asset
+RoR2/Base/Beetle/skinBeetleGuardSulfur.asset	RoR2/Base/BeetleGuard/skinBeetleGuardSulfur.asset
+RoR2/Base/Beetle/skinBeetleQueen2Default.asset	RoR2/Base/BeetleQueen/skinBeetleQueen2Default.asset
+RoR2/Base/Beetle/skinBeetleQueen2Sulfur.asset	RoR2/Base/BeetleQueen/skinBeetleQueen2Sulfur.asset
+RoR2/Base/Beetle/skinBeetleWardDefault.asset	RoR2/Base/BeetleGroup/BeetleWard/skinBeetleWardDefault.asset
+RoR2/Base/Beetle/skinBeetleWardSulfur.asset	RoR2/Base/BeetleGroup/BeetleWard/skinBeetleWardSulfur.asset
+RoR2/Base/Beetle/texAcidDecalDiffuse.png	RoR2/Base/BeetleQueen/texAcidDecalDiffuse.png
+RoR2/Base/Beetle/texAcidDecalMask.png	RoR2/Base/BeetleGroup/texAcidDecalMask.png
+RoR2/Base/Beetle/texAcidDecalNormal.png	RoR2/Base/BeetleGroup/texAcidDecalNormal.png
+RoR2/Base/Beetle/texBeetleDiffuse2.png	RoR2/Base/BeetleGroup/texBeetleDiffuse2.png
+RoR2/Base/Beetle/texBeetleGrubRangeIndicator.png	RoR2/Base/BeetleGroup/texBeetleGrubRangeIndicator.png
+RoR2/Base/Beetle/texBeetleGuardAllyDiffuse.png	RoR2/Base/BeetleGroup/texBeetleGuardAllyDiffuse.png
+RoR2/Base/Beetle/texBeetleGuardAllyFresnelMask.png	RoR2/Base/BeetleGroup/texBeetleGuardAllyFresnelMask.png
+RoR2/Base/Beetle/texBeetleGuardDiffuse.png	RoR2/Base/BeetleGroup/texBeetleGuardDiffuse.png
+RoR2/Base/Beetle/texBeetleGuardEmission.png	RoR2/Base/BeetleGroup/texBeetleGuardEmission.png
+RoR2/Base/Beetle/texBeetleGuardNormal.png	RoR2/Base/BeetleGroup/texBeetleGuardNormal.png
+RoR2/Base/Beetle/texBeetleGuardShellMask.png	RoR2/Base/BeetleGroup/texBeetleGuardShellMask.png
+RoR2/Base/Beetle/texBeetleNormal.png	RoR2/Base/BeetleGroup/texBeetleNormal.png
+RoR2/Base/Beetle/texBeetleQueenDiffuse.png	RoR2/Base/BeetleGroup/texBeetleQueenDiffuse.png
+RoR2/Base/Beetle/texBeetleQueenEyeMask.png	RoR2/Base/BeetleGroup/texBeetleQueenEyeMask.png
+RoR2/Base/Beetle/texBeetleQueenNormal.png	RoR2/Base/BeetleGroup/texBeetleQueenNormal.png
+RoR2/Base/Beetle/texBeetleQueenSplatmap.png	RoR2/Base/BeetleGroup/texBeetleQueenSplatmap.png
+RoR2/Base/Beetle/texBeetleStrike.png	RoR2/Base/BeetleGroup/texBeetleStrike.png
+RoR2/Base/Beetle/texBuffBeetleJuiceIcon.tif	RoR2/Base/BeetleGroup/texBuffBeetleJuiceIcon.tif
+RoR2/Base/Beetle/texBuggyMask.png	RoR2/Base/BeetleQueen/texBuggyMask.png
+RoR2/Base/Beetle/texSulfurBeetleGuardDiffuse.png	RoR2/Base/BeetleGuard/texSulfurBeetleGuardDiffuse.png
+RoR2/Base/Beetle/texSulfurBeetleGuardFresnelMask.png	RoR2/Base/BeetleGuard/texSulfurBeetleGuardFresnelMask.png
+RoR2/Base/Beetle/texSulfurBeetleQueenDiffuse.png	RoR2/Base/BeetleQueen/texSulfurBeetleQueenDiffuse.png
+RoR2/Base/Beetle/texSulfurBeetleQueenFresnelMask.png	RoR2/Base/BeetleQueen/texSulfurBeetleQueenFresnelMask.png
+RoR2/Base/Common/CliffHeight.png	RoR2/Base/Common/TiledTextures/CliffHeight.png
+RoR2/Base/Common/ColorRamps/texRampCompositeLight.psd	RoR2/Base/Common/GlobalTextures/texRampCompositeLight.psd
+RoR2/Base/Common/ColorRamps/texRampElites.psd	RoR2/Base/Common/GlobalTextures/texRampElites.psd
+RoR2/Base/Common/Fonts/Bombardier/tmpbombdropshadow.asset	RoR2/Base/Common/Fonts/Bombardier/tmpBombDropshadow.asset
+RoR2/Base/Common/Fonts/Noto/NotoSans-Regular SDF(Cyrillic, 0400-04FF).asset	
+RoR2/Base/Common/Fonts/Noto/NotoSansCJKsc-Regular SDF (CJK 4E00-5E56).asset	
+RoR2/Base/Common/Fonts/Noto/NotoSansCJKsc-Regular SDF (CJK 5E56-6EAC).asset	
+RoR2/Base/Common/Fonts/Noto/NotoSansCJKsc-Regular SDF (CJK 6EAC-7F02).asset	
+RoR2/Base/Common/Fonts/Noto/NotoSansCJKsc-Regular SDF (CJK 7F02-8F58).asset	
+RoR2/Base/Common/Fonts/Noto/NotoSansCJKsc-Regular SDF (CJK 8F58-9FAF).asset	
+RoR2/Base/Common/Fonts/Noto/NotoSansCJKsc-Regular SDF (Japanese ROOT 3040-309f,3000-303f,30a0-30ff,ff00-ffef).asset	
+RoR2/Base/Common/Fonts/Noto/NotoSansCJKsc-Regular SDF (Korean).asset	
+RoR2/Base/Common/PerlinNoise.png	RoR2/Base/Common/TiledTextures/PerlinNoise.png
+RoR2/Base/Common/PerlinNoiseAlpha.png	RoR2/Base/Common/TiledTextures/PerlinNoiseAlpha.png
+RoR2/Base/Common/VFX/ExpHit.prefab	RoR2/Base/Common/VFX/ExpOrb/ExpHit.prefab
+RoR2/Base/Common/VFX/ExpOrb.prefab	RoR2/Base/Common/VFX/ExpOrb/ExpOrb.prefab
+RoR2/Base/Common/VFX/matChestLightbeam.mat	RoR2/Base/Common/VFX/ExpOrb/matChestLightbeam.mat
+RoR2/Base/Common/VFX/matExpTrail.mat	RoR2/Base/Common/VFX/ExpOrb/matExpTrail.mat
+RoR2/Base/Common/VFX/texAlphaGradient1.png	RoR2/Base/Common/VFX/ParticleMasks/texAlphaGradient1.png
+RoR2/Base/Common/VFX/texAlphaGradient2.png	RoR2/Base/Common/VFX/ParticleMasks/texAlphaGradient2.png
+RoR2/Base/Common/VFX/texAlphaGradient2Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texAlphaGradient2Mask.png
+RoR2/Base/Common/VFX/texAlphaGradient3.png	RoR2/Base/Common/VFX/ParticleMasks/texAlphaGradient3.png
+RoR2/Base/Common/VFX/texAlphaGradient3Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texAlphaGradient3Mask.png
+RoR2/Base/Common/VFX/texAlphaGradient4Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texAlphaGradient4Mask.png
+RoR2/Base/Common/VFX/texAlphaGradient5Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texAlphaGradient5Mask.png
+RoR2/Base/Common/VFX/texAlphaGradient6Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texAlphaGradient6Mask.png
+RoR2/Base/Common/VFX/texBanditExplosionMask.png	RoR2/Base/Common/VFX/ParticleMasks/texBanditExplosionMask.png
+RoR2/Base/Common/VFX/texBasicMask.png	RoR2/Base/Common/VFX/ParticleMasks/texBasicMask.png
+RoR2/Base/Common/VFX/texBehemothTileMask.png	RoR2/Base/Common/VFX/ParticleMasks/texBehemothTileMask.png
+RoR2/Base/Common/VFX/texBehemothTileNormal.png	RoR2/Base/Common/VFX/ParticleMasks/texBehemothTileNormal.png
+RoR2/Base/Common/VFX/texBlackHoleMask.png	RoR2/Base/Common/VFX/ParticleMasks/texBlackHoleMask.png
+RoR2/Base/Common/VFX/texBlackRadialGradient256.png	RoR2/Base/Common/VFX/ParticleMasks/texBlackRadialGradient256.png
+RoR2/Base/Common/VFX/texCloud1.tga	RoR2/Base/Common/VFX/ParticleMasks/texCloud1.tga
+RoR2/Base/Common/VFX/texCloud2.tga	RoR2/Base/Common/VFX/ParticleMasks/texCloud2.tga
+RoR2/Base/Common/VFX/texCrackedGroundImpactMask.png	RoR2/Base/Common/VFX/ParticleMasks/texCrackedGroundImpactMask.png
+RoR2/Base/Common/VFX/texCrackedGroundImpactNormalMask.png	RoR2/Base/Common/VFX/ParticleMasks/texCrackedGroundImpactNormalMask.png
+RoR2/Base/Common/VFX/texDebrisRain1Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texDebrisRain1Mask.png
+RoR2/Base/Common/VFX/texDonutMask.png	RoR2/Base/Common/VFX/ParticleMasks/texDonutMask.png
+RoR2/Base/Common/VFX/texEngiTrail.png	RoR2/Base/Common/VFX/ParticleMasks/texEngiTrail.png
+RoR2/Base/Common/VFX/texExplosionEmptyMask.png	RoR2/Base/Common/VFX/ParticleMasks/texExplosionEmptyMask.png
+RoR2/Base/Common/VFX/texFeatherMask.png	RoR2/Base/Common/VFX/ParticleMasks/texFeatherMask.png
+RoR2/Base/Common/VFX/texGalaxy1Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texGalaxy1Mask.png
+RoR2/Base/Common/VFX/texGenericStarburstMask.png	RoR2/Base/Common/VFX/ParticleMasks/texGenericStarburstMask.png
+RoR2/Base/Common/VFX/texGenericStarburstMaskSkewed.png	RoR2/Base/Common/VFX/ParticleMasks/texGenericStarburstMaskSkewed.png
+RoR2/Base/Common/VFX/texGlowPaintMask.png	RoR2/Base/Common/VFX/ParticleMasks/texGlowPaintMask.png
+RoR2/Base/Common/VFX/texGlowSkullMask.png	RoR2/Base/Common/VFX/ParticleMasks/texGlowSkullMask.png
+RoR2/Base/Common/VFX/texGlowSoftCenterMask.png	RoR2/Base/Common/VFX/ParticleMasks/texGlowSoftCenterMask.png
+RoR2/Base/Common/VFX/texGradientRoom.png	RoR2/Base/Common/VFX/ParticleMasks/texGradientRoom.png
+RoR2/Base/Common/VFX/texHealingCrossMask.png	RoR2/Base/Common/VFX/ParticleMasks/texHealingCrossMask.png
+RoR2/Base/Common/VFX/texHorizontalGradient1.png	RoR2/Base/Common/VFX/ParticleMasks/texHorizontalGradient1.png
+RoR2/Base/Common/VFX/texHorizontalGradient2.png	RoR2/Base/Common/VFX/ParticleMasks/texHorizontalGradient2.png
+RoR2/Base/Common/VFX/texLensFlareMask1.png	RoR2/Base/Common/VFX/ParticleMasks/texLensFlareMask1.png
+RoR2/Base/Common/VFX/texLensFlareMask2.png	RoR2/Base/Common/VFX/ParticleMasks/texLensFlareMask2.png
+RoR2/Base/Common/VFX/texLightPillar1Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texLightPillar1Mask.png
+RoR2/Base/Common/VFX/texLightning1Mask.tif	RoR2/Base/Common/VFX/ParticleMasks/texLightning1Mask.tif
+RoR2/Base/Common/VFX/texLightning2Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texLightning2Mask.png
+RoR2/Base/Common/VFX/texLightning3Mask.tif	RoR2/Base/Common/VFX/ParticleMasks/texLightning3Mask.tif
+RoR2/Base/Common/VFX/texMageBoltMask.png	RoR2/Base/Common/VFX/ParticleMasks/texMageBoltMask.png
+RoR2/Base/Common/VFX/texMotionTrail1Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texMotionTrail1Mask.png
+RoR2/Base/Common/VFX/texMuzzleflash1Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texMuzzleflash1Mask.png
+RoR2/Base/Common/VFX/texNormalBlank.png	RoR2/Base/Common/VFX/ParticleMasks/texNormalBlank.png
+RoR2/Base/Common/VFX/texParticleDust1Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texParticleDust1Mask.png
+RoR2/Base/Common/VFX/texParticleDust2Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texParticleDust2Mask.png
+RoR2/Base/Common/VFX/texParticleDust3Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texParticleDust3Mask.png
+RoR2/Base/Common/VFX/texParticleDust4Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texParticleDust4Mask.png
+RoR2/Base/Common/VFX/texRocketFlare.png	RoR2/Base/Common/VFX/ParticleMasks/texRocketFlare.png
+RoR2/Base/Common/VFX/texShard01Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texShard01Mask.png
+RoR2/Base/Common/VFX/texShard02Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texShard02Mask.png
+RoR2/Base/Common/VFX/texShard03Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texShard03Mask.png
+RoR2/Base/Common/VFX/texShockwaveMask.psd	RoR2/Base/Common/VFX/ParticleMasks/texShockwaveMask.psd
+RoR2/Base/Common/VFX/texShockwaveRing1Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texShockwaveRing1Mask.png
+RoR2/Base/Common/VFX/texShockwaveRing1MaskCentered.png	RoR2/Base/Common/VFX/ParticleMasks/texShockwaveRing1MaskCentered.png
+RoR2/Base/Common/VFX/texShockwaveRing2Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texShockwaveRing2Mask.png
+RoR2/Base/Common/VFX/texShockwaveRing3Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texShockwaveRing3Mask.png
+RoR2/Base/Common/VFX/texSlash1Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texSlash1Mask.png
+RoR2/Base/Common/VFX/texSoftGlowRing.png	RoR2/Base/Common/VFX/ParticleMasks/texSoftGlowRing.png
+RoR2/Base/Common/VFX/texSpark1Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texSpark1Mask.png
+RoR2/Base/Common/VFX/texSplat1Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texSplat1Mask.png
+RoR2/Base/Common/VFX/texSplat1TiledMask.png	RoR2/Base/Common/VFX/ParticleMasks/texSplat1TiledMask.png
+RoR2/Base/Common/VFX/texSplat2TiledMask.png	RoR2/Base/Common/VFX/ParticleMasks/texSplat2TiledMask.png
+RoR2/Base/Common/VFX/texThermiteDroplet2Mask.png	RoR2/Base/Common/VFX/ParticleMasks/texThermiteDroplet2Mask.png
+RoR2/Base/Common/VFX/texTriangleMask.png	RoR2/Base/Core/CameraEffects/texTriangleMask.png
+RoR2/Base/Common/VFX/texWhiteRadialGradient256.png	RoR2/Base/Common/VFX/ParticleMasks/texWhiteRadialGradient256.png
+RoR2/Base/Common/VFX/texWideGlowMask.png	RoR2/Base/Common/VFX/ParticleMasks/texWideGlowMask.png
+RoR2/Base/Common/dccsBeetleFamily.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsBeetleFamily.asset
+RoR2/Base/Common/dccsBeetleFamilySulfur.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsBeetleFamilySulfur.asset
+RoR2/Base/Common/dccsGolemFamily.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsGolemFamily.asset
+RoR2/Base/Common/dccsGolemFamilyNature.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsGolemFamilyNature.asset
+RoR2/Base/Common/dccsGolemFamilySandy.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsGolemFamilySandy.asset
+RoR2/Base/Common/dccsGolemFamilySnowy.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsGolemFamilySnowy.asset
+RoR2/Base/Common/dccsGupFamily.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsGupFamily.asset
+RoR2/Base/Common/dccsImpFamily.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsImpFamily.asset
+RoR2/Base/Common/dccsJellyfishFamily.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsJellyfishFamily.asset
+RoR2/Base/Common/dccsLemurianFamily.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsLemurianFamily.asset
+RoR2/Base/Common/dccsLunarFamily.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsLunarFamily.asset
+RoR2/Base/Common/dccsMushroomFamily.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsMushroomFamily.asset
+RoR2/Base/Common/dccsNullifiersOnly.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsNullifiersOnly.asset
+RoR2/Base/Common/dccsParentFamily.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsParentFamily.asset
+RoR2/Base/Common/dccsWispFamily.asset	RoR2/Base/Common/DirectorCardCategorySelections/dccsWispFamily.asset
+RoR2/Base/Common/muEscape.asset	RoR2/Base/Common/MusicTrackDefs/muEscape.asset
+RoR2/Base/Common/muFULLSong02.asset	RoR2/Base/Common/MusicTrackDefs/muFULLSong02.asset
+RoR2/Base/Common/muFULLSong06.asset	RoR2/Base/Common/MusicTrackDefs/muFULLSong06.asset
+RoR2/Base/Common/muFULLSong07.asset	RoR2/Base/Common/MusicTrackDefs/muFULLSong07.asset
+RoR2/Base/Common/muFULLSong18.asset	RoR2/Base/Common/MusicTrackDefs/muFULLSong18.asset
+RoR2/Base/Common/muFULLSong19.asset	RoR2/Base/Common/MusicTrackDefs/muFULLSong19.asset
+RoR2/Base/Common/muGameplayBase_09.asset	RoR2/Base/Common/MusicTrackDefs/muGameplayBase_09.asset
+RoR2/Base/Common/muIntroCutscene.asset	RoR2/Base/Common/MusicTrackDefs/muIntroCutscene.asset
+RoR2/Base/Common/muLogbook.asset	RoR2/Base/Common/MusicTrackDefs/muLogbook.asset
+RoR2/Base/Common/muMainEndingFull.asset	RoR2/Base/Common/MusicTrackDefs/muMainEndingFull.asset
+RoR2/Base/Common/muMainEndingOutroA.asset	RoR2/Base/Common/MusicTrackDefs/muMainEndingOutroA.asset
+RoR2/Base/Common/muMainEndingOutroB.asset	RoR2/Base/Common/MusicTrackDefs/muMainEndingOutroB.asset
+RoR2/Base/Common/muMenu.asset	RoR2/Base/Common/MusicTrackDefs/muMenu.asset
+RoR2/Base/Common/muNone.asset	RoR2/Base/Common/MusicTrackDefs/muNone.asset
+RoR2/Base/Common/muSong04.asset	RoR2/Base/Common/MusicTrackDefs/muSong04.asset
+RoR2/Base/Common/muSong05.asset	RoR2/Base/Common/MusicTrackDefs/muSong05.asset
+RoR2/Base/Common/muSong08.asset	RoR2/Base/Common/MusicTrackDefs/muSong08.asset
+RoR2/Base/Common/muSong13.asset	RoR2/Base/Common/MusicTrackDefs/muSong13.asset
+RoR2/Base/Common/muSong14.asset	RoR2/Base/Common/MusicTrackDefs/muSong14.asset
+RoR2/Base/Common/muSong16.asset	RoR2/Base/Common/MusicTrackDefs/muSong16.asset
+RoR2/Base/Common/muSong21.asset	RoR2/Base/Common/MusicTrackDefs/muSong21.asset
+RoR2/Base/Common/muSong22.asset	RoR2/Base/Common/MusicTrackDefs/muSong22.asset
+RoR2/Base/Common/muSong23.asset	RoR2/Base/Common/MusicTrackDefs/muSong23.asset
+RoR2/Base/Common/muSong24.asset	RoR2/Base/Common/MusicTrackDefs/muSong24.asset
+RoR2/Base/Common/muSong25.asset	RoR2/Base/Common/MusicTrackDefs/muSong25.asset
+RoR2/Base/Common/physmatFunball.physicMaterial	
+RoR2/Base/Common/texCloudBone1.png	RoR2/Base/Common/TiledTextures/texCloudBone1.png
+RoR2/Base/Common/texCloudColor1.png	RoR2/Base/Common/TiledTextures/texCloudColor1.png
+RoR2/Base/Common/texCloudColor2.png	RoR2/Base/Common/TiledTextures/texCloudColor2.png
+RoR2/Base/Common/texCloudCrackedIce.png	RoR2/Base/Common/TiledTextures/texCloudCrackedIce.png
+RoR2/Base/Common/texCloudCrackedIceInverted.png	RoR2/Base/Common/TiledTextures/texCloudCrackedIceInverted.png
+RoR2/Base/Common/texCloudDifferenceBW1.png	RoR2/Base/Common/TiledTextures/texCloudDifferenceBW1.png
+RoR2/Base/Common/texCloudDifferenceBW2.png	RoR2/Base/Common/TiledTextures/texCloudDifferenceBW2.png
+RoR2/Base/Common/texCloudDirtyFire.png	RoR2/Base/Common/TiledTextures/texCloudDirtyFire.png
+RoR2/Base/Common/texCloudIce.png	RoR2/Base/Common/TiledTextures/texCloudIce.png
+RoR2/Base/Common/texCloudLightning1.png	
+RoR2/Base/Common/texCloudOrganic1.png	RoR2/Base/Common/TiledTextures/texCloudOrganic1.png
+RoR2/Base/Common/texCloudOrganic2.png	RoR2/Base/Common/TiledTextures/texCloudOrganic2.png
+RoR2/Base/Common/texCloudOrganic3.png	RoR2/Base/Common/TiledTextures/texCloudOrganic3.png
+RoR2/Base/Common/texCloudOrganicNormal.png	RoR2/Base/Common/TiledTextures/texCloudOrganicNormal.png
+RoR2/Base/Common/texCloudPixel.png	RoR2/Base/Common/TiledTextures/texCloudPixel.png
+RoR2/Base/Common/texCloudPixel2.png	RoR2/Base/Common/TiledTextures/texCloudPixel2.png
+RoR2/Base/Common/texCloudRain.png	RoR2/Base/Common/TiledTextures/texCloudRain.png
+RoR2/Base/Common/texCloudSkulls.png	RoR2/Base/Common/TiledTextures/texCloudSkulls.png
+RoR2/Base/Common/texCloudStroke1.png	RoR2/Base/Common/TiledTextures/texCloudStroke1.png
+RoR2/Base/Common/texCloudWaterRipples.png	RoR2/Base/Common/TiledTextures/texCloudWaterRipples.png
+RoR2/Base/Common/texCloudWhitenoise.png	RoR2/Base/Common/TiledTextures/texCloudWhitenoise.png
+RoR2/Base/Common/texCloudWhitenoiseNormal.png	RoR2/Base/Common/TiledTextures/texCloudWhitenoiseNormal.png
+RoR2/Base/Common/texCloudWhitenoisePointFiltered.png	RoR2/Base/Common/GlobalTextures/texCloudWhitenoisePointFiltered.png
+RoR2/Base/Common/texCloudWhitenoiseSubtle.png	RoR2/Base/Common/TiledTextures/texCloudWhitenoiseSubtle.png
+RoR2/Base/Common/texDepth2.jpg	RoR2/Base/Common/TiledTextures/texDepth2.jpg
+RoR2/Base/Common/texGrassMap1.png	RoR2/Base/Common/TiledTextures/texGrassMap1.png
+RoR2/Base/Common/texHologramCloud.png	RoR2/Base/Common/TiledTextures/texHologramCloud.png
+RoR2/Base/Common/texMagmaCloud.png	RoR2/Base/Common/TiledTextures/texMagmaCloud.png
+RoR2/Base/Common/texNormalBumpyRock.jpg	RoR2/Base/Common/TiledTextures/texNormalBumpyRock.jpg
+RoR2/Base/Common/texNormalConcrete.jpg	RoR2/Base/Common/TiledTextures/texNormalConcrete.jpg
+RoR2/Base/Common/texNormalConcrete.png	RoR2/Base/Common/TiledTextures/texNormalConcrete.png
+RoR2/Base/Common/texNormalConcreteSubtle.jpg	RoR2/Base/Common/TiledTextures/texNormalConcreteSubtle.jpg
+RoR2/Base/Common/texNormalIce.jpg	RoR2/Base/Common/TiledTextures/texNormalIce.jpg
+RoR2/Base/Common/texNormalIceCracked.jpg	RoR2/Base/Common/TiledTextures/texNormalIceCracked.jpg
+RoR2/Base/Common/texNormalIcePainted.png	RoR2/Base/Common/TiledTextures/texNormalIcePainted.png
+RoR2/Base/Common/texNormalPixel.jpg	RoR2/Base/Common/TiledTextures/texNormalPixel.jpg
+RoR2/Base/Common/texNormalRope.png	RoR2/Base/Common/TiledTextures/texNormalRope.png
+RoR2/Base/Common/texNormalSmoothRock.png	RoR2/Base/Common/TiledTextures/texNormalSmoothRock.png
+RoR2/Base/Common/texNormalStainedGlass.jpg	RoR2/Base/Common/TiledTextures/texNormalStainedGlass.jpg
+RoR2/Base/Common/texNormalStrange1.jpg	RoR2/Base/Common/TiledTextures/texNormalStrange1.jpg
+RoR2/Base/Common/texNormalTemple2.png	RoR2/Base/Common/TiledTextures/texNormalTemple2.png
+RoR2/Base/Common/texNormalTiles.jpg	RoR2/Base/Common/TiledTextures/texNormalTiles.jpg
+RoR2/Base/Common/texRockyNormals.png	RoR2/Base/Common/TiledTextures/texRockyNormals.png
+RoR2/Base/Common/texRockyNormalsFlattened.png	RoR2/Base/Common/TiledTextures/texRockyNormalsFlattened.png
+RoR2/Base/Common/texSnowEncode.png	RoR2/Base/Common/TiledTextures/texSnowEncode.png
+RoR2/Base/Common/texTerrainCliff1.tga	RoR2/Base/Common/TiledTextures/texTerrainCliff1.tga
+RoR2/Base/Common/texTerrainGrass.tga	RoR2/Base/Common/TiledTextures/texTerrainGrass.tga
+RoR2/Base/Common/texTerrainMiscHeight1.png	RoR2/Base/Common/TiledTextures/texTerrainMiscHeight1.png
+RoR2/Base/Common/texTerrainMiscHeight2.png	RoR2/Base/Common/TiledTextures/texTerrainMiscHeight2.png
+RoR2/Base/Common/texTerrainRock2.png	RoR2/Base/Common/TiledTextures/texTerrainRock2.png
+RoR2/Base/Common/texTerrainSnow2.tga	RoR2/Base/Common/TiledTextures/texTerrainSnow2.tga
+RoR2/Base/Common/texTileRustyMetal.tif	RoR2/Base/Common/TiledTextures/texTileRustyMetal.tif
+RoR2/Base/Common/texTileRustyMetalFresh.tif	RoR2/Base/Common/TiledTextures/texTileRustyMetalFresh.tif
+RoR2/Base/Core/AudioManager.prefab	RoR2/Base/Core/Audio/AudioManager.prefab
+RoR2/Base/Core/EntityStates.GameOver.BaseGameOverControllerState.asset	RoR2/Base/Core/GameOverController/EntityStates.GameOver.BaseGameOverControllerState.asset
+RoR2/Base/Core/EntityStates.GameOver.FinishEndingContent.asset	RoR2/Base/Core/GameOverController/EntityStates.GameOver.FinishEndingContent.asset
+RoR2/Base/Core/EntityStates.GameOver.LingerShort.asset	RoR2/Base/Core/GameOverController/EntityStates.GameOver.LingerShort.asset
+RoR2/Base/Core/EntityStates.GameOver.ShowCredits.asset	RoR2/Base/Core/GameOverController/EntityStates.GameOver.ShowCredits.asset
+RoR2/Base/Core/EntityStates.GameOver.ShowReport.asset	RoR2/Base/Core/GameOverController/EntityStates.GameOver.ShowReport.asset
+RoR2/Base/Core/GameOverController.prefab	RoR2/Base/Core/GameOverController/GameOverController.prefab
+RoR2/Base/Core/MPEventSystem.prefab	RoR2/Base/Core/MPEventSystem/MPEventSystem.prefab
+RoR2/Base/Core/MPEventSystemManager.prefab	RoR2/Base/Core/MPEventSystem/MPEventSystemManager.prefab
+RoR2/Base/Core/Main Camera.prefab	
+RoR2/Base/Core/Menu Main Camera.prefab	RoR2/Base/Core/Camera/Menu Main Camera.prefab
+RoR2/Base/Core/MusicController.prefab	RoR2/Base/Core/Audio/MusicController.prefab
+RoR2/Base/Core/NetworkManager.prefab	RoR2/Base/Core/Network/NetworkManager.prefab
+RoR2/Base/Core/NetworkSession.prefab	RoR2/Base/Core/Network/NetworkSession.prefab
+RoR2/Base/Core/NetworkUser.prefab	RoR2/Base/Core/Network/NetworkUser.prefab
+RoR2/Base/Core/Rewired Input Manager.prefab	RoR2/Base/Core/Rewired/Rewired Input Manager.prefab
+RoR2/Base/Core/RoR2.Networking.SteamLobbyFinder+LobbyStateBase.asset	RoR2/Base/Core/SteamLobbyFinder/RoR2.Networking.SteamLobbyFinder+LobbyStateBase.asset
+RoR2/Base/Core/RoR2.Networking.SteamLobbyFinder+LobbyStateBeginGame.asset	RoR2/Base/Core/SteamLobbyFinder/RoR2.Networking.SteamLobbyFinder+LobbyStateBeginGame.asset
+RoR2/Base/Core/RoR2.Networking.SteamLobbyFinder+LobbyStateMultiSearch.asset	RoR2/Base/Core/SteamLobbyFinder/RoR2.Networking.SteamLobbyFinder+LobbyStateMultiSearch.asset
+RoR2/Base/Core/RoR2.Networking.SteamLobbyFinder+LobbyStateNonLeader.asset	RoR2/Base/Core/SteamLobbyFinder/RoR2.Networking.SteamLobbyFinder+LobbyStateNonLeader.asset
+RoR2/Base/Core/RoR2.Networking.SteamLobbyFinder+LobbyStateSingleSearch.asset	RoR2/Base/Core/SteamLobbyFinder/RoR2.Networking.SteamLobbyFinder+LobbyStateSingleSearch.asset
+RoR2/Base/Core/RoR2.Networking.SteamLobbyFinder+LobbyStateStart.asset	RoR2/Base/Core/SteamLobbyFinder/RoR2.Networking.SteamLobbyFinder+LobbyStateStart.asset
+RoR2/Base/Core/Stage.prefab	RoR2/Base/Core/Network/Stage.prefab
+RoR2/Base/Core/TMP Default Style Sheet.asset	
+RoR2/Base/Core/WwiseGlobal.prefab	RoR2/Base/Core/Audio/WwiseGlobal.prefab
+RoR2/Base/Core/matScreenDamage.mat	RoR2/Base/Core/CameraEffects/matScreenDamage.mat
+RoR2/Base/Core/matSprintLines.mat	RoR2/Base/Core/CameraEffects/matSprintLines.mat
+RoR2/Base/Core/texCrackedScreen.png	RoR2/Base/Core/CameraEffects/texCrackedScreen.png
+RoR2/Base/Drones/EmergencyDroneBody.png	
+RoR2/Base/Drones/cscDrone1.asset	
+RoR2/Base/Drones/cscDrone2.asset	
+RoR2/Base/Drones/cscMegaDrone.asset	
+RoR2/Base/Nullifier/skinNullifierAlly.asset	
+RoR2/Base/Shaders/HGScreenDamage.shader	RoR2/Base/Core/CameraEffects/HGScreenDamage.shader
+RoR2/Base/Spectator/EntityStates.ImpMonster.Weapon.CloakPermanent.asset	RoR2/Base/Shopkeeper/Spectator/EntityStates.ImpMonster.Weapon.CloakPermanent.asset
+RoR2/Base/Spectator/EntityStates.SpectatorSkills.LockOn.asset	RoR2/Base/Shopkeeper/Spectator/EntityStates.SpectatorSkills.LockOn.asset
+RoR2/Base/Spectator/LockOn.asset	RoR2/Base/Shopkeeper/Spectator/LockOn.asset
+RoR2/Base/Spectator/SpectatorBody.prefab	RoR2/Base/Shopkeeper/Spectator/SpectatorBody.prefab
+RoR2/Base/Spectator/SpectatorBodyPrimarySkillFamily.asset	RoR2/Base/Shopkeeper/Spectator/SpectatorBodyPrimarySkillFamily.asset
+RoR2/Base/Spectator/SpectatorSlowBody.prefab	RoR2/Base/Shopkeeper/Spectator/SpectatorSlowBody.prefab
+RoR2/Base/TeslaTrooper/TeslaCoilBlueprint.prefab	
+RoR2/Base/UI/BackgroundStamp.prefab	RoR2/Base/UI/CreditsPanel/BackgroundStamp.prefab
+RoR2/Base/UI/CompanyCredits.prefab	RoR2/Base/UI/CreditsPanel/CompanyCredits.prefab
+RoR2/Base/UI/CreditNameRoleStrip.prefab	RoR2/Base/UI/CreditsPanel/CreditNameRoleStrip.prefab
+RoR2/Base/UI/CreditsPanel.prefab	RoR2/Base/UI/CreditsPanel/CreditsPanel.prefab
+RoR2/Base/UI/CursorIndicator.prefab	RoR2/Base/UI/Cursor/CursorIndicator.prefab
+RoR2/Base/UI/HGCreditNameLabel.prefab	RoR2/Base/UI/CreditsPanel/HGCreditNameLabel.prefab
+RoR2/Base/UI/RoR2.UI.CreditsPanelController+BaseCreditsPanelState.asset	RoR2/Base/UI/CreditsPanel/RoR2.UI.CreditsPanelController+BaseCreditsPanelState.asset
+RoR2/Base/UI/RoR2.UI.CreditsPanelController+IntroState.asset	RoR2/Base/UI/CreditsPanel/RoR2.UI.CreditsPanelController+IntroState.asset
+RoR2/Base/UI/RoR2.UI.CreditsPanelController+MainScrollState.asset	RoR2/Base/UI/CreditsPanel/RoR2.UI.CreditsPanelController+MainScrollState.asset
+RoR2/Base/UI/RoR2.UI.CreditsPanelController+OutroState.asset	RoR2/Base/UI/CreditsPanel/RoR2.UI.CreditsPanelController+OutroState.asset
+RoR2/Base/UI/SoftwareNotice.prefab	RoR2/Base/UI/CreditsPanel/SoftwareNotice.prefab
+RoR2/Base/UI/SteamLobbyUserListElement.prefab	
+RoR2/Base/UI/acrid.psd	RoR2/Base/UI/CreditsPanel/acrid.psd
+RoR2/Base/UI/artifact.psd	RoR2/Base/UI/CreditsPanel/artifact.psd
+RoR2/Base/UI/artifactteleporter.psd	RoR2/Base/UI/CreditsPanel/artifactteleporter.psd
+RoR2/Base/UI/bandito.psd	RoR2/Base/UI/CreditsPanel/bandito.psd
+RoR2/Base/UI/company logo OLD.png	RoR2/Base/UI/Large Splashes/company logo OLD.png
+RoR2/Base/UI/company logo transparent.png	RoR2/Base/UI/Large Splashes/company logo transparent.png
+RoR2/Base/UI/company logo.png	RoR2/Base/UI/Large Splashes/company logo.png
+RoR2/Base/UI/compounds.psd	RoR2/Base/UI/CreditsPanel/compounds.psd
+RoR2/Base/UI/d10-1.png	RoR2/Base/UI/CreditsPanel/d10-1.png
+RoR2/Base/UI/d11-1.png	RoR2/Base/UI/CreditsPanel/d11-1.png
+RoR2/Base/UI/d11-3.png	RoR2/Base/UI/CreditsPanel/d11-3.png
+RoR2/Base/UI/d12-3.png	RoR2/Base/UI/CreditsPanel/d12-3.png
+RoR2/Base/UI/d13-3.png	RoR2/Base/UI/CreditsPanel/d13-3.png
+RoR2/Base/UI/doppelganger.psd	RoR2/Base/UI/CreditsPanel/doppelganger.psd
+RoR2/Base/UI/dronecommanderconcept_credits.png	RoR2/Base/UI/CreditsPanel/dronecommanderconcept_credits.png
+RoR2/Base/UI/dunestrider.psd	RoR2/Base/UI/CreditsPanel/dunestrider.psd
+RoR2/Base/UI/evolution.psd	RoR2/Base/UI/CreditsPanel/evolution.psd
+RoR2/Base/UI/flyingvermin_concept_credits.png	RoR2/Base/UI/CreditsPanel/flyingvermin_concept_credits.png
+RoR2/Base/UI/gamepad.psd	RoR2/Base/UI/CreditsPanel/gamepad.psd
+RoR2/Base/UI/hereticconcept_credits.png	RoR2/Base/UI/CreditsPanel/hereticconcept_credits.png
+RoR2/Base/UI/interpolation.psd	RoR2/Base/UI/CreditsPanel/interpolation.psd
+RoR2/Base/UI/intervalattack.psd	RoR2/Base/UI/CreditsPanel/intervalattack.psd
+RoR2/Base/UI/itconcept1_credits.png	RoR2/Base/UI/CreditsPanel/itconcept1_credits.png
+RoR2/Base/UI/itconcept2_credits.png	RoR2/Base/UI/CreditsPanel/itconcept2_credits.png
+RoR2/Base/UI/itconcept3_credits.png	RoR2/Base/UI/CreditsPanel/itconcept3_credits.png
+RoR2/Base/UI/j11-1.png	RoR2/Base/UI/CreditsPanel/j11-1.png
+RoR2/Base/UI/j12-1.png	RoR2/Base/UI/CreditsPanel/j12-1.png
+RoR2/Base/UI/j13-1.png	RoR2/Base/UI/CreditsPanel/j13-1.png
+RoR2/Base/UI/j14-1.png	RoR2/Base/UI/CreditsPanel/j14-1.png
+RoR2/Base/UI/lemmy.jpg	RoR2/Base/UI/CreditsPanel/lemmy.jpg
+RoR2/Base/UI/lemmy2.psd	RoR2/Base/UI/CreditsPanel/lemmy2.psd
+RoR2/Base/UI/lobbies.psd	RoR2/Base/UI/CreditsPanel/lobbies.psd
+RoR2/Base/UI/logo_stacked_colored_outlined_dropshadow_hard_small.png	RoR2/Base/UI/Large Splashes/logo_stacked_colored_outlined_dropshadow_hard_small.png
+RoR2/Base/UI/lunartrinkets.psd	RoR2/Base/UI/CreditsPanel/lunartrinkets.psd
+RoR2/Base/UI/matScreenColorOverlay.mat	RoR2/Base/UI/SpecialUIMaterials/matScreenColorOverlay.mat
+RoR2/Base/UI/matUIAnimateAlphaNakedButton.mat	RoR2/Base/UI/SpecialUIMaterials/matUIAnimateAlphaNakedButton.mat
+RoR2/Base/UI/matUIBasicAdditive.mat	RoR2/Base/UI/CreditsPanel/matUIBasicAdditive.mat
+RoR2/Base/UI/matUIOverbrighten2x.mat	RoR2/Base/UI/SpecialUIMaterials/matUIOverbrighten2x.mat
+RoR2/Base/UI/matUIPaintStreakAnimated.mat	RoR2/Base/UI/SpecialUIMaterials/matUIPaintStreakAnimated.mat
+RoR2/Base/UI/matUIPaintStreakFlash.mat	RoR2/Base/UI/SpecialUIMaterials/matUIPaintStreakFlash.mat
+RoR2/Base/UI/matUIPaintStreakStatic.mat	RoR2/Base/UI/SpecialUIMaterials/matUIPaintStreakStatic.mat
+RoR2/Base/UI/matUIRoomGradient.mat	RoR2/Base/UI/SpecialUIMaterials/matUIRoomGradient.mat
+RoR2/Base/UI/matUISwipeOut.mat	RoR2/Base/UI/SpecialUIMaterials/matUISwipeOut.mat
+RoR2/Base/UI/minedeployer.psd	RoR2/Base/UI/CreditsPanel/minedeployer.psd
+RoR2/Base/UI/railgunner_concept_credits.png	RoR2/Base/UI/CreditsPanel/railgunner_concept_credits.png
+RoR2/Base/UI/reliquary.psd	RoR2/Base/UI/CreditsPanel/reliquary.psd
+RoR2/Base/UI/sawblade.psd	RoR2/Base/UI/CreditsPanel/sawblade.psd
+RoR2/Base/UI/sawmerangpath.psd	RoR2/Base/UI/CreditsPanel/sawmerangpath.psd
+RoR2/Base/UI/scavshoot.jpg	RoR2/Base/UI/CreditsPanel/scavshoot.jpg
+RoR2/Base/UI/scavstand.psd	RoR2/Base/UI/CreditsPanel/scavstand.psd
+RoR2/Base/UI/seer.psd	RoR2/Base/UI/CreditsPanel/seer.psd
+RoR2/Base/UI/spidermine.psd	RoR2/Base/UI/CreditsPanel/spidermine.psd
+RoR2/Base/UI/spite.psd	RoR2/Base/UI/CreditsPanel/spite.psd
+RoR2/Base/UI/texEAWarningSplash.png	RoR2/Base/UI/Large Splashes/texEAWarningSplash.png
+RoR2/Base/UI/texLogoChris.png	RoR2/Base/UI/CreditsPanel/texLogoChris.png
+RoR2/Base/UI/texLogoGearboxPublishingVertical.png	RoR2/Base/UI/CreditsPanel/texLogoGearboxPublishingVertical.png
+RoR2/Base/UI/texLogoGhostpunch.png	RoR2/Base/UI/CreditsPanel/texLogoGhostpunch.png
+RoR2/Base/UI/texLogoLionbridge.png	RoR2/Base/UI/CreditsPanel/texLogoLionbridge.png
+RoR2/Base/UI/texLogoPlayEveryWare.png	RoR2/Base/UI/CreditsPanel/texLogoPlayEveryWare.png
+RoR2/Base/UI/texLogoSkewSound.png	RoR2/Base/UI/CreditsPanel/texLogoSkewSound.png
+RoR2/Base/UI/texLogoSpeedTree.png	RoR2/Base/UI/CreditsPanel/texLogoSpeedTree.png
+RoR2/Base/UI/texLogoStreamlineGames.png	RoR2/Base/UI/CreditsPanel/texLogoStreamlineGames.png
+RoR2/Base/UI/texLogoStreamlineMediaGroup.png	RoR2/Base/UI/CreditsPanel/texLogoStreamlineMediaGroup.png
+RoR2/Base/UI/texParentFlowGradient.png	RoR2/Base/UI/CreditsPanel/texParentFlowGradient.png
+RoR2/Base/UI/texPoweredByWwise256.png	RoR2/Base/UI/CreditsPanel/texPoweredByWwise256.png
+RoR2/Base/UI/texUIAnimateRamp.png	RoR2/Base/UI/SpecialUIMaterials/texUIAnimateRamp.png
+RoR2/Base/UI/texUIAnimateRampHighlights.png	RoR2/Base/UI/SpecialUIMaterials/texUIAnimateRampHighlights.png
+RoR2/Base/UI/texUIAnimateRampPulse.png	RoR2/Base/UI/SpecialUIMaterials/texUIAnimateRampPulse.png
+RoR2/Base/UI/texUISSOverlay2.png	RoR2/Base/UI/SpecialUIMaterials/texUISSOverlay2.png
+RoR2/Base/UI/tutorial.psd	RoR2/Base/UI/CreditsPanel/tutorial.psd
+RoR2/Base/UI/vermin_concept_credits.png	RoR2/Base/UI/CreditsPanel/vermin_concept_credits.png
+RoR2/Base/UI/voidsurvivor_concept_credits.png	RoR2/Base/UI/CreditsPanel/voidsurvivor_concept_credits.png
+RoR2/Base/UI/votebuttons.psd	RoR2/Base/UI/CreditsPanel/votebuttons.psd
+RoR2/Base/arena/ArenaHeatvent.prefab	
+RoR2/Base/arena/ArenaNullifierMolt.prefab	
+RoR2/Base/arena/ArenaSkybox.prefab	
+RoR2/Base/arena/ArenaStalagmiteHugeCluster.prefab	
+RoR2/Base/arena/ArenaStalagmiteLargeCluster.prefab	
+RoR2/Base/arena/CrabFoam1Prop.prefab	
+RoR2/Base/arena/NullifierGemProp.prefab	
+RoR2/Base/arena/texArenaSandDiffuse.png	RoR2/GlobalContent/texArenaSandDiffuse.png
+RoR2/Base/artifactworld/dccsArtifactWorldInteractablesDLC1.asset	
+RoR2/Base/artifactworld/matArtifact.mat	RoR2/GlobalContent/matArtifact.mat
+RoR2/Base/artifactworld/texTrimSheetArtifactDiffuse 1.png	
+RoR2/Base/bazaar/AncientGear1.prefab	
+RoR2/Base/bazaar/BazaarBarrel1.prefab	
+RoR2/Base/bazaar/BazaarBoulder.prefab	
+RoR2/Base/bazaar/BazaarHangingCloth 1.prefab	
+RoR2/Base/bazaar/BazaarHangingCloth.prefab	
+RoR2/Base/bazaar/BazaarHangingLight.prefab	
+RoR2/Base/bazaar/BazaarLight1.prefab	
+RoR2/Base/bazaar/BazaarLight1Large Variant.prefab	
+RoR2/Base/bazaar/BazaarLightCrystalSmall 1.prefab	
+RoR2/Base/bazaar/BazaarLightCrystalSmall.prefab	
+RoR2/Base/bazaar/BazaarPebble.prefab	
+RoR2/Base/bazaar/BazaarVase1.prefab	
+RoR2/Base/bazaar/BazaarWoodColumn1.prefab	
+RoR2/Base/bazaar/BazaarWoodColumnFullEntryway.prefab	
+RoR2/Base/bazaar/BazaarWoodColumnWithAngle.prefab	
+RoR2/Base/bazaar/BazaarWoodFlooring.prefab	
+RoR2/Base/bazaar/CaveCeilingLarge.prefab	
+RoR2/Base/bazaar/CaveCeilingSmall.prefab	
+RoR2/Base/bazaar/CaveWallSmall.prefab	
+RoR2/Base/bazaar/CaveWallSmallCorner.prefab	
+RoR2/Base/bazaar/GenericBazaarIceMesh.prefab	
+RoR2/Base/bazaar/LunarInfectionLargeMesh.prefab	
+RoR2/Base/bazaar/LunarInfectionSingleMesh.prefab	
+RoR2/Base/bazaar/LunarInfectionSmallMesh.prefab	
+RoR2/Base/bazaar/NewtStatueProp.prefab	
+RoR2/Base/bazaar/ShatteredGlass.prefab	
+RoR2/Base/bazaar/lunar infection.fbx	RoR2/GlobalContent/lunar infection.fbx
+RoR2/Base/blackbeach/blackbeachAirNodes.asset	
+RoR2/Base/blackbeach/blackbeachGroundNodes.asset	
+RoR2/Base/blackbeach/dccsBlackBeachMonstersDLC.asset	
+RoR2/Base/blackbeach/texBBMudNormal.png	RoR2/GlobalContent/texBBMudNormal.png
+RoR2/Base/blackbeach/texBlackbeachDirt.png	RoR2/GlobalContent/texBlackbeachDirt.png
+RoR2/Base/blackbeach/texBlackbeachGrass.png	RoR2/GlobalContent/texBlackbeachGrass.png
+RoR2/Base/blackbeach2/blackbeach2AirNode.prefab	
+RoR2/Base/blackbeach2/blackbeach2GroundNode.prefab	
+RoR2/Base/dampcave/DCHeroSwitchback.prefab	
+RoR2/Base/foggyswamp/FSWallHero.prefab	
+RoR2/Base/frozenwall/FWSimpleGrass.prefab	
+RoR2/Base/frozenwall/GlacierClusterLarge.prefab	
+RoR2/Base/frozenwall/GlacierClusterMedium.prefab	
+RoR2/Base/frozenwall/HumanCanister1Mesh.prefab	
+RoR2/Base/frozenwall/HumanCellTowerSnowy.prefab	
+RoR2/Base/frozenwall/HumanChainLink1.prefab	
+RoR2/Base/frozenwall/HumanChainLink1Crushed.prefab	
+RoR2/Base/frozenwall/HumanCrate1Mesh.prefab	
+RoR2/Base/frozenwall/HumanCrate2Mesh.prefab	
+RoR2/Base/frozenwall/HumanFan.prefab	
+RoR2/Base/frozenwall/HumanShippingContainer1.prefab	
+RoR2/Base/frozenwall/HumanSkeletonRagdoll.prefab	
+RoR2/Base/frozenwall/HumanWaterContainer1.prefab	
+RoR2/Base/frozenwall/texFWSnow.tga	RoR2/GlobalContent/texFWSnow.tga
+RoR2/Base/goldshores/dccsGoldshoresInteractablesDLC1.asset	
+RoR2/Base/goldshores/dccsGoldshoresMonstersDLC1.asset	
+RoR2/Base/goldshores/goldshoresAirNodes.asset	
+RoR2/Base/goldshores/texWhiteSandSimple.png	RoR2/GlobalContent/texWhiteSandSimple.png
+RoR2/Base/golemplains/texGPGrassTerrain.png	RoR2/GlobalContent/texGPGrassTerrain.png
+RoR2/Base/golemplains/texGPGrassTerrainNormal.png	RoR2/GlobalContent/texGPGrassTerrainNormal.png
+RoR2/Base/golemplains/texGPLichenTerrain.png	RoR2/GlobalContent/texGPLichenTerrain.png
+RoR2/Base/golemplains2/BBBoulderMediumRound1.prefab	RoR2/Base/arena/BBBoulderMediumRound1.prefab
+RoR2/Base/golemplains2/GPRockSlab.prefab	RoR2/Base/arena/GPRockSlab.prefab
+RoR2/Base/golemplains2/GPTerrainColumn.prefab	
+RoR2/Base/golemplains2/golemplains2AirNode.prefab	
+RoR2/Base/golemplains2/golemplains2GroundNode.prefab	
+RoR2/Base/goolake/EelSkeleton.prefab	
+RoR2/Base/goolake/GlWarningSign.prefab	
+RoR2/Base/goolake/PebbleGoolake.prefab	
+RoR2/Base/goolake/glSimpleGrass.prefab	
+RoR2/Base/goolake/mdlGlWarningSign.fbx	
+RoR2/Base/goolake/mdlPebble1.fbx	RoR2/GlobalContent/mdlPebble1.fbx
+RoR2/Base/goolake/texGooWaterfallFoam.png	RoR2/GlobalContent/texGooWaterfallFoam.png
+RoR2/Base/goolake/texSand1Simple.png	RoR2/GlobalContent/texSand1Simple.png
+RoR2/Base/moon/BridgeCrossingIndicator, 1.prefab	
+RoR2/Base/moon/BridgeCrossingIndicator, 2.prefab	
+RoR2/Base/moon/GhostPlant1.prefab	
+RoR2/Base/moon/GhostPlant2.prefab	
+RoR2/Base/moon/GhostPlant3.prefab	
+RoR2/Base/moon/GhostPlant4.prefab	
+RoR2/Base/moon/GhostPlant5.prefab	
+RoR2/Base/moon/GhostPlant6.prefab	
+RoR2/Base/moon/GhostPlantRoof1.prefab	
+RoR2/Base/moon/GhostPlantRoof2.prefab	
+RoR2/Base/moon/GhostPlantRoof3.prefab	
+RoR2/Base/moon/HG_Moon_Props.fbx	RoR2/GlobalContent/HG_Moon_Props.fbx
+RoR2/Base/moon/MoonArenaColumn, Small.prefab	
+RoR2/Base/moon/MoonBridgeClamp Variant.prefab	
+RoR2/Base/moon/MoonGhostPlantLarge1.prefab	
+RoR2/Base/moon/MoonGhostPlantLarge2.prefab	
+RoR2/Base/moon/MoonGhostPlantLarge3.prefab	
+RoR2/Base/moon/MoonGhostPlantLarge4.prefab	
+RoR2/Base/moon/MoonHouse, Small.prefab	
+RoR2/Base/moon/MoonMarker, Small.prefab	
+RoR2/Base/moon/MoonPebbleDark Variant.prefab	
+RoR2/Base/moon/MoonPebbleEarthy Variant.prefab	
+RoR2/Base/moon/MoonPillar, Round Cap.prefab	
+RoR2/Base/moon/MoonPillar, Stib Short.prefab	
+RoR2/Base/moon/MoonPillar, Stib Tall Broken.prefab	
+RoR2/Base/moon/MoonStibCluster, Small.prefab	
+RoR2/Base/moon/MoonWall60Viewport Variant.prefab	
+RoR2/Base/moon/QuarryRubbleRockMedium Variant.prefab	
+RoR2/Base/moon/dccsMoonMonstersDLC1.asset	
+RoR2/Base/moon/mdlBrotherAxe.prefab	
+RoR2/Base/moon/mdlBrotherHalberd.prefab	
+RoR2/Base/moon/mdlBrotherHammer.prefab	
+RoR2/Base/moon/mdlBrotherSword.prefab	
+RoR2/Base/moon/mdlBrother_Unfinished_Cap.prefab	
+RoR2/Base/moon/mdlBrother_Unfinished_Connector.prefab	
+RoR2/Base/moon/mdlBrother_Unfinished_Connector2.prefab	
+RoR2/Base/moon/mdlBrother_Unfinished_Hammerhead.prefab	
+RoR2/Base/moon/mdlBrother_Unfinished_Hammerhead2.prefab	
+RoR2/Base/moon/mdlBrother_Unfinished_Handle.prefab	
+RoR2/Base/moon/mdlBrother_Unfinished_Implement.prefab	
+RoR2/Base/moon/mdlBrother_Unfinished_Large_Ring.prefab	
+RoR2/Base/moon/mdlBrother_Unfinished_Ring.prefab	
+RoR2/Base/moon/mdlBrother_Unfinished_Sword.prefab	
+RoR2/Base/moon/mdlChain_Connector_Platform.prefab	
+RoR2/Base/moon/mdlGolemClamp.prefab	
+RoR2/Base/moon/mdlGolemClampOpenable.prefab	
+RoR2/Base/moon/mdlGreenhouseChain Variant.prefab	
+RoR2/Base/moon/mdlGreenhouseChainFallen Variant.prefab	
+RoR2/Base/moon/mdlGreenhouseChainStraightHangLong Variant.prefab	
+RoR2/Base/moon/mdlGreenhouseChainStraightHangShort Variant (2) Variant.prefab	
+RoR2/Base/moon/mdlGreenhouseChainStraightHangShort Variant.prefab	
+RoR2/Base/moon/mdlLunarAnvil.prefab	
+RoR2/Base/moon/mdlLunarCoolingBowl.prefab	
+RoR2/Base/moon/mdlLunarForge.prefab	
+RoR2/Base/moon/mdlLunarForgeBusted.prefab	
+RoR2/Base/moon/mdlLunarTool1.prefab	
+RoR2/Base/moon/mdlLunarTool2.prefab	
+RoR2/Base/moon/mdlLunarTool3.prefab	
+RoR2/Base/moon/mdlLunarTool4.prefab	
+RoR2/Base/moon/mdlLunarTool5.prefab	
+RoR2/Base/moon/mdlLunarWispArm.prefab	
+RoR2/Base/moon/mdlLunarWispArmBroken.prefab	
+RoR2/Base/moon/mdlLunarWispCore.prefab	
+RoR2/Base/moon/mdlLunarWispHead.prefab	
+RoR2/Base/moon/mdlLunarWispHeadBroken.prefab	
+RoR2/Base/moon/mdlLunarWispJaw.prefab	
+RoR2/Base/moon/mdlMoon_Pillar_Busted1.prefab	
+RoR2/Base/moon/mdlMoon_Pillar_Busted2.prefab	
+RoR2/Base/moon/mdlMoon_Pillar_Busted3.prefab	
+RoR2/Base/moon/mdlPlatform_Column_Low.prefab	
+RoR2/Base/moon/mdlPlatform_Column_Low_Straight Variant.prefab	
+RoR2/Base/moon/mdlProvidenceStatue_Smashed1A.prefab	
+RoR2/Base/moon/mdlProvidenceStatue_Smashed1B.prefab	
+RoR2/Base/moon/mdlProvidenceStatue_Smashed1C.prefab	
+RoR2/Base/moon/mdlProvidenceStatue_Smashed2A.prefab	
+RoR2/Base/moon/mdlProvidenceStatue_Smashed2B.prefab	
+RoR2/Base/moon/mdlProvidenceStatue_Smashed3A.prefab	
+RoR2/Base/moon/mdlProvidenceStatue_Smashed_3B.prefab	
+RoR2/Base/moon/mdlQuarryDeposit.prefab	
+RoR2/Base/moon/mdlQuarryEntry.prefab	
+RoR2/Base/moon/mdlQuarryFoggyFloor.prefab	
+RoR2/Base/moon/mdlTallMoonPot.prefab	
+RoR2/Base/moon/mdlTallMoonPotShards1.prefab	
+RoR2/Base/moon/mdlTallMoonPotShards2.prefab	
+RoR2/Base/moon/mdlUnfinished_Golem_Head.prefab	
+RoR2/Base/moon/mdlUnfinished_Golem_Head2.prefab	
+RoR2/Base/moon/mdlUnfinished_Golem_Magnet.prefab	
+RoR2/Base/moon/mdlUnfinished_Golem_Stone1.prefab	
+RoR2/Base/moon/mdlUnfinished_Golem_Stone2.prefab	
+RoR2/Base/moon/mdlUnfinished_Golem_Stone3.prefab	
+RoR2/Base/moon/mdlUnfinished_Golem_Stone4.prefab	
+RoR2/Base/moon/mdlUnfinished_Stone.prefab	
+RoR2/Base/moon/mdlUnfinished_Stone_Large.prefab	
+RoR2/Base/moon/mdlWeaponRackSingle.prefab	
+RoR2/Base/moon/mdlWeaponRackWide.prefab	
+RoR2/Base/moon/mdlWideMoonPot.prefab	
+RoR2/Base/moon/mdlWideMoonPotShards1.prefab	
+RoR2/Base/moon/mdlWideMoonPotShards2.prefab	
+RoR2/Base/moon/mdl_Plant_Ash1.prefab	
+RoR2/Base/moon/mdl_Plant_Ash3.prefab	
+RoR2/Base/moon/mdl_disc_platform.prefab	
+RoR2/Base/moon/mdlroot_structure.prefab	
+RoR2/Base/moon/texMoonLichen.png	RoR2/GlobalContent/texMoonLichen.png
+RoR2/Base/mysteryspace/MSCrystalLarge.prefab	
+RoR2/Base/mysteryspace/MSCrystalPlatform.prefab	
+RoR2/Base/mysteryspace/MSEgg.prefab	
+RoR2/Base/mysteryspace/MSFloatingIsland1.prefab	
+RoR2/Base/mysteryspace/MSFloatingIsland2.prefab	
+RoR2/Base/mysteryspace/MSFloatingRock1.prefab	
+RoR2/Base/mysteryspace/MSFloatingRock2.prefab	
+RoR2/Base/mysteryspace/MSFloatingRock3.prefab	
+RoR2/Base/mysteryspace/MSObelisk.prefab	
+RoR2/Base/mysteryspace/MSSandDune.prefab	
+RoR2/Base/rootjungle/BounceShroom.prefab	
+RoR2/Base/rootjungle/HOLDER_ Props.fbx	
+RoR2/Base/rootjungle/RJMossPatch1.prefab	
+RoR2/Base/rootjungle/RJMossPatch2.prefab	
+RoR2/Base/rootjungle/RJMossPatchLarge.prefab	
+RoR2/Base/rootjungle/RJPebble.prefab	
+RoR2/Base/rootjungle/RJRock.prefab	
+RoR2/Base/rootjungle/RJRoot1.prefab	
+RoR2/Base/rootjungle/RJRoot2.prefab	
+RoR2/Base/rootjungle/RJRoot3.prefab	
+RoR2/Base/rootjungle/RJRoot4.prefab	
+RoR2/Base/rootjungle/RJShroomBig.prefab	
+RoR2/Base/rootjungle/RJShroomShelf.prefab	
+RoR2/Base/rootjungle/RJShroomSmall.prefab	
+RoR2/Base/rootjungle/RJTriangle.prefab	
+RoR2/Base/rootjungle/RJTwistedTreeBig.prefab	
+RoR2/Base/shipgraveyard/SGCaveBack.prefab	
+RoR2/Base/shipgraveyard/SGCaveInternalStairs.prefab	
+RoR2/Base/shipgraveyard/SGPortalCard.prefab	RoR2/Base/shipgraveyard/FX/SGPortalCard.prefab
+RoR2/Base/shipgraveyard/matAlien1DefenseMatrix.mat	RoR2/Base/shipgraveyard/FX/matAlien1DefenseMatrix.mat
+RoR2/Base/shipgraveyard/matSGCameraDustBig.mat	RoR2/Base/shipgraveyard/FX/matSGCameraDustBig.mat
+RoR2/Base/shipgraveyard/matSGPortalCard.mat	RoR2/Base/shipgraveyard/FX/matSGPortalCard.mat
+RoR2/Base/shipgraveyard/texSGGrassTerrain2.psd	RoR2/GlobalContent/texSGGrassTerrain2.psd
+RoR2/Base/skymeadow/HumanPlatformBarrier1Wide.prefab	
+RoR2/Base/skymeadow/HumanPlatformBarrier2Wide.prefab	
+RoR2/Base/skymeadow/HumanTempLight1Off.prefab	
+RoR2/Base/skymeadow/HumanTempLight1On.prefab	
+RoR2/Base/skymeadow/HumanTempLight2Off.prefab	
+RoR2/Base/skymeadow/HumanTempLight2On.prefab	
+RoR2/Base/skymeadow/HumanTempLight3Mesh.prefab	
+RoR2/Base/skymeadow/PowerLine1.prefab	
+RoR2/Base/skymeadow/SMBigFlower.prefab	
+RoR2/Base/skymeadow/SMBigFlower2.prefab	
+RoR2/Base/skymeadow/SMGravityTunnelFX.prefab	
+RoR2/Base/skymeadow/SMPebble.prefab	
+RoR2/Base/skymeadow/SMRockAngular.prefab	
+RoR2/Base/skymeadow/SMRockBridge.prefab	
+RoR2/Base/skymeadow/SMRockFormationMedium1.prefab	
+RoR2/Base/skymeadow/SMRockFormationMedium2.prefab	
+RoR2/Base/skymeadow/SMRockFormationMedium3.prefab	
+RoR2/Base/skymeadow/SMRockFormationSmall1.prefab	
+RoR2/Base/skymeadow/SMRockFormationSmall2.prefab	
+RoR2/Base/skymeadow/SMRockOblong.prefab	
+RoR2/Base/skymeadow/SMSkyboxPrefab.prefab	
+RoR2/Base/skymeadow/SMSpikeBridge.prefab	
+RoR2/Base/skymeadow/SMVine1.prefab	
+RoR2/Base/skymeadow/SMVine2.prefab	
+RoR2/Base/skymeadow/SMVine3.prefab	
+RoR2/Base/skymeadow/UsedChest.prefab	
+RoR2/Base/skymeadow/texSMGrassTerrain.png	RoR2/GlobalContent/texSMGrassTerrain.png
+RoR2/Base/title/ppLocalGold.asset	RoR2/Base/title/PostProcessing/ppLocalGold.asset
+RoR2/Base/wispgraveyard/dccsWispGraveyardMonstersDLC1.asset	
+RoR2/DLC1/DisplayEliteRabbitEars.prefab	RoR2/Junk_DLC1/DisplayEliteRabbitEars.prefab
+RoR2/DLC1/EliteSecretSpeedEquipment.asset	RoR2/Junk_DLC1/EliteSecretSpeedEquipment.asset
+RoR2/DLC1/EmpowerAlways/EmpowerAlways.asset	RoR2/Junk_DLC1/EmpowerAlways/EmpowerAlways.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/ArtifactBombDisabledPrerequisite.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ArtifactBombDisabledPrerequisite.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/ArtifactCommandDisabledPrerequisite.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ArtifactCommandDisabledPrerequisite.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/ArtifactEnigmaDisabledPrerequisite.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ArtifactEnigmaDisabledPrerequisite.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/ArtifactGlassDisabledPrerequisite.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ArtifactGlassDisabledPrerequisite.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/ArtifactMixEnemyDisabledPrerequisite.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ArtifactMixEnemyDisabledPrerequisite.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/ArtifactSingleMonsterTypeDisabledPrerequisite.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ArtifactSingleMonsterTypeDisabledPrerequisite.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/ArtifactWeakAssKneesDisabledPrerequisite.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ArtifactWeakAssKneesDisabledPrerequisite.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/ArtifactWispOnDeathDisabledPrerequisite.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ArtifactWispOnDeathDisabledPrerequisite.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_AncientLoft1.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_AncientLoft1.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_AncientLoft2.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_AncientLoft2.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_DampCave.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_DampCave.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_FrozenWall.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_FrozenWall.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_GolemPlains.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_GolemPlains.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_GooLake.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_GooLake.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_SkyMeadow.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_SkyMeadow.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_SpecialBeautiful.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_SpecialBeautiful.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_SpecialDream.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_SpecialDream.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_SpecialFD.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_SpecialFD.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_SpecialHenge.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_SpecialHenge.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_SpecialNebStation.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_SpecialNebStation.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_SpecialShatteredPlanet.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_SpecialShatteredPlanet.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/DistantPlanet_SpecialWeirdStation.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/DistantPlanet_SpecialWeirdStation.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/EntityStates.InfiniteTowerSafeWard.Active.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/EntityStates.InfiniteTowerSafeWard.Active.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/EntityStates.InfiniteTowerSafeWard.AwaitingActivation.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/EntityStates.InfiniteTowerSafeWard.AwaitingActivation.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/EntityStates.InfiniteTowerSafeWard.AwaitingPortalUse.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/EntityStates.InfiniteTowerSafeWard.AwaitingPortalUse.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/EntityStates.InfiniteTowerSafeWard.Burrow.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/EntityStates.InfiniteTowerSafeWard.Burrow.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/EntityStates.InfiniteTowerSafeWard.CorrallingPlayers.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/EntityStates.InfiniteTowerSafeWard.CorrallingPlayers.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/EntityStates.InfiniteTowerSafeWard.SelfDestruct.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/EntityStates.InfiniteTowerSafeWard.SelfDestruct.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/EntityStates.InfiniteTowerSafeWard.Travelling.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/EntityStates.InfiniteTowerSafeWard.Travelling.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/EntityStates.InfiniteTowerSafeWard.Unburrow.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/EntityStates.InfiniteTowerSafeWard.Unburrow.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/ITSafeWardPositionIndicator.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ITSafeWardPositionIndicator.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerBossWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerBossWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentArtifactBombWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentArtifactBombWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentArtifactCommandWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentArtifactCommandWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentArtifactEnigmaWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentArtifactEnigmaWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentArtifactGlassWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentArtifactGlassWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentArtifactMixEnemyWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentArtifactMixEnemyWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentArtifactSingleMonsterTypeWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentArtifactSingleMonsterTypeWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentArtifactWeakAssKneesUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentArtifactWeakAssKneesUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentArtifactWispOnDeathUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentArtifactWispOnDeathUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentBossBrotherUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentBossBrotherUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentBossLunarWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentBossLunarWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentBossScavWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentBossScavWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentBossVoidWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentBossVoidWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentBossWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentBossWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerCurrentWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerCurrentWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerDefaultWaveUI.controller	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerDefaultWaveUI.controller
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerDefaultWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerDefaultWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerEdgeEffect.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerEdgeEffect.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerFogDamager.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerFogDamager.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerGameOverController.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerGameOverController.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerNextWaveUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerNextWaveUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerSafeWard.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerSafeWard.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerSafeWardAwaitingInteraction.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerSafeWardAwaitingInteraction.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerSceneDirector.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerSceneDirector.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerSphereCloseBlownOut.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerSphereCloseBlownOut.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerSphereCloseCausticShield.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerSphereCloseCausticShield.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerSphereShield.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerSphereShield.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerSphereShieldGrid.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerSphereShieldGrid.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerSphereShieldTypeB.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerSphereShieldTypeB.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerSphereShieldWhiteGrid.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerSphereShieldWhiteGrid.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerUI.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerUI.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveArtifactBomb.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveArtifactBomb.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveArtifactCommand.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveArtifactCommand.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveArtifactEnigma.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveArtifactEnigma.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveArtifactGlass.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveArtifactGlass.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveArtifactMixEnemy.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveArtifactMixEnemy.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveArtifactSingleMonsterType.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveArtifactSingleMonsterType.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveArtifactWeakAssKnees.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveArtifactWeakAssKnees.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveArtifactWispOnDeath.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveArtifactWispOnDeath.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveBase.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveBase.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveBoss.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveBoss.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveBossBrother.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveBossBrother.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveBossLunar.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveBossLunar.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveBossScav.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveBossScav.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveBossVoid.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveBossVoid.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveCategories/BossWaveCategory.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ITWaveCategories/BossWaveCategory.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveCategories/CommonWaveCategory.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/ITWaveCategories/CommonWaveCategory.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/InfiniteTowerWaveDefault.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/InfiniteTowerWaveDefault.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/OuterInfiniteTowerSphereCloseBlownOut.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/OuterInfiniteTowerSphereCloseBlownOut.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/OuterInfiniteTowerSphereCloseCausticShield.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/OuterInfiniteTowerSphereCloseCausticShield.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/OuterInfiniteTowerSphereShieldGrid.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/OuterInfiniteTowerSphereShieldGrid.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/OuterInfiniteTowerSphereShieldWhiteGrid.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/OuterInfiniteTowerSphereShieldWhiteGrid.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/Skybox Orbiting Objects Template.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/Skybox Orbiting Objects Template.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/VoidArena Distant Planets.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/VoidArena Distant Planets.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/VoidArena Shield FX.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/VoidArena Shield FX.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/VoidWhale.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/VoidWhale.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/Wave11OrGreaterPrerequisite.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/Wave11OrGreaterPrerequisite.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/WaveEndPositionIndicator.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/WaveEndPositionIndicator.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/Weather, InfiniteTower Frozenwall Variant Variant.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/Weather, InfiniteTower Frozenwall Variant Variant.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/Weather, InfiniteTower.prefab	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/Weather, InfiniteTower.prefab
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/animActive.anim	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/animActive.anim
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/animAwaitingActivation.anim	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/animAwaitingActivation.anim
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/animCorrallingPlayers.anim	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/animCorrallingPlayers.anim
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/animInfiniteTowerSafeWard.controller	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/animInfiniteTowerSafeWard.controller
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/animSelfDestruct.anim	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/animSelfDestruct.anim
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/animVoidWhale.controller	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/animVoidWhale.controller
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/animationInfiniteTowerUIFinish.anim	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/animationInfiniteTowerUIFinish.anim
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/animationInfiniteTowerUIFullyCharged.anim	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/animationInfiniteTowerUIFullyCharged.anim
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/animationInfiniteTowerUIPulseBar.anim	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/animationInfiniteTowerUIPulseBar.anim
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/crtexVoidSunCaustics.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/crtexVoidSunCaustics.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/cscBrotherIT.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/cscBrotherIT.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/dccsITScav.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/dccsITScav.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/dccsITVoidMonsters.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/dccsITVoidMonsters.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/dccsInfiniteTowerInteractables.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/dccsInfiniteTowerInteractables.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/dpInfiniteTowerInteractables.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/dpInfiniteTowerInteractables.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/dtITBossWave.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/dtITBossWave.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/dtITDefaultWave.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/dtITDefaultWave.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/dtITLunar.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/dtITLunar.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/dtITSpecialBossWave.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/dtITSpecialBossWave.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/dtITVoid.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/dtITVoid.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/iscInfiniteTowerPortal.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/iscInfiniteTowerPortal.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/iscInfiniteTowerSafeWard.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/iscInfiniteTowerSafeWard.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/iscInfiniteTowerSafeWardAwaitingInteraction.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/iscInfiniteTowerSafeWardAwaitingInteraction.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/lsdInfiniteTowerNextWaveTimer.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/lsdInfiniteTowerNextWaveTimer.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/lsdInfiniteTowerSafeWardTravelling.asset	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/lsdInfiniteTowerSafeWardTravelling.asset
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matDistant Objects Infinite Tower.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matDistant Objects Infinite Tower.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matDistantPlanetShieldBackdrop.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matDistantPlanetShieldBackdrop.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matDistantPlanetShieldRim.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matDistantPlanetShieldRim.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matDistantPlanetSilhouette.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matDistantPlanetSilhouette.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matITSafeWardAreaIndicator1.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matITSafeWardAreaIndicator1.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matITSafeWardAreaIndicator2.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matITSafeWardAreaIndicator2.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matITSafeWardIn.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matITSafeWardIn.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matInfiniteTowerBooleanEffect1.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matInfiniteTowerBooleanEffect1.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matInfiniteTowerBoulderHeavySnow.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matInfiniteTowerBoulderHeavySnow.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matInfiniteTowerEdgeParticlesBrightShards.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matInfiniteTowerEdgeParticlesBrightShards.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matInfiniteTowerSkyboxSphere, Bright Top.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matInfiniteTowerSkyboxSphere, Bright Top.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matInfiniteTowerSkyboxSphere, Scrolling Caustics.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matInfiniteTowerSkyboxSphere, Scrolling Caustics.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matInfiniteTowerSphereCausticShield.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matInfiniteTowerSphereCausticShield.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matInfiniteTowerSphereShieldDistantCausticFog.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matInfiniteTowerSphereShieldDistantCausticFog.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matInfiniteTowerTerrain.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matInfiniteTowerTerrain.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matInfiniteTowerTrim.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matInfiniteTowerTrim.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matSkyboxInfiniteTower.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matSkyboxInfiniteTower.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matTitleLowFogVoid.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matTitleLowFogVoid.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matVoidSunCausticsGenerator.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matVoidSunCausticsGenerator.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matVoidWhale.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matVoidWhale.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/matVoidWhaleEyes.mat	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/matVoidWhaleEyes.mat
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/mdlVoidWhale.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/mdlVoidWhale.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/mdlVoidWhale@Blink.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/mdlVoidWhale@Blink.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/mdlVoidWhale@Pitch.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/mdlVoidWhale@Pitch.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/mdlVoidWhale@Swim.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/mdlVoidWhale@Swim.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/mdlVoidWhale@Yaw.fbx	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/mdlVoidWhale@Yaw.fbx
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texAlphaGradientDarkClamped.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texAlphaGradientDarkClamped.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texITWaveBossIcon.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texITWaveBossIcon.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texITWaveBrotherIcon.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texITWaveBrotherIcon.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texITWaveDefaultIcon.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texITWaveDefaultIcon.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texITWaveLunarIcon.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texITWaveLunarIcon.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texITWaveScavIcon.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texITWaveScavIcon.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texITWaveVoidIcon.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texITWaveVoidIcon.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texInfiniteTowerGrid.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texInfiniteTowerGrid.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texInfiniteTowerGridInverted.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texInfiniteTowerGridInverted.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texInfiniteTowerSafeWardIcon.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texInfiniteTowerSafeWardIcon.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texTowerSphereShield.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texTowerSphereShield.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texUIInfiniteTowerFillbar.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texUIInfiniteTowerFillbar.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texUIInfiniteTowerFillbarBoss.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texUIInfiniteTowerFillbarBoss.png
+RoR2/DLC1/GameModes/InfiniteTowerRun/InfiniteTowerAssets/texVoidWhale.png	RoR2/DLC1/GameModes/InfiniteTowerRun/ITAssets/texVoidWhale.png
+RoR2/DLC1/IrradiatingLaser/DisplayIrradiatingLaser.prefab	RoR2/Junk_DLC1/IrradiatingLaser/DisplayIrradiatingLaser.prefab
+RoR2/DLC1/IrradiatingLaser/IrradiatingLaser.asset	RoR2/Junk_DLC1/IrradiatingLaser/IrradiatingLaser.asset
+RoR2/DLC1/IrradiatingLaser/PickupIrradiatingLaser.prefab	RoR2/Junk_DLC1/IrradiatingLaser/PickupIrradiatingLaser.prefab
+RoR2/DLC1/IrradiatingLaser/matIrradiatingLaser.mat	RoR2/Junk_DLC1/IrradiatingLaser/matIrradiatingLaser.mat
+RoR2/DLC1/IrradiatingLaser/mdlIrradiatingLaser.fbx	RoR2/Junk_DLC1/IrradiatingLaser/mdlIrradiatingLaser.fbx
+RoR2/DLC1/IrradiatingLaser/texIrradiatingLaserIcon.png	RoR2/Junk_DLC1/IrradiatingLaser/texIrradiatingLaserIcon.png
+RoR2/DLC1/LunarWings/DisplayLunarWings.prefab	RoR2/Junk_DLC1/LunarWings/DisplayLunarWings.prefab
+RoR2/DLC1/LunarWings/LunarWings.asset	RoR2/Junk_DLC1/LunarWings/LunarWings.asset
+RoR2/DLC1/LunarWings/LunarWingsController.controller	RoR2/Junk_DLC1/LunarWings/LunarWingsController.controller
+RoR2/DLC1/LunarWings/PickupLunarWings.prefab	RoR2/Junk_DLC1/LunarWings/PickupLunarWings.prefab
+RoR2/DLC1/LunarWings/matLunarWings.mat	RoR2/Junk_DLC1/LunarWings/matLunarWings.mat
+RoR2/DLC1/LunarWings/matLunarWingsGlow.mat	RoR2/Junk_DLC1/LunarWings/matLunarWingsGlow.mat
+RoR2/DLC1/LunarWings/matLunarWingsParticleStone.mat	RoR2/Junk_DLC1/LunarWings/matLunarWingsParticleStone.mat
+RoR2/DLC1/LunarWings/mdlLunarWings.fbx	RoR2/Junk_DLC1/LunarWings/mdlLunarWings.fbx
+RoR2/DLC1/LunarWings/mdlLunarWingsPickup.fbx	RoR2/Junk_DLC1/LunarWings/mdlLunarWingsPickup.fbx
+RoR2/DLC1/LunarWings/texLunarWingsDiffuse.png	RoR2/Junk_DLC1/LunarWings/texLunarWingsDiffuse.png
+RoR2/DLC1/LunarWings/texLunarWingsEmission.png	RoR2/Junk_DLC1/LunarWings/texLunarWingsEmission.png
+RoR2/DLC1/LunarWings/texLunarWingsIcon.png	RoR2/Junk_DLC1/LunarWings/texLunarWingsIcon.png
+RoR2/DLC1/LunarWings/texLunarWingsNormal.png	RoR2/Junk_DLC1/LunarWings/texLunarWingsNormal.png
+RoR2/DLC1/OrbOnUse/OrbOnUse.asset	RoR2/Junk_DLC1/OrbOnUse/OrbOnUse.asset
+RoR2/DLC1/OrbOnUse/PickupOrbOnUse.prefab	RoR2/Junk_DLC1/OrbOnUse/PickupOrbOnUse.prefab
+RoR2/DLC1/OrbOnUse/mdlOrbOnUsePickup.fbx	RoR2/Junk_DLC1/OrbOnUse/mdlOrbOnUsePickup.fbx
+RoR2/DLC1/OrbOnUse/texOrbOnUseIcon.png	RoR2/Junk_DLC1/OrbOnUse/texOrbOnUseIcon.png
+RoR2/DLC1/PickupAffixSecretSpeed.prefab	RoR2/Junk_DLC1/PickupAffixSecretSpeed.prefab
+RoR2/DLC1/Skins.Commando.Alt2.asset	RoR2/Base/Commando/Skins.Commando.Alt2.asset
+RoR2/DLC1/ancientloft/AncientLoft_CircleArchway.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_CirclePot.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_DistantTree.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_FloorTiles.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_FountainLG.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_FountainSM.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_Geyser.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_LightStatue.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_LilyPad.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_Pebble.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_PillarBroken.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_PillarBroken_Still Variant.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_PillarHalfIntact.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_PillarHalfIntactSimpler.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_PillarIntact.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_Rubbles.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_SculptureSM.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_SpnningRocks.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_TempleShrine.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_WaterFenceTypeA.prefab	
+RoR2/DLC1/ancientloft/AncientLoft_WaterFenceTypeB.prefab	
+RoR2/DLC1/ancientloft/mdlFloatingPillarStone.prefab	
+RoR2/DLC1/bdEliteSecretSpeed.asset	RoR2/Junk_DLC1/bdEliteSecretSpeed.asset
+RoR2/DLC1/edSecretSpeed.asset	RoR2/Junk_DLC1/edSecretSpeed.asset
+RoR2/DLC1/itfrozenwall/FWSimpleGrassInfiniteTower.prefab	
+RoR2/DLC1/matRabbitEars.mat	RoR2/Junk_DLC1/matRabbitEars.mat
+RoR2/DLC1/mdlRabbitEars.fbx	RoR2/Junk_DLC1/mdlRabbitEars.fbx
+RoR2/DLC1/snowyforest/SFCrate.prefab	
+RoR2/DLC1/snowyforest/SFFirepit.prefab	
+RoR2/DLC1/snowyforest/SFPebble.prefab	
+RoR2/DLC1/snowyforest/SFPots.prefab	
+RoR2/DLC1/snowyforest/SMRockFormationMedium3.prefab	
+RoR2/DLC1/snowyforest/SMRockFormationSmall1.prefab	
+RoR2/DLC1/snowyforest/mdlSFBrokenLantern.prefab	
+RoR2/DLC1/snowyforest/mdlSFHangingLantern.prefab	
+RoR2/DLC1/sulfurpools/SPMossSpiral.prefab	
+RoR2/DLC1/texAffixSecretSpeedIcon.png	RoR2/Junk_DLC1/texAffixSecretSpeedIcon.png
+RoR2/DLC1/texBuffAffixSecretSpeed.png	RoR2/Junk_DLC1/texBuffAffixSecretSpeed.png
+RoR2/DLC1/texRabbitEarsDiffuse.png	RoR2/Junk_DLC1/texRabbitEarsDiffuse.png
+RoR2/DLC1/texRabbitEarsNormals.png	RoR2/Junk_DLC1/texRabbitEarsNormals.png
+RoR2/DLC1/texRabbitEarsSpecular.png	RoR2/Junk_DLC1/texRabbitEarsSpecular.png
+RoR2/DLC1/voidraid/DCPebble Variant.prefab	
+RoR2/DLC1/voidraid/DCPebbleCrystal Variant.prefab	
+RoR2/DLC1/voidraid/PebbleBlackbeach Variant.prefab	
+RoR2/DLC1/voidraid/RaidALtGrass Variant.prefab	
+RoR2/DLC1/voidraid/SGRockSmall Variant.prefab	
+RoR2/DLC1/voidraid/bbSimpleGrassPrefab Variant.prefab	
+RoR2/DLC1/voidraid/spmGlGrass1 Variant.prefab	
+RoR2/DLC1/voidstage/mdlVoidCoralPlatformTypeA.prefab	
+RoR2/DLC1/voidstage/mdlVoidCoralPlatformTypeB.prefab	
+RoR2/InDev/EchoHunterGhost.prefab	RoR2/Junk/EchoHunterGhost.prefab
+RoR2/InDev/EchoHunterProjectile.prefab	RoR2/Junk/EchoHunterProjectile.prefab
+RoR2/InDev/EliteEchoEquipment.asset	RoR2/Junk/EliteEchoEquipment.asset
+RoR2/InDev/SummonedEcho.asset	RoR2/Junk/SummonedEcho.asset
+RoR2/InDev/bdDeafened.asset	RoR2/Junk/bdDeafened.asset
+RoR2/InDev/bdEliteEcho.asset	RoR2/Junk/bdEliteEcho.asset
+RoR2/InDev/edEcho.asset	RoR2/Junk/edEcho.asset
+RoR2/InDev/matEcho.mat	RoR2/Junk/matEcho.mat
+RoR2/InDev/matEchoHunterGhostSphere.mat	RoR2/Junk/matEchoHunterGhostSphere.mat
+RoR2/Junk/CommandoPerformanceTest/EntityStates.Commando.CommandoWeapon.FireBarrage.asset	RoR2/Base/Commando/EntityStates.Commando.CommandoWeapon.FireBarrage.asset
+RoR2/Junk/LunarWisp/LunarWispTrackingBombExplosion.prefab	RoR2/Base/LunarWisp/LunarWispTrackingBombExplosion.prefab
+RoR2/Junk/Squid/EntityStates.Squid.SquidDeathState.asset	RoR2/Base/Squid/EntityStates.Squid.SquidDeathState.asset
+RoR2/Junk/Treebot/TreebotFruitDeathEffect.prefab	RoR2/Base/Treebot/TreebotFruitDeathEffect.prefab
+RoR2/Junk/UI/LobbyUserList.prefab	
+RoR2/Junk/slice2/terrainSlice2Grass1.asset	
+RoR2/Junk/slice2/terrainSlice2Sand.asset	
+RoR2/Junk/stage1/stage1Terrain.asset	
