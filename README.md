@@ -159,6 +159,7 @@ Updating from a version before 1.4.43: the first launch moves each saved value t
 |---|---|---|
 | `LagTracer` | true | Diagnostic: during a run, every 10 s logs the average fps, the worst frame, frames over 100 ms, live enemies (Monster + Lunar + Void teams, logged as `monsters`) / bodies / projectiles, the time spent in the paths item mods hook (RecalculateStats, TakeDamage, OnHitEnemy, OnCharacterDeath, OnInventoryChanged, BulletAttack.Fire, FireProjectile, Heal), the per-frame paths (body ticks, AI, state machines, overlays, HUD, mods' per-frame subscribers), Unity's CPU vs GPU frame time, physics steps per frame and GC collections; laggy windows at Info, smooth ones at Debug; a frame over 250 ms is logged at once; a run-end `Lag summary` names the worst moment. The Mod Watcher's report turns these into a Performance section. About 6 lines a minute |
 | `SoundTracer` | true | Diagnostic: at each run end, logs the loop-type sounds that were started on objects that no longer exist and never got their stop (to name an audio loop that follows you into the lobby), the last sounds before the run ended, and who calls `AkSoundEngine.StopAll`. Turn off once the loop is found |
+| `PhysicsPileupTracer` | true | Diagnostic: during a run, after a frame over 0.5 s (at most every 10 s, stage loads skipped), logs which moving objects (colliders on a rigidbody) hold the most colliders, how many of them are triggers, and how many share one 4 m spot, plus the static collider count. Built to name what piled up in the 8:57 PM Void Locus hang (PhysX registering new overlapping pairs without end). Silent while frames stay under 0.5 s. Host only. |
 
 ### Spawn speed (`SpawnCreditMultiplier`)
 
@@ -213,6 +214,7 @@ The **Hallowed Ichor timer fix** is per PC, because each game runs its own timer
 The **totem tether guard** is per PC, because each game moves its own tether.
 The **Paladin shockwave** and **Sandswept fire trail** fixes are per PC, because each game draws its own shockwaves and runs its own trails.
 The **Sharp Anchor** guard is host only, because only the host runs the anchor zones' buffs.
+The **physics pile-up tracer** is host only: it only logs, and the host's log is the one read.
 
 **Difficulty scaling** must match on every PC: each game computes monster level itself, so friends with a different
 Inferno `Difficulty Scaling` or without `InfernoLevelBoostFix` see enemies at the wrong level on their health bars
@@ -232,6 +234,8 @@ and `Level and Difficulty Boost` (1.25 by default) values.
   states are unregistered in game 1.5.0), and log a FireCannons "The Object you want to instantiate is null" error.
 
 ## What it logs (source `CompatShield`)
+- `Physics pile-up tracer: during a run, after a frame over 500 ms (at most every 10 s), logs which moving objects hold the most colliders and how many of them share one 4 m spot` at load; `Physics pile-up tracer: can't watch runs, not applied: ...` if the game's run events are missing; `Physics pile-up tracer: couldn't start for this run: ...` if the ticker can't be made at a run start.
+- `Physics pile-up: 600 ms frame in voidraid (stage 12 t=50:01); 41 moving colliders of 3 kinds, 24 in the most crowded 4 m spot, 50 static; most: AmmoPack: 30 colliders on 15 objects, 15 triggers, 24 in one spot; ... (census 2 ms)` after a long frame. Up to six kinds, most colliders first. `Physics pile-up tracer: couldn't take a census (logged once): ...` if counting fails.
 - `StormyItems: a Sharp Anchor zone that has lost its holder now skips its tick instead of throwing every tick` at the first run start; `StormyItems: a Sharp Anchor zone had lost track of its holder, so its tick was skipped instead of throwing (first time this launch)` the first time it steps in; `Sharp Anchor fix: ... not applied` if the mod's code is not the expected shape.
 - `PaladinMod: a shockwave whose dust effect is gone now stops moving it instead of throwing every tick` at the first run start; `PaladinMod: a shockwave's dust effect was gone, so the shockwave stopped moving it (first time this launch)` the first time it steps in; `Paladin shockwave fix: ... not applied` if the mod's code is not the expected shape.
 - `Sandswept: a fire trail whose last flame burned out no longer throws when the game resizes it` at the first run start; `Sandswept: a fire trail's last flame burned out, so its size was left as it was (first time this launch)` the first time it steps in; `Sandswept fire trail fix: ... not applied` if the mod's code is not the expected shape.
