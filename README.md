@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/IsaiahAnson/ror2-compat-shield/releases/latest"><img src="assets/btn-download.svg" height="34" alt="Download latest"></a>&nbsp;
+  <a href="https://github.com/IsaiahAnson/compatshield/releases/latest"><img src="assets/btn-download.svg" height="34" alt="Download latest"></a>&nbsp;
   <a href="VERSIONS.md"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/btn-versions-dark.svg"><img src="assets/btn-versions-light.svg" height="34" alt="All versions"></picture></a>&nbsp;
   <a href="docs/REFERENCE.md"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/btn-reference-dark.svg"><img src="assets/btn-reference-light.svg" height="34" alt="Full reference"></picture></a>
 </p>
@@ -92,7 +92,7 @@ Each entry in the [full reference](docs/REFERENCE.md#what-it-fixes) says what br
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icon-install-dark.svg"><img src="assets/icon-install-light.svg" width="30" height="30" align="absmiddle" alt=""></picture> Install
 
-1. Download the zip from the [latest release](https://github.com/IsaiahAnson/ror2-compat-shield/releases/latest).
+1. Download the zip from the [latest release](https://github.com/IsaiahAnson/compatshield/releases/latest).
 2. In Thunderstore Mod Manager or r2modman, import the zip as a local mod. It replaces any earlier CompatShield.
 3. Start the game from the mod manager. The settings file is created on that first launch.
 
@@ -103,7 +103,7 @@ To remove it, delete the `Local-CompatShield` folder under `BepInEx\patchers` in
 All 58 settings live in one file, `BepInEx\config\local.compatshield.cfg`. The mod manager's config editor shows them in eight numbered sections.
 
 <table>
-  <tr><th width="36"></th><th align="left">Section</th><th align="left">What's in it</th><th align="right">Settings</th></tr>
+  <tr><th width="50"></th><th align="left">Section</th><th align="left">What's in it</th><th align="right">Settings</th></tr>
   <tr><td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/mini-spawns-dark.svg"><img src="assets/mini-spawns-light.svg" width="20" height="20" alt=""></picture></td><td><a href="docs/REFERENCE.md#1-spawns-and-enemies">1.&nbsp;Spawns&nbsp;and&nbsp;Enemies</a></td><td>Spawn speed, enemy caps, how often printers, scrappers and drones appear, drone health</td><td align="right">9</td></tr>
   <tr><td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/mini-sacrifice-dark.svg"><img src="assets/mini-sacrifice-light.svg" width="20" height="20" alt=""></picture></td><td><a href="docs/REFERENCE.md#2-artifact-of-sacrifice">2.&nbsp;Artifact&nbsp;of&nbsp;Sacrifice</a></td><td>Drop chance, which interactables stay under Sacrifice, the ShareSuite credit fix</td><td align="right">4</td></tr>
   <tr><td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/mini-balance-dark.svg"><img src="assets/mini-balance-light.svg" width="20" height="20" alt=""></picture></td><td><a href="docs/REFERENCE.md#3-balance">3.&nbsp;Balance</a></td><td>Acolyte attack speed, ItemRoulette spin cost, Artifact of Genetics, locked items</td><td align="right">4</td></tr>
@@ -134,7 +134,7 @@ The build that ships is `bin\Release\netstandard2.1\CompatShield.dll`. To use it
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icon-versions-dark.svg"><img src="assets/icon-versions-light.svg" width="30" height="30" align="absmiddle" alt=""></picture> Versions
 
-45 packaged builds are kept, from 1.4.2 to 1.4.54, each with its zip: see [VERSIONS.md](VERSIONS.md) or the [releases page](https://github.com/IsaiahAnson/ror2-compat-shield/releases). The source code here is the latest version. Each older version has a tag that holds the README shipped with that build.
+45 packaged builds are kept, from 1.4.2 to 1.4.54, each with its zip: see [VERSIONS.md](VERSIONS.md) or the [releases page](https://github.com/IsaiahAnson/compatshield/releases). The source code here is the latest version. Each older version has a tag that holds the README shipped with that build.
 
 <img src="assets/divider.svg" width="100%" height="8" alt="">
 

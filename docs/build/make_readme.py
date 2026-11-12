@@ -8,7 +8,7 @@ import re
 import sys
 
 reference_path, versions_path, out_path = sys.argv[1:4]
-BASE = "https://github.com/IsaiahAnson/ror2-compat-shield"
+BASE = "https://github.com/IsaiahAnson/compatshield"
 REF = "docs/REFERENCE.md"
 
 with open(reference_path, encoding="utf-8-sig") as f:
@@ -64,6 +64,7 @@ for number, name in found:
     assert anchor(title) in by_anchor, title
     counts.append(count)
     # An HTML table, because the icon column needs a fixed width (GitHub shrinks an image in an auto-sized cell).
+    # GitHub counts the cell's 26px of padding and its border inside that width, so 50 leaves room for a 20px icon.
     rows.append('  <tr><td align="center">%s</td><td><a href="%s#%s">%s</a></td><td>%s</td><td align="right">%d</td></tr>' % (
         themed("mini-" + icon, 'width="20" height="20" alt=""'), REF, anchor(title), title.replace(" ", "&nbsp;"),
         about, count))
@@ -137,7 +138,7 @@ To remove it, delete the `Local-CompatShield` folder under `BepInEx\\patchers` i
 All {total_settings} settings live in one file, `BepInEx\\config\\local.compatshield.cfg`. The mod manager's config editor shows them in eight numbered sections.
 
 <table>
-  <tr><th width="36"></th><th align="left">Section</th><th align="left">What's in it</th><th align="right">Settings</th></tr>
+  <tr><th width="50"></th><th align="left">Section</th><th align="left">What's in it</th><th align="right">Settings</th></tr>
 {chr(10).join(rows)}
 </table>
 
