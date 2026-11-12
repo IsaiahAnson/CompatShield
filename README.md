@@ -96,6 +96,7 @@ Updating from a version before 1.4.43: the first launch moves each saved value t
 | `AcolyteAttackSpeedMultiplier` | 1.5 | Multiplies Acolyte's attack speed, in the normal and the transformed form (1 = game default, 0 or below is ignored). Enemy copies of the same body get it too, and a move set not to speed up above 1 attack speed stays as it is. Every PC: each player's own Acolyte uses the value on that player's PC |
 | `RouletteSpinCost` | true | A paid ItemRoulette spin also comes out of ShareSuite's shared gold, so spins really cost money in multiplayer. Does nothing with shared money off or in single player. Host only |
 | `DisableGenetics` | true | Keeps the Artifact of Genetics off (a vote for it is ignored, it is hidden from the lobby list) while the GeneticArtifact mod stays installed. Host decides the force-off; every PC hides it |
+| `LockedItems` | (empty) | Items and equipment locked off in every lobby, as a comma-separated list of internal names (as in `Def.StartBonusMod.cfg`, for example `ChainLightning, JetBoots`). Each shows `[CONFIG DISABLED]` in the lobby item list and its lock can't be clicked off, like an item disabled in TinkersSatchel's config. It goes by name, so adding or removing mods can't move the locks to other items (ItemBlacklist with LobbyVotesSave stores votes by position, which is how bans drifted). Only items with a lobby rule can be locked; the log names any it could not find. Host decides the lock; the red title shows on each PC with the same list. |
 
 ### 4. Lag and Hang Protection
 
@@ -215,6 +216,7 @@ The **totem tether guard** is per PC, because each game moves its own tether.
 The **Paladin shockwave** and **Sandswept fire trail** fixes are per PC, because each game draws its own shockwaves and runs its own trails.
 The **Sharp Anchor** guard is host only, because only the host runs the anchor zones' buffs.
 The **physics pile-up tracer** is host only: it only logs, and the host's log is the one read.
+**Locked items** are host only: the host's game decides which lobby choices can be picked and sends that to everyone. A friend sees the lock either way; the red `[CONFIG DISABLED]` title shows only on a PC whose `LockedItems` list is the same.
 
 **Difficulty scaling** must match on every PC: each game computes monster level itself, so friends with a different
 Inferno `Difficulty Scaling` or without `InfernoLevelBoostFix` see enemies at the wrong level on their health bars
@@ -234,6 +236,7 @@ and `Level and Difficulty Boost` (1.25 by default) values.
   states are unregistered in game 1.5.0), and log a FireCannons "The Object you want to instantiate is null" error.
 
 ## What it logs (source `CompatShield`)
+- `Locked items: 28 name(s) will be locked off in the lobby as soon as the game's rule list is ready` at load, then `Locked items: 25 of 28 locked off in the lobby by name (the On choice can't be picked, shown as [CONFIG DISABLED]): ArmedBackpack, ...`. `Locked items: no item or equipment is named X, Y ...` for names with no lobby rule (mod removed, wrong name, or an item the lobby never lists). `Locked items: ... not applied` if the game's rule list changed shape.
 - `Physics pile-up tracer: during a run, after a frame over 500 ms (at most every 10 s), logs which moving objects hold the most colliders and how many of them share one 4 m spot` at load; `Physics pile-up tracer: can't watch runs, not applied: ...` if the game's run events are missing; `Physics pile-up tracer: couldn't start for this run: ...` if the ticker can't be made at a run start.
 - `Physics pile-up: 600 ms frame in voidraid (stage 12 t=50:01); 41 moving colliders of 3 kinds, 24 in the most crowded 4 m spot, 50 static; most: AmmoPack: 30 colliders on 15 objects, 15 triggers, 24 in one spot; ... (census 2 ms)` after a long frame. Up to six kinds, most colliders first. `Physics pile-up tracer: couldn't take a census (logged once): ...` if counting fails.
 - `StormyItems: a Sharp Anchor zone that has lost its holder now skips its tick instead of throwing every tick` at the first run start; `StormyItems: a Sharp Anchor zone had lost track of its holder, so its tick was skipped instead of throwing (first time this launch)` the first time it steps in; `Sharp Anchor fix: ... not applied` if the mod's code is not the expected shape.
