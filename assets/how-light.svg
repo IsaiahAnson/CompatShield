@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 178" width="880" height="178" role="img" aria-labelledby="t d">
+  <title id="t">How CompatShield works</title>
+  <desc id="d">Four steps. 1, Loads first: BepInEx starts it before the game and any mod. 2, Patches in memory: it fixes each broken mod as it loads, and no mod file is changed. 3, Guards the run: it stops error loops, hangs and runaway chains while you play. 4, Steps aside: when a mod ships its own fix, the patch stops and says so in the log.</desc>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+    .card { fill: #ffffff; stroke: #d0d7de; }
+    .name { fill: #1f2328; } .role { fill: #424a53; } .meta { fill: #59636e; }
+    .g { fill: none; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+    .cB .g { stroke: #0969da; } .cO .g { stroke: #bc4c00; } .cT .g { stroke: #0f766e; } .cV .g { stroke: #8250df; }
+    .ar { fill: none; stroke: #59636e; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.8; }
+    .pop { animation: pop 0.55s ease-out both; }
+    .p2 { animation-delay: 0.12s; } .p3 { animation-delay: 0.24s; } .p4 { animation-delay: 0.36s; }
+    .ar { animation: ar 3.2s ease-in-out 1s infinite both; }
+    .a2 { animation-delay: 1.5s; } .a3 { animation-delay: 2s; }
+    @keyframes pop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes ar { 0%, 100% { opacity: 0.3; } 25% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .pop, .ar { animation: none; } }
+  </style>
+  <defs>
+    <linearGradient id="fB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0969da" stop-opacity="0.15"/><stop offset="1" stop-color="#0969da" stop-opacity="0.04"/></linearGradient>
+    <linearGradient id="fO" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bc4c00" stop-opacity="0.15"/><stop offset="1" stop-color="#bc4c00" stop-opacity="0.04"/></linearGradient>
+    <linearGradient id="fT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f766e" stop-opacity="0.15"/><stop offset="1" stop-color="#0f766e" stop-opacity="0.04"/></linearGradient>
+    <linearGradient id="fV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8250df" stop-opacity="0.15"/><stop offset="1" stop-color="#8250df" stop-opacity="0.04"/></linearGradient>
+  </defs>
+  <g class="pop p1 cB"><rect class="card" x="0.5" y="9.5" width="195" height="159" rx="14"/><rect x="16.5" y="25.5" width="44" height="44" rx="11" fill="url(#fB)" stroke="#0969da" stroke-opacity="0.5" stroke-width="1.6"/><g transform="translate(38.5 47.5) scale(0.6)"><path class="g" d="M3 -19 L-12 3 H-1 L-3 19 L12 -3 H1 Z"/></g><text class="mono meta" x="179.5" y="43.5" font-size="13" font-weight="600" text-anchor="end">01</text><text class="name" x="16.5" y="97.5" font-size="16.5" font-weight="600">Loads first</text><text class="role" x="16.5" y="118.5" font-size="12.6">BepInEx starts it before</text><text class="role" x="16.5" y="135.5" font-size="12.6">the game and any mod.</text></g>
+  <path class="ar" d="M204.5 89 H219.5 M213.5 83 l6 6 l-6 6"/>
+  <g class="pop p2 cO"><rect class="card" x="228.5" y="9.5" width="195" height="159" rx="14"/><rect x="244.5" y="25.5" width="44" height="44" rx="11" fill="url(#fO)" stroke="#bc4c00" stroke-opacity="0.5" stroke-width="1.6"/><g transform="translate(266.5 47.5) scale(0.6)"><rect class="g" x="-12" y="-12" width="24" height="24" rx="4"/><path class="g" d="M-5 -20 v8 M5 -20 v8 M-5 12 v8 M5 12 v8 M-20 -5 h8 M-20 5 h8 M12 -5 h8 M12 5 h8"/><path class="g" d="M-5 0.5 l3.5 3.5 l6.5 -7.5"/></g><text class="mono meta" x="407.5" y="43.5" font-size="13" font-weight="600" text-anchor="end">02</text><text class="name" x="244.5" y="97.5" font-size="16.5" font-weight="600">Patches in memory</text><text class="role" x="244.5" y="118.5" font-size="12.6">Fixes each broken mod as</text><text class="role" x="244.5" y="135.5" font-size="12.6">it loads. No mod file is</text><text class="role" x="244.5" y="152.5" font-size="12.6">changed.</text></g>
+  <path class="ar a2" d="M432.5 89 H447.5 M441.5 83 l6 6 l-6 6"/>
+  <g class="pop p3 cT"><rect class="card" x="456.5" y="9.5" width="195" height="159" rx="14"/><rect x="472.5" y="25.5" width="44" height="44" rx="11" fill="url(#fT)" stroke="#0f766e" stroke-opacity="0.5" stroke-width="1.6"/><g transform="translate(494.5 47.5) scale(0.6)"><path class="g" d="M0 -19 L15 -13 V-1 C15 9 8.5 15.5 0 19 C-8.5 15.5 -15 9 -15 -1 V-13 Z"/><path class="g" d="M-6.5 -0.5 l4.5 4.5 l8.5 -9.5"/></g><text class="mono meta" x="635.5" y="43.5" font-size="13" font-weight="600" text-anchor="end">03</text><text class="name" x="472.5" y="97.5" font-size="16.5" font-weight="600">Guards the run</text><text class="role" x="472.5" y="118.5" font-size="12.6">Stops error loops, hangs</text><text class="role" x="472.5" y="135.5" font-size="12.6">and runaway chains while</text><text class="role" x="472.5" y="152.5" font-size="12.6">you play.</text></g>
+  <path class="ar a3" d="M660.5 89 H675.5 M669.5 83 l6 6 l-6 6"/>
+  <g class="pop p4 cV"><rect class="card" x="684.5" y="9.5" width="195" height="159" rx="14"/><rect x="700.5" y="25.5" width="44" height="44" rx="11" fill="url(#fV)" stroke="#8250df" stroke-opacity="0.5" stroke-width="1.6"/><g transform="translate(722.5 47.5) scale(0.6)"><path class="g" d="M-3 -17 H-14 a4 4 0 0 0 -4 4 V13 a4 4 0 0 0 4 4 H-3"/><path class="g" d="M-7 0 H18 M10 -8 l8 8 l-8 8"/></g><text class="mono meta" x="863.5" y="43.5" font-size="13" font-weight="600" text-anchor="end">04</text><text class="name" x="700.5" y="97.5" font-size="16.5" font-weight="600">Steps aside</text><text class="role" x="700.5" y="118.5" font-size="12.6">When a mod ships its own</text><text class="role" x="700.5" y="135.5" font-size="12.6">fix, the patch stops and</text><text class="role" x="700.5" y="152.5" font-size="12.6">says so in the log.</text></g>
+</svg>

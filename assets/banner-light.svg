@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 340" width="1280" height="340" role="img" aria-labelledby="t d">
+  <title id="t">CompatShield</title>
+  <desc id="d">CompatShield, a BepInEx patcher for Risk of Rain 2. It fixes mods the October 2026 update broke, without editing a single mod file. The picture: errors rain down on a glowing shield dome and stop at its edge. Under the dome, an orange shield with a cross stands between four mod tiles, each with a check mark.</desc>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+    .bg { fill: #f6f8fa; }
+    .edge { fill: none; stroke: #d0d7de; }
+    .name { fill: #1f2328; } .role { fill: #424a53; } .meta { fill: #59636e; }
+    .fO { fill: #bc4c00; } .fT { fill: #0f766e; } .fB { fill: #0969da; } .fH { fill: #e16f24; }
+    .sH { fill: none; stroke: #e16f24; stroke-width: 2; stroke-linecap: round; }
+    .g { fill: none; stroke: #59636e; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .gf { fill: #59636e; }
+    .tile { fill: #ffffff; stroke: #0f766e; stroke-opacity: 0.7; stroke-width: 1.4; }
+    .ck { fill: none; stroke: #ffffff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .pill { fill: #ffffff; stroke: #d0d7de; }
+    .rim { fill: none; stroke: url(#rim); stroke-width: 2.6; stroke-linecap: round; }
+    .rim2 { fill: none; stroke: #bc4c00; stroke-opacity: 0.2; stroke-width: 7; stroke-linecap: round; }
+    .rim3 { fill: none; stroke: #bc4c00; stroke-opacity: 0.07; stroke-width: 17; stroke-linecap: round; }
+    .hexl { fill: none; stroke: #bc4c00; stroke-width: 1; }
+    .shield { fill: #fff1e5; stroke: #bc4c00; stroke-width: 6; stroke-linejoin: round; }
+    .drop { fill: none; stroke: #6e7781; stroke-linecap: round; }
+    .dropE { fill: none; stroke: #cf222e; stroke-width: 2.4; stroke-linecap: round; }
+    .ec { fill: #ffffff; }
+    .ec2 { fill: #cf222e; fill-opacity: 0.1; stroke: #cf222e; stroke-opacity: 0.55; }
+    .ect { fill: #cf222e; font-weight: 600; }
+    .ex { fill: none; stroke: #cf222e; stroke-width: 1.8; stroke-linecap: round; }
+    .hit { opacity: 0.9; transform-box: fill-box; transform-origin: center; }
+    .hx { opacity: 0; }
+    .flow { fill: none; stroke: #e16f24; stroke-width: 4.5; stroke-linecap: round; stroke-dasharray: 0.07 0.93; opacity: 0; }
+    .wave { fill: none; stroke: #bc4c00; stroke-width: 1.6; opacity: 0; transform-origin: 962px 298px; }
+    .pulse { transform-box: fill-box; transform-origin: center; }
+
+    .rA { animation: fallA 2.6s linear infinite; }
+    .rB { animation: fallB 1.7s linear infinite; }
+    .rE { animation: fallE 2.3s linear infinite; }
+    .hit { animation: hit 3.9s ease-out infinite both; }
+    .h1 { animation-delay: 0.3s; } .h2 { animation-delay: 1.5s; } .h3 { animation-delay: 2.7s; }
+    .h4 { animation-delay: 0.9s; } .h5 { animation-delay: 2.1s; } .h6 { animation-delay: 3.3s; }
+    .flow { animation: flow 5.4s linear 1s infinite; }
+    .wave { animation: wave 4.8s ease-out infinite both; }
+    .w2 { animation-delay: 2.4s; }
+    .pulse { animation: pulse 3.6s ease-in-out infinite; }
+    .bob { animation: bob 6s ease-in-out infinite; }
+    .q2 { animation-delay: -2s; } .q3 { animation-delay: -4s; }
+    @keyframes fallA { to { transform: translateY(150px); } }
+    @keyframes fallB { to { transform: translateY(220px); } }
+    @keyframes fallE { to { transform: translateY(300px); } }
+    @keyframes hit { 0% { opacity: 0; transform: scale(0.3); } 5% { opacity: 1; transform: scale(1); } 24% { opacity: 0; transform: scale(1.4); } 100% { opacity: 0; transform: scale(1.4); } }
+    @keyframes flow { 0% { stroke-dashoffset: 1; opacity: 0; } 8% { opacity: 1; } 90% { opacity: 1; } 100% { stroke-dashoffset: 0.07; opacity: 0; } }
+    @keyframes wave { 0% { transform: scale(0.42); opacity: 0; } 14% { opacity: 0.55; } 100% { transform: scale(1); opacity: 0; } }
+    @keyframes pulse { 0%, 100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+    @media (prefers-reduced-motion: reduce) { .rA, .rB, .rE, .hit, .flow, .wave, .pulse, .bob { animation: none; } }
+  </style>
+  <defs>
+    <clipPath id="frame"><rect x="1" y="1" width="1278" height="338" rx="16"/></clipPath>
+    <clipPath id="out"><path clip-rule="evenodd" d="M0 0 H1280 V340 H0 Z M716 298 A246 232 0 0 1 1208 298 Z"/></clipPath>
+    <pattern id="pA" width="46" height="150" patternUnits="userSpaceOnUse">
+      <path class="drop" stroke-width="1.2" stroke-opacity="0.3" d="M11 8 v30 M34 88 v22"/>
+    </pattern>
+    <pattern id="pB" width="74" height="220" patternUnits="userSpaceOnUse">
+      <path class="drop" stroke-width="1.9" stroke-opacity="0.5" d="M17 18 v50 M53 132 v38"/>
+    </pattern>
+    <pattern id="pE" width="236" height="300" patternUnits="userSpaceOnUse">
+      <path class="dropE" stroke-opacity="0.9" d="M40 24 v44 M158 176 v36"/>
+    </pattern>
+    <pattern id="hex" width="27.71" height="48" patternUnits="userSpaceOnUse" patternTransform="translate(962 66)">
+      <path class="hexl" d="M13.86 0 L27.71 8 V24 L13.86 32 L0 24 V8 Z M13.86 32 V48"/>
+    </pattern>
+    <linearGradient id="rfx" gradientUnits="userSpaceOnUse" x1="570" y1="0" x2="800" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="rfy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="1"/>
+    </linearGradient>
+    <mask id="rf" maskUnits="userSpaceOnUse" x="0" y="0" width="1280" height="340">
+      <rect width="1280" height="340" fill="url(#rfx)"/><rect y="290" width="1280" height="50" fill="url(#rfy)"/>
+    </mask>
+    <radialGradient id="df" gradientUnits="userSpaceOnUse" cx="962" cy="298" r="246" gradientTransform="translate(962 298) scale(1 0.9431) translate(-962 -298)">
+      <stop offset="0" stop-color="#bc4c00" stop-opacity="0"/><stop offset="0.55" stop-color="#bc4c00" stop-opacity="0.02"/>
+      <stop offset="0.86" stop-color="#bc4c00" stop-opacity="0.07"/><stop offset="1" stop-color="#bc4c00" stop-opacity="0.2"/>
+    </radialGradient>
+    <radialGradient id="hm" gradientUnits="userSpaceOnUse" cx="962" cy="298" r="246" gradientTransform="translate(962 298) scale(1 0.9431) translate(-962 -298)">
+      <stop offset="0.3" stop-color="#fff" stop-opacity="0"/><stop offset="0.8" stop-color="#fff" stop-opacity="0.45"/><stop offset="1" stop-color="#fff" stop-opacity="1"/>
+    </radialGradient>
+    <mask id="hmask" maskUnits="userSpaceOnUse" x="0" y="0" width="1280" height="340"><rect width="1280" height="340" fill="url(#hm)"/></mask>
+    <linearGradient id="rim" gradientUnits="userSpaceOnUse" x1="716" y1="0" x2="1208" y2="0">
+      <stop offset="0" stop-color="#bc4c00" stop-opacity="0.35"/><stop offset="0.22" stop-color="#bc4c00"/><stop offset="0.5" stop-color="#e16f24"/>
+      <stop offset="0.78" stop-color="#bc4c00"/><stop offset="1" stop-color="#bc4c00" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="ground" gradientUnits="userSpaceOnUse" x1="640" y1="0" x2="1280" y2="0">
+      <stop offset="0" stop-color="#59636e" stop-opacity="0"/><stop offset="0.16" stop-color="#59636e" stop-opacity="0.55"/>
+      <stop offset="0.9" stop-color="#59636e" stop-opacity="0.55"/><stop offset="1" stop-color="#59636e" stop-opacity="0.15"/>
+    </linearGradient>
+    <radialGradient id="go" cx="0.75" cy="0.92" r="0.42"><stop offset="0" stop-color="#bc4c00" stop-opacity="0.13"/><stop offset="1" stop-color="#bc4c00" stop-opacity="0"/></radialGradient>
+    <radialGradient id="gb" cx="0.92" cy="0" r="0.45"><stop offset="0" stop-color="#0969da" stop-opacity="0.13"/><stop offset="1" stop-color="#0969da" stop-opacity="0"/></radialGradient>
+    <radialGradient id="gs"><stop offset="0" stop-color="#bc4c00" stop-opacity="0.42"/><stop offset="0.6" stop-color="#bc4c00" stop-opacity="0.1"/><stop offset="1" stop-color="#bc4c00" stop-opacity="0"/></radialGradient>
+    <linearGradient id="ab" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#bc4c00"/><stop offset="1" stop-color="#e16f24"/></linearGradient>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="1279" height="339" rx="16"/>
+  <g clip-path="url(#frame)">
+    <rect width="1280" height="340" fill="url(#gb)"/>
+    <rect width="1280" height="340" fill="url(#go)"/>
+    <g clip-path="url(#out)" mask="url(#rf)">
+      <g transform="rotate(14 962 170)">
+        <rect class="rA" x="-400" y="-600" width="2200" height="1500" fill="url(#pA)"/>
+        <rect class="rB" x="-400" y="-600" width="2200" height="1500" fill="url(#pB)"/>
+        <rect class="rE" x="-400" y="-600" width="2200" height="1500" fill="url(#pE)"/>
+      </g>
+    </g>
+    <g class="bob" opacity="1.0"><rect class="ec" x="640.5" y="30.5" width="206" height="24" rx="12.0"/><rect class="ec2" x="640.5" y="30.5" width="206" height="24" rx="12.0"/><path class="ex" d="M650.6 39.3 l6.4 6.4 m0 -6.4 l-6.4 6.4"/><text class="mono ect" x="663.1" y="46.8" font-size="12.5">InvalidProgramException</text></g>
+    <g class="bob q2" opacity="1.0"><rect class="ec" x="1060.5" y="22.5" width="198" height="24" rx="12.0"/><rect class="ec2" x="1060.5" y="22.5" width="198" height="24" rx="12.0"/><path class="ex" d="M1070.6 31.3 l6.4 6.4 m0 -6.4 l-6.4 6.4"/><text class="mono ect" x="1083.1" y="38.8" font-size="12.5">NullReferenceException</text></g>
+    <g class="bob q3" opacity="0.62"><rect class="ec" x="604.5" y="96.5" width="174" height="21" rx="10.5"/><rect class="ec2" x="604.5" y="96.5" width="174" height="21" rx="10.5"/><path class="ex" d="M613.4 103.8 l6.4 6.4 m0 -6.4 l-6.4 6.4"/><text class="mono ect" x="624.4" y="110.7" font-size="11">StackOverflowException</text></g>
+    <ellipse cx="962" cy="298" rx="262" ry="9" fill="#bc4c00" fill-opacity="0.13"/>
+    <path d="M640 298.5 H1280" stroke="url(#ground)" stroke-width="1.5" fill="none"/>
+    <path d="M716 298 A246 232 0 0 1 1208 298 Z" fill="url(#df)"/>
+    <path d="M716 298 A246 232 0 0 1 1208 298 Z" fill="url(#hex)" opacity="0.42" mask="url(#hmask)"/>
+    <path class="wave" d="M716 298 A246 232 0 0 1 1208 298"/>
+    <path class="wave w2" d="M716 298 A246 232 0 0 1 1208 298"/>
+    <path class="rim3" d="M716 298 A246 232 0 0 1 1208 298"/>
+    <path class="rim2" d="M716 298 A246 232 0 0 1 1208 298"/>
+    <path class="rim" d="M716 298 A246 232 0 0 1 1208 298"/>
+    <path class="flow" pathLength="1" d="M716 298 A246 232 0 0 1 1208 298"/>
+    <g class="hit h1"><circle class="fH" cx="1165.9" cy="168.3" r="3.2"/><path class="sH" d="M1167.7 161.5 L1169.4 154.7"/><path class="sH" d="M1171.6 164.2 L1177.3 160.1"/><path class="sH" d="M1172.9 168.8 L1179.9 169.3"/></g>
+    <g class="hit h2 hx"><circle class="fH" cx="1096.0" cy="103.4" r="3.2"/><path class="sH" d="M1094.9 96.5 L1093.9 89.6"/><path class="sH" d="M1099.6 97.5 L1103.3 91.5"/><path class="sH" d="M1102.6 101.2 L1109.3 99.0"/></g>
+    <g class="hit h3"><circle class="fH" cx="1008.9" cy="70.3" r="3.2"/><path class="sH" d="M1005.5 64.2 L1002.0 58.1"/><path class="sH" d="M1010.2 63.4 L1011.5 56.5"/><path class="sH" d="M1014.3 65.8 L1019.7 61.3"/></g>
+    <g class="hit h4 hx"><circle class="fH" cx="923.5" cy="68.9" r="3.2"/><path class="sH" d="M918.3 64.2 L913.0 59.6"/><path class="sH" d="M922.5 61.9 L921.4 55.0"/><path class="sH" d="M927.2 62.9 L930.8 56.9"/></g>
+    <g class="hit h5"><circle class="fH" cx="835.3" cy="99.1" r="3.2"/><path class="sH" d="M828.7 96.7 L822.2 94.2"/><path class="sH" d="M831.8 93.0 L828.4 87.0"/><path class="sH" d="M836.6 92.3 L837.8 85.4"/></g>
+    <g class="hit h6 hx"><circle class="fH" cx="763.0" cy="161.6" r="3.2"/><path class="sH" d="M756.0 161.9 L749.0 162.2"/><path class="sH" d="M757.4 157.4 L751.9 153.1"/><path class="sH" d="M761.5 154.8 L760.0 148.0"/></g>
+    <rect class="tile" x="768" y="240" width="44" height="44" rx="10"/><g transform="translate(790 262) scale(0.6)"><path class="g" d="M0 -19 L16.5 -9.5 V9.5 L0 19 L-16.5 9.5 V-9.5 Z"/><path class="g" d="M-16.5 -9.5 L0 0 L16.5 -9.5 M0 0 V19"/></g><circle class="fT" cx="809" cy="243" r="8.5"/><path class="ck" d="M805 243 l3 3 l5.5 -6"/>
+    <rect class="tile" x="834" y="240" width="44" height="44" rx="10"/><g transform="translate(856 262) scale(0.6)"><circle class="g" cx="0" cy="-9" r="7"/><path class="g" d="M-15 17 C-15 7 -8 3 0 3 C8 3 15 7 15 17"/></g><circle class="fT" cx="875" cy="243" r="8.5"/><path class="ck" d="M871 243 l3 3 l5.5 -6"/>
+    <rect class="tile" x="1046" y="240" width="44" height="44" rx="10"/><g transform="translate(1068 262) scale(0.6)"><path class="g" d="M1 -19 C3 -10 14 -5 14 6 C14 14 8 19 0 19 C-8 19 -14 14 -14 6 C-14 0 -10 -4 -8 -8 C-5 -4 -1 -9 1 -19 Z"/></g><circle class="fT" cx="1087" cy="243" r="8.5"/><path class="ck" d="M1083 243 l3 3 l5.5 -6"/>
+    <rect class="tile" x="1112" y="240" width="44" height="44" rx="10"/><g transform="translate(1134 262) scale(0.6)"><path class="g" d="M-13 -6 V6 M-4.5 -16 V16 M4.5 -10 V10 M13 -4 V4"/></g><circle class="fT" cx="1153" cy="243" r="8.5"/><path class="ck" d="M1149 243 l3 3 l5.5 -6"/>
+    <circle class="pulse" cx="962" cy="172" r="104" fill="url(#gs)"/>
+    <path class="shield" d="M912 106 H1012 V166 C1012 203 986 222 962 234 C938 222 912 203 912 166 Z"/>
+    <rect class="fO" x="956.5" y="124" width="11" height="88" rx="1.5"/>
+    <rect class="fO" x="933" y="147" width="58" height="11" rx="1.5"/>
+  </g>
+
+  <rect x="64" y="54" width="84" height="4" rx="2" fill="url(#ab)"/>
+  <text class="fO" x="64" y="92" font-size="16" font-weight="600" letter-spacing="2.2">RISK OF RAIN 2  ·  BEPINEX PATCHER</text>
+  <text class="name" x="61" y="158" font-size="66" font-weight="700" letter-spacing="-1">Compat<tspan class="fO">Shield</tspan></text>
+  <text class="role" x="64" y="200" font-size="24">Fixes mods the October 2026 update broke,</text>
+  <text class="role" x="64" y="232" font-size="24">without editing a single mod file.</text>
+  <rect class="pill" x="64.5" y="256.5" width="117" height="34" rx="17"/><circle class="fO" cx="82" cy="273.5" r="4.5"/><text class="role" x="95" y="279.5" font-size="17" font-weight="500">One DLL</text>
+  <rect class="pill" x="191.5" y="256.5" width="205" height="34" rx="17"/><circle class="fT" cx="209" cy="273.5" r="4.5"/><text class="role" x="222" y="279.5" font-size="17" font-weight="500">Patches in memory</text>
+  <rect class="pill" x="406.5" y="256.5" width="181" height="34" rx="17"/><circle class="fB" cx="424" cy="273.5" r="4.5"/><text class="role" x="437" y="279.5" font-size="17" font-weight="500">Delete it to undo</text>
+  <rect class="edge" x="0.5" y="0.5" width="1279" height="339" rx="16"/>
+</svg>
