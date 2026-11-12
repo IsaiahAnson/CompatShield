@@ -1,6 +1,6 @@
 # CompatShield versions
 
-Every packaged build that was kept, newest first. Each zip is a complete install: import it as a local mod in Thunderstore Mod Manager or r2modman, and it replaces any earlier CompatShield. Install steps are in the [README](README.md#install).
+Every packaged build that was kept, newest first. Each zip is a complete install: import it as a local mod in Thunderstore Mod Manager or r2modman, and it replaces any earlier CompatShield. Install steps are in the [README](README.md#-install).
 
 The source code in this repository is the latest version only. Each older version has a tag (`v1.4.2` and so on) whose commit holds the README that shipped with that build, so comparing two tags shows what changed in the notes between them. The build itself is the zip on that version's release page. On `main`, the README that ships inside the latest zip is kept as [docs/REFERENCE.md](docs/REFERENCE.md); the front page of the repository is written for GitHub.
 
