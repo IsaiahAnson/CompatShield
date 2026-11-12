@@ -66,6 +66,7 @@ instead of aborting its setup. Every other kind of error passes through untouche
 | `DropChanceMultiplier` (section `[Sacrifice]`) | 1 (off) | Multiplies each kill's Artifact of Sacrifice item drop chance, after RiskyMod/ShareSuite (0.7 = 30% fewer) |
 | `OrphanLoopGuard` | true | A looping sound whose object is destroyed before it was stopped (an enemy mid-attack when the run ends) stops with its object instead of playing on into the lobby (every PC) |
 | `SoundTracer` (section `[Diagnostics]`) | true | Diagnostic: at each run end, logs the loop-type sounds that were started on objects that no longer exist and never got their stop (to name an audio loop that follows you into the lobby), the last sounds before the run ended, and who calls `AkSoundEngine.StopAll`. Turn off once the loop is found |
+| `LagTracer` (section `[Diagnostics]`) | true | Diagnostic: during a run, every 10 s logs the average fps, the worst frame, frames over 100 ms, live monsters / bodies / projectiles, the time spent in RecalculateStats / TakeDamage / OnHitEnemy (where item mods' hooks pile up) and GC collections; laggy windows at Info, smooth ones at Debug; a frame over 250 ms is logged at once; a run-end `Lag summary` names the worst moment. The Mod Watcher's report turns these into a Performance section. About 6 lines a minute |
 
 ### Spawn speed (`SpawnCreditMultiplier`)
 
@@ -132,6 +133,7 @@ and `Level and Difficulty Boost` (1.25 by default) values.
   states are unregistered in game 1.5.0), and log a FireCannons "The Object you want to instantiate is null" error.
 
 ## What it logs (source `CompatShield`)
+- `Lag: <scene> (stage N t=m:ss) | 38 fps avg, worst frame 212 ms, 3 frame(s) over 100 ms | monsters 58, bodies 73, projectiles 140 | RecalculateStats 1240x 310 ms, TakeDamage 2100x 95 ms, OnHitEnemy 2100x 180 ms | GC 4 collection(s), heap 1200 MB` (Info when laggy, Debug otherwise), `Lag: 312 ms frame in <scene> (...)`, and `Lag summary: ...` at run end.
 
 - `Outdated-hook guard installed`
 - `Enabled fixes: OutdatedHookGuard=..., PaladinMaterialsFix=..., TinkersSatchelItemIsolation=..., TinkersSatchelLanguageFix=..., MovedAssetRedirect=..., AudioOverlapStopFix=..., ZetAspectsDropFix=..., GasolineChainFix=..., BrokenHandlerGuard=..., StunDurationFix=..., PrintToInventoryScrappers=..., InfernoMithrixFix=..., InfernoLevelBoostFix=..., InfernoCooldownScalingFix=..., InfernoHookChurnFix=..., RespawnHookChurnFix=..., LunarPoolLoopStopFix=..., ShamanModelFix=..., FlowerRootFix=..., ScepterFlowerOwnerFix=..., SwiftImpactFix=..., MonsterLimit=..., SpawnCreditMultiplier=..., SacrificeDropChanceMultiplier=...`
