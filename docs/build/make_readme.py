@@ -90,6 +90,8 @@ page = f"""<p align="center">
   {themed("banner", 'width="100%" alt="CompatShield, a BepInEx patcher for Risk of Rain 2. It fixes mods the October 2026 update broke, without editing a single mod file."')}
 </p>
 
+<a href="{STORE}"><img src="https://raw.githubusercontent.com/IsaiahAnson/CompatShield/stats/downloads.svg" width="100%" alt="Download count and latest version on Thunderstore. Get it on Thunderstore."></a>
+
 <p align="center">
   <a href="{BASE}/releases/latest"><img src="assets/btn-download.svg" height="34" alt="Download latest"></a>&nbsp;
   <a href="{STORE}">{themed("btn-thunderstore", 'height="34" alt="Get it on Thunderstore"')}</a>&nbsp;
