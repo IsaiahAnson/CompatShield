@@ -4,11 +4,12 @@ Every packaged build that was kept, newest first. Each zip is a complete install
 
 The source code in this repository is the latest version only. Each older version has a tag (`v1.4.2` and so on) whose commit holds the README that shipped with that build, so comparing two tags shows what changed in the notes between them. The build itself is the zip on that version's release page. On `main`, the README that ships inside the latest zip is kept as [docs/REFERENCE.md](docs/REFERENCE.md); the front page of the repository is written for GitHub.
 
-The catalog starts at 1.4.2, the earliest zip kept. These numbers have no zip: 1.4.16, 1.4.17, 1.4.21 to 1.4.26.
+The catalog starts at 1.4.2, the earliest zip kept. These numbers have no zip: 1.4.16, 1.4.17, 1.4.21 to 1.4.26, and 1.4.55 (not released; its changes shipped in 1.4.56). [CHANGELOG.md](CHANGELOG.md) says in a line or two what each version changed.
 
 | Version | Built | Download | What changed |
 |---|---|---|---|
-| [**1.4.54** (latest)](https://github.com/IsaiahAnson/compatshield/releases/tag/v1.4.54) | Nov 11, 2026, 1:28 PM | [zip, 175 KB](https://github.com/IsaiahAnson/compatshield/releases/download/v1.4.54/CompatShield-1.4.54.zip) | Changes to existing fixes and their notes |
+| [**1.4.56** (latest)](https://github.com/IsaiahAnson/compatshield/releases/tag/v1.4.56) | Nov 24, 2026, 9:58 AM | [zip, 287 KB](https://github.com/IsaiahAnson/compatshield/releases/download/v1.4.56/CompatShield-1.4.56-thunderstore.zip) | New settings: `OverloadingStakeCap`, `OverloadingStakeCooldown`, `QuitCrashGuard`, `Starstorm2LogQuiet`, `HeadsetCostFix`; a fix that fails to load no longer stops the rest; README shortened. Includes the 1.4.55 changes. The zip is the Thunderstore package |
+| [1.4.54](https://github.com/IsaiahAnson/compatshield/releases/tag/v1.4.54) | Nov 11, 2026, 1:28 PM | [zip, 175 KB](https://github.com/IsaiahAnson/compatshield/releases/download/v1.4.54/CompatShield-1.4.54.zip) | Changes to existing fixes and their notes |
 | [1.4.53](https://github.com/IsaiahAnson/compatshield/releases/tag/v1.4.53) | Nov 11, 2026, 12:59 AM | [zip, 171 KB](https://github.com/IsaiahAnson/compatshield/releases/download/v1.4.53/CompatShield-1.4.53.zip) | Changes to existing fixes and their notes |
 | [1.4.52](https://github.com/IsaiahAnson/compatshield/releases/tag/v1.4.52) | Nov 10, 2026, 11:46 PM | [zip, 170 KB](https://github.com/IsaiahAnson/compatshield/releases/download/v1.4.52/CompatShield-1.4.52.zip) | New settings: `HookTimer` |
 | [1.4.51](https://github.com/IsaiahAnson/compatshield/releases/tag/v1.4.51) | Nov 10, 2026, 10:04 PM | [zip, 157 KB](https://github.com/IsaiahAnson/compatshield/releases/download/v1.4.51/CompatShield-1.4.51.zip) | New settings: `BigHitTracer` |

@@ -98,6 +98,9 @@ manifest = {
 assert len(manifest["description"]) <= 250, len(manifest["description"])  # Thunderstore's limit
 if (SHIELD / "CompatShield.cs").stat().st_mtime > DLL.stat().st_mtime:
     sys.exit("CompatShield.cs is newer than the built DLL: run tools\\run_harness.ps1 (builds Release) first")
+CHANGELOG = SHIELD / "CHANGELOG.md"  # one entry per version; Thunderstore shows it as the Changelog tab
+if not CHANGELOG.exists() or ("## " + VERSION + " ") not in CHANGELOG.read_text(encoding="utf-8"):
+    sys.exit("CHANGELOG.md has no '## " + VERSION + " (date)' entry: add one before packaging")
 with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED) as z:
     z.writestr("manifest.json", json.dumps(manifest, indent=2))
     z.writestr("icon.png", icon_bytes())
@@ -105,12 +108,13 @@ with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("README.md", thunderstore_readme().encode("utf-8"))
     else:
         z.write(SHIELD / "README.md", "README.md")
+    z.write(CHANGELOG, "CHANGELOG.md")
     z.write(DLL, "patchers/CompatShield.dll")
 
 with zipfile.ZipFile(OUT) as z:
     for i in z.infolist():
         print(f"{i.file_size:9d}  {i.filename}")
     dll_hash = hashlib.sha256(z.read("patchers/CompatShield.dll")).hexdigest()[:16]
-installed = Path.home() / r"AppData\Roaming\Thunderstore Mod Manager\DataFolder\RiskOfRain2\profiles\Default\BepInEx\patchers\Local-CompatShield\CompatShield.dll"
+installed = Path.home() / r"AppData\Roaming\Thunderstore Mod Manager\DataFolder\RiskOfRain2\profiles\Default\BepInEx\patchers\Mentalize-CompatShield\CompatShield.dll"
 print("zip:", OUT, f"({OUT.stat().st_size} bytes)")
 print("DLL in zip matches your installed copy:", installed.exists() and dll_hash == hashlib.sha256(installed.read_bytes()).hexdigest()[:16])

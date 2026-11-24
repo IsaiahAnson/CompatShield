@@ -18,7 +18,10 @@ if ($LASTEXITCODE -ne 0) { "BUILD FAILED (harness)"; exit 1 }
 if ($exe.Length -gt 200) { "WARNING: harness path is $($exe.Length) chars; .NET Framework needs it under 260 with its files" }
 
 $env:SHIELDTEST_DATA = "$shield\tests\shielddata"
-$modes = @('', 'churn', 'respawn', 'deathtimer', 'lunarpool', 'shaman', 'tracer', 'lag', 'physcap', 'pileup', 'lockeditems', 'bighit', 'hooktimer', 'statlimit', 'hardcap', 'hallowed', 'cfgsave', 'totem', 'modguards', 'anchorguard', 'chain', 'blastcap', 'blastguard', 'statsguard', 'overlapguard', 'dotguard', 'bulletguard', 'acolyte', 'roulette', 'bubbets', 'lineardamage', 'skillslots', 'dagger', 'theta', 'nulldccs', 'genetics', 'configmove', 'wiring', 'inferno', 'swift', 'guardil', 'pti', 'flower', 'scepter', 'soh', 'sohcall', 'sacrifice', 'sackeep', 'sharesuite', 'zet')
+$env:SHIELDTEST_SOURCE = "$shield\CompatShield.cs"
+$env:SHIELDTEST_PROFILE = "$env:APPDATA\Thunderstore Mod Manager\DataFolder\RiskOfRain2\profiles\Default\BepInEx"
+$env:SHIELDTEST_MANAGED = "C:\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed"
+$modes = @('', 'churn', 'respawn', 'deathtimer', 'lunarpool', 'shaman', 'tracer', 'lag', 'physcap', 'pileup', 'pileupowners', 'lockeditems', 'bighit', 'hooktimer', 'statlimit', 'hardcap', 'hardcapcount', 'hallowed', 'cfgsave', 'totem', 'modguards', 'anchorguard', 'chain', 'blastcap', 'blastguard', 'statsguard', 'overlapguard', 'dotguard', 'bulletguard', 'acolyte', 'roulette', 'bubbets', 'lineardamage', 'skillslots', 'dagger', 'theta', 'nulldccs', 'genetics', 'configmove', 'wiring', 'inferno', 'swift', 'guardil', 'pti', 'flower', 'scepter', 'soh', 'sohcall', 'sacrifice', 'sackeep', 'sharesuite', 'zet', 'overloadingstake', 'quitcrash', 'taunt', 'hookreel', 'ss2quiet', 'headset', 'smallguards', 'dispatchguard', 'dronetweak', 'infernoscaling', 'interactableweight', 'lookups')
 $pass = 0; $fail = 0; $skip = 0
 foreach ($m in $modes) {
   if ($m) { $env:SHIELDTEST_MODE = $m } else { Remove-Item Env:SHIELDTEST_MODE -ErrorAction SilentlyContinue }

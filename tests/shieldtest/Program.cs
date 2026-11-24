@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BepInEx.Logging;
@@ -6,6 +7,15 @@ using HarmonyLib;
 using MonoMod.RuntimeDetour.HookGen;
 
 public static class Game { public static void SetCurrentLanguage(string lang, bool reload) { } }
+
+public sealed class DirtyPatchStandIn {
+    public bool statsDirty;
+    public void MarkDirty() { statsDirty = true; }
+}
+public sealed class StakePatchStandIn {
+    public void Fire(object info) { }
+    public void OnDestroy() { }
+}
 
 // Shaped like Paladin's GatherMaterials: branch-free static field assignments, one of which crashes.
 public static class FakeAsset {
@@ -762,19 +772,25 @@ namespace RespawnStandIn {
 }
 
 public static class Program {
+    static string SourcePath => Environment.GetEnvironmentVariable("SHIELDTEST_SOURCE") ?? System.IO.Path.GetFullPath(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "CompatShield.cs"));
     delegate void OldOrig(string lang);
     delegate void OldHook(OldOrig orig, string lang);   // pre-update signature: no bool
     static void OldHandler(OldOrig orig, string lang) { }
 
     static int failures;
     static void Check(string name, bool ok) { Console.WriteLine($"{(ok ? "PASS" : "FAIL")}  {name}"); if (!ok) failures++; }
+    static void EnsureShieldLogger() { var f=typeof(CompatShield.CompatShieldPatcher).GetField("Log",BindingFlags.NonPublic|BindingFlags.Static);if(f.GetValue(null)==null)f.SetValue(null,BepInEx.Logging.Logger.CreateLogSource("CompatShield")); }
+    sealed class FakeNoInventoryBody { public object inventory { get; set; } }
+    sealed class FakeCapBody { public object Master; }
+    sealed class FakeCapMember { public object Body; }
+    static class FakeCapTeams { public static System.Collections.IEnumerable Members(object team) => (System.Collections.IEnumerable)team; }
 
     static int Main(string[] argv) {
         // Like BepInEx: serve BepInEx's own Mono.Cecil for any version MonoMod/Harmony ask for.
-        var core = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            @"Thunderstore Mod Manager\DataFolder\RiskOfRain2\profiles\Default\BepInEx\core");
-        var profile = System.IO.Path.GetDirectoryName(core);
-        var managed = @"C:\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed";
+        var profile = Environment.GetEnvironmentVariable("SHIELDTEST_PROFILE") ?? System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            @"Thunderstore Mod Manager\DataFolder\RiskOfRain2\profiles\Default\BepInEx");
+        var core = System.IO.Path.Combine(profile, "core");
+        var managed = Environment.GetEnvironmentVariable("SHIELDTEST_MANAGED") ?? @"C:\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed";
         AppDomain.CurrentDomain.AssemblyResolve += (s, e) => {
             var name = new AssemblyName(e.Name).Name;
             if (name == "Mono.Cecil") return Assembly.LoadFrom(System.IO.Path.Combine(core, "Mono.Cecil.dll"));
@@ -826,6 +842,20 @@ public static class Program {
         if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "dagger") return DaggerCheck(profile);
         if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "theta") return ThetaCheck(profile);
         if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "bubbets") return BubbetsCheck(profile);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "overloadingstake") return OverloadingStakeCheck(managed, profile);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "quitcrash") return QuitCrashCheck(managed, profile);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "pileupowners") return PileupOwnersCheck(managed);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "hardcapcount") return HardEnemyCapCountCheck(managed);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "taunt") return TauntGuardCheck(profile);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "hookreel") return HookReelCheck(managed);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "ss2quiet") return Starstorm2QuietCheck(profile);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "headset") return HeadsetCheck(profile);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "smallguards") return SmallGuardCheck(profile);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "dispatchguard") return DispatchGuardCheck();
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "dronetweak") return DroneTweakCheck(managed);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "infernoscaling") return InfernoScalingCheck(managed, profile);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "interactableweight") return InteractableWeightCheck(managed);
+        if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "lookups") return LookupCheck(managed, profile);
         if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "roulette") return RouletteCheck(profile);
         if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "nulldccs") return NullDccsCheck(profile);
         if (Environment.GetEnvironmentVariable("SHIELDTEST_MODE") == "genetics") return GeneticsCheck(profile);
@@ -973,6 +1003,13 @@ public static class Program {
     // The wiring between Finish()'s config and each fix: ApplyModFixes dispatches by assembly name exactly once (real
     // AncientScepter.dll and Inferno.dll, patch only), and every config key is in the 'Enabled fixes' line and the gate.
     static int WiringCheck(string profile) {
+        { // 1.4.55 launch: two guards looked for RoR2 types in a Unity assembly and one was keyed to a file name that is not the assembly name
+            var shieldSource = System.IO.File.ReadAllText(SourcePath);
+            Check("no RoR2 type is looked up in a Unity assembly", !System.Text.RegularExpressions.Regex.IsMatch(shieldSource, "typeof[(]UnityEngine[.][A-Za-z.]+[)][.]Assembly[.]GetType[(].RoR2[.]"));
+            var mysticsDll = System.IO.Path.Combine(profile, "plugins", "Phreel-RealerMysticsItems", "MysticsItemsPlugin.dll");
+            if (!System.IO.File.Exists(mysticsDll)) Console.WriteLine("SKIP  MysticsItems dispatch name (mod not installed)");
+            else Check("Death Ceremony guard is dispatched under the mod's real assembly name", shieldSource.Contains("name == " + (char)34 + AssemblyName.GetAssemblyName(mysticsDll).Name + (char)34 + " && appliedFixes.Add(name)) Guarded(\"DeathCeremonySnapshotGuard\"") || shieldSource.Contains("name == " + (char)34 + AssemblyName.GetAssemblyName(mysticsDll).Name + (char)34 + " && appliedFixes.Add(name)) DeathCeremonySnapshotGuard"));
+        }
         var shieldType = typeof(CompatShield.CompatShieldPatcher);
         var ns = BindingFlags.NonPublic | BindingFlags.Static;
         shieldType.GetField("Log", ns).SetValue(null, BepInEx.Logging.Logger.CreateLogSource("CompatShield"));
@@ -1000,7 +1037,7 @@ public static class Program {
             logs.Exists(l => l.Contains("Level and Difficulty Boost will also find a level cap"))
             && logs.Exists(l => l.Contains("Enemy Cooldown Reduction Scaling now shortens enemy cooldowns"))
             && !logs.Exists(l => l.Contains("Inferno scaling fix")));
-        var src = System.IO.File.ReadAllText(@"C:\Users\isaia\OneDrive\Desktop\RoR2 Mod Watcher\ror2-compat-shield\CompatShield.cs");
+        var src = System.IO.File.ReadAllText(SourcePath);
         int e0 = src.IndexOf("Log.LogInfo($\"Enabled fixes:");
         string enabled = src.Substring(e0, src.IndexOf(");", e0) - e0);
         int g0 = src.IndexOf("if (paladinFixEnabled ||");
@@ -1087,7 +1124,7 @@ public static class Program {
             Check("an existing backup is not overwritten", System.IO.File.ReadAllText(backup) == sample);
         } finally { System.IO.Directory.Delete(dir, true); }
 
-        var src = System.IO.File.ReadAllText(@"C:\Users\isaia\OneDrive\Desktop\RoR2 Mod Watcher\ror2-compat-shield\CompatShield.cs");
+        var src = System.IO.File.ReadAllText(SourcePath);
         var cats = fix.GetNestedType("Cat", all).GetFields(all).ToDictionary(f => f.Name, f => (string)f.GetRawConstantValue());
         var bound = new System.Collections.Generic.HashSet<string>();
         foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(src, "cfg\\.Bind\\(ConfigMigration\\.Cat\\.(\\w+), \"(\\w+)\""))
@@ -2369,9 +2406,9 @@ public static class Program {
         var isFlip = lag.GetMethod("IsFlip", all);
         Check("lag: only a clear->set statsDirty flip across the call counts as that call's dirtying",
             (bool)isFlip.Invoke(null, new object[] { false, true }) && !(bool)isFlip.Invoke(null, new object[] { true, true }) && !(bool)isFlip.Invoke(null, new object[] { false, false }));
-        Check("lag: PatchDirtySources pairs a prefix and a postfix (the flip is read across the call), not a prefix alone",
+        Check("lag: Harmony-safe static dirty prefix/postfix methods pair the flip across the call",
             PatchProcessor.ReadMethodBody(lag.GetMethod("PatchDirtySources", all)).Count(kv => kv.Value is MethodBase mb4 && mb4.Name == "Patch" && mb4.DeclaringType == typeof(Harmony)) == 2
-            && lag.GetNestedType("DirtyPatches", all)?.GetMethod("DirtyPostfix", all) != null && lag.GetMethod("RecalcPrefix", all) != null
+            && lag.GetNestedType("DirtyPatches", all)?.GetMethod("DirtyNoArgsPostfix", all) != null && lag.GetNestedType("DirtyPatches", all)?.GetMethod("DirtyBuffPostfix", all) != null && lag.GetNestedType("DirtyPatches", all)?.GetMethod("DirtyTimedBuffPostfix", all) != null && lag.GetMethod("RecalcPrefix", all) != null
             && lag.GetNestedType("DirtyPatches", all) != typeof(CompatShield.LagTracer));   // its own class: a separate Harmony __state from the timing sink
         var topNames = lag.GetMethod("TopNames", all);
         Check("lag: the projectile census counts prefab names, biggest first, ties by name",
@@ -4463,7 +4500,7 @@ public static class Program {
         onStart.Invoke(null, new object[] { null });
         Check("a mod without the method logs not applied, once", logs.Skip(warned).Count(l => l.Contains("ApplyDaggerAttackSpeedBuff not found") && l.Contains("not applied")) == 1);
 
-        const string managedDir = @"C:\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed";
+        string managedDir = Environment.GetEnvironmentVariable("SHIELDTEST_MANAGED") ?? @"C:\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed";
         var modPath = System.IO.Path.Combine(profile, "plugins", "irule4567-Smite_Items", "Smite Items.dll");
         var ror2Path = System.IO.Path.Combine(managedDir, "RoR2.dll");
         if (!System.IO.File.Exists(modPath) || !System.IO.File.Exists(ror2Path)) {
@@ -4853,28 +4890,22 @@ public static class Program {
         gameResolver.AddSearchDirectory(managedDir);
         var gameRead = new Mono.Cecil.ReaderParameters { AssemblyResolver = gameResolver };
 
-        // The preloader shim: Inventory.RemoveItem(ItemDef, int) is added once, forwards to RemoveItem2 and matches the mod's reference.
+        // The compatibility shim is conditional on a real plugin caller. This profile has none.
         using (var game = Mono.Cecil.AssemblyDefinition.ReadAssembly(ror2Path, gameRead))
         using (var modDef = Mono.Cecil.AssemblyDefinition.ReadAssembly(bubbetsPath)) {
             var inv = game.MainModule.GetType("RoR2.Inventory");
             bool Shim(Mono.Cecil.MethodDefinition m) => m.Name == "RemoveItem" && m.Parameters.Count == 2 && m.Parameters[0].ParameterType.FullName == "RoR2.ItemDef";
             Check("game 1.5.0 has no RemoveItem(ItemDef, int) of its own", !inv.Methods.Any(Shim));
+            typeof(CompatShield.CompatShieldPatcher).GetField("PluginDllRoot", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null,
+                new Func<string>(() => System.IO.Path.Combine(profile, "plugins")));
             CompatShield.CompatShieldPatcher.Patch(game);
-            Check("preloader adds RemoveItem(ItemDef, int)", inv.Methods.Count(Shim) == 1);
-            CompatShield.CompatShieldPatcher.Patch(game);
-            Check("adding it twice changes nothing", inv.Methods.Count(Shim) == 1);
-            var shim = inv.Methods.First(Shim);
-            var body = shim.Body.Instructions;
-            Check("shim forwards to RemoveItem2", body.Any(i => i.Operand is Mono.Cecil.MethodReference r && r.Name == "RemoveItem2"));
-            Check("shim is public, instance, returns void", shim.IsPublic && !shim.IsStatic && shim.ReturnType.FullName == "System.Void");
-            var modRefs = modDef.MainModule.GetMemberReferences().OfType<Mono.Cecil.MethodReference>()
-                .Where(r => r.Name == "RemoveItem" && r.DeclaringType.FullName == "RoR2.Inventory" && r.Parameters.Count == 2 && r.Parameters[0].ParameterType.FullName == "RoR2.ItemDef").ToList();
-            Check("the mod's dead reference has the shim's shape", modRefs.Count > 0 && modRefs.All(r => r.ReturnType.FullName == "System.Void" && r.Parameters[1].ParameterType.FullName == "System.Int32" && r.HasThis));
-            using (var ms = new System.IO.MemoryStream()) {
-                game.Write(ms);
-                ms.Position = 0;
-                using (var again = Mono.Cecil.AssemblyDefinition.ReadAssembly(ms))
-                    Check("the patched game assembly still writes and reads", again.MainModule.GetType("RoR2.Inventory").Methods.Any(Shim));
+            Check("profile plugin scan finds no legacy RemoveItem caller", !inv.Methods.Any(Shim));
+            var missingRoot=System.IO.Path.Combine(profile,"__missing_shieldtest_plugin_root");
+            typeof(CompatShield.CompatShieldPatcher).GetField("PluginDllRoot",BindingFlags.NonPublic|BindingFlags.Static).SetValue(null,new Func<string>(()=>missingRoot));
+            using(var fallback=Mono.Cecil.AssemblyDefinition.ReadAssembly(ror2Path,gameRead)){
+                CompatShield.CompatShieldPatcher.Patch(fallback);var fallbackInventory=fallback.MainModule.GetType("RoR2.Inventory");
+                var note=(string)typeof(CompatShield.CompatShieldPatcher).GetField("preloadNote",BindingFlags.NonPublic|BindingFlags.Static).GetValue(null);
+                Check("preloader scan error fails open by adding the real shim and logging why",fallbackInventory.Methods.Any(Shim)&&note.Contains("scan incomplete: plugin folder missing"));
             }
             var other = Mono.Cecil.AssemblyDefinition.CreateAssembly(new Mono.Cecil.AssemblyNameDefinition("NotTheGame", new Version(1, 0)), "NotTheGame", Mono.Cecil.ModuleKind.Dll);
             CompatShield.CompatShieldPatcher.Patch(other);
@@ -4911,8 +4942,9 @@ public static class Program {
         var rewrite = fix.GetMethod("RewriteSoles", all);
         var original = HarmonyLib.PatchProcessor.GetOriginalInstructions(ilTakeDamage);
         int before = original.Count;
-        Check("the rewrite matches the shipped Jellied Soles hook", (bool)rewrite.Invoke(null, new object[] { original }));
-        Check("the rewrite adds five instructions", original.Count == before + 5);
+        var recognizes = fix.GetMethod("RecognizesCurrentSolesHook", all);
+        Check("BubbetsItems 1.8.21 hook shape is recognized", (bool)recognizes.Invoke(null, new object[] { original }));
+        Check("current fitting hook is not rewritten", !(bool)rewrite.Invoke(null, new object[] { original }) && original.Count == before);
         var broken = HarmonyLib.PatchProcessor.GetOriginalInstructions(ilTakeDamage);
         broken.RemoveAll(c => c.opcode == System.Reflection.Emit.OpCodes.Ldsfld && c.operand is FieldInfo f && f.Name == "Stloc");
         var copy = broken.Select(c => c.opcode).ToList();
@@ -4921,7 +4953,9 @@ public static class Program {
 
         Check("the rewrite picks MoveType.AfterLabel", (int)MonoMod.Cil.MoveType.AfterLabel == 1);
         fix.GetMethod("Apply", all).Invoke(null, new object[] { harmony, bubbets, ror2 });
-        Check("Jellied Soles reports rewritten", (bool)fix.GetField("SolesRewritten", all).GetValue(null));
+        Check("Jellied Soles is left intact with an info outcome", logs.Exists(l => l.Contains("hook already fits this game, left alone")));
+        var patchInfo = HarmonyLib.Harmony.GetPatchInfo(ilTakeDamage);
+        Check("Jellied Soles is not switched off", patchInfo == null || !patchInfo.Prefixes.Any(p => p.PatchMethod.Name == "SkipPrefix"));
 
         // .NET Framework refuses the hook predicates (they name a private game struct; the game runtime does not check), so the real run below may SKIP.
         // This part walks the game IL the way the predicates do: adaptiveArmor, then the next ble, then where it lands.
@@ -4934,11 +4968,12 @@ public static class Program {
             Check("the game still reads adaptiveArmor", armor > 0);
             int ble = armor;
             while (ble < ins.Count && ins[ble].OpCode != Mono.Cecil.Cil.OpCodes.Ble && ins[ble].OpCode != Mono.Cecil.Cil.OpCodes.Ble_S) ble++;
-            Check("a ble follows it", ble < ins.Count);
+                Check("a ble follows it", ble < ins.Count);
             if (ble < ins.Count) {
                 var landing = (Mono.Cecil.Cil.Instruction)ins[ble].Operand;
-                var local = landing.Operand as Mono.Cecil.Cil.VariableDefinition;
-                Check("the branch lands on a struct being built, so the float the mod assumed is not there", landing.OpCode.Name.StartsWith("ldloca") && local != null && local.VariableType.FullName != "System.Single");
+                var damageStore = ins.Skip(ble).Take(40).FirstOrDefault(i => i.OpCode.Name.StartsWith("stloc") && i.Operand is Mono.Cecil.Cil.VariableDefinition v && v.Index == 12);
+                var local = damageStore?.Operand as Mono.Cecil.Cil.VariableDefinition;
+                Check("the adaptiveArmor branch is followed by the damage local V_12 store", landing != null && damageStore != null && local.VariableType.FullName == "System.Single");
             }
         }
 
@@ -4953,7 +4988,7 @@ public static class Program {
                     int nop = -1;
                     for (int i = 0; i < list.Count - 1; i++)
                         if (list[i].OpCode == Mono.Cecil.Cil.OpCodes.Nop && list[i + 1].OpCode.Name.StartsWith("stloc") && i > 5 && list[i - 1].OpCode == Mono.Cecil.Cil.OpCodes.Call && list[i - 4].OpCode == Mono.Cecil.Cil.OpCodes.Ldarg_0 && list[i - 5].OpCode.Name.StartsWith("ldloc")) nop = i;
-                    Check("Jellied Soles emits its hook on the real damage method", nop > 0);
+                    Check("Jellied Soles emits its 1.8.21 hook on the real damage method", nop > 0);
                     if (nop > 0) {
                         var load = list[nop - 5];
                         var store = list[nop + 1];
@@ -5165,39 +5200,30 @@ public static class Program {
         Check("blastcap: at depth limit 1 the outer blast runs and any blast inside it is stopped", rootRan && s1 && !innerRan && !s2 && Depth() == 1);
         Fin(s2); Fin(s1);
 
-        // Time limit: blasts 2 or more deep stop when the allowance runs out, measured from the outermost blast, boundary included.
+        // A slow frame alone must not stop a shallow chain.
         Reset(10, 100f);
         Pre("root", out s1); Pre("level1", out bool sLevel1);
         clockMs = 99.9; bool early = Pre("early", out s2); Fin(s2);
-        clockMs = 100; bool atLimit = Pre("atlimit", out s2); bool stateAtLimit = s2; Fin(s2);
         clockMs = 500; bool late = Pre("late", out s2); Fin(s2);
-        Check("blastcap: a blast 2 deep runs before the allowance is gone and is stopped at and after it", early && !atLimit && !stateAtLimit && !late && Depth() == 2);
-        Fin(sLevel1); Fin(s1);
-        Check("blastcap: time-stopped blasts are counted as too late, and the line gives the chain's length", Chains().Count == 1 && Chains()[0].Contains("(0 too deep, 2 too late)") && Chains()[0].Contains("took 500 ms") && Chains()[0].Contains("came from atlimit"));
-
-        // A blast directly inside the outermost one is ordinary fan-out (Brilliant Behemoth), so it gets far more room.
-        Reset(10, 100f);
-        Pre("root", out s1);
-        clockMs = 399.9; bool fanEarly = Pre("fan", out s2); Fin(s2);
-        clockMs = 400; bool fanLate = Pre("fanlate", out s2); Fin(s2);
-        Check("blastcap: a blast directly inside the outermost one runs until the allowance is 3 times overdrawn", fanEarly && !fanLate && Depth() == 1);
+        Check("blastcap: a shallow chain continues after the old 100 ms allowance", early && late && Depth() == 2);
+        Fin(true); Fin(true);
+        Reset(100, 100f);
+        Pre("wide root", out s1); var accepted = 0; var denied = false;
+        for (int i = 0; i < 40; i++) { bool ok=Pre("wide child", out s2); if(ok){accepted++;Fin(s2);}else{denied=true;break;} }
+        Check("blastcap: a fast wide shallow burst is stopped by the per-chain count ceiling", accepted==32 && denied && Depth()==1);
         Fin(s1);
+        Fin(sLevel1); Fin(s1);
 
-        // The allowance is shared: a chain that used it up leaves less for the next, until time passes between chains.
-        Reset(10, 100f);
-        Pre("root", out s1); Pre("level1", out sLevel1); clockMs = 150; Fin(sLevel1); Fin(s1);
-        Pre("root2", out s1); Pre("level1b", out sLevel1); bool sharedStopped = !Pre("deep", out s2); Fin(s2); Fin(sLevel1); Fin(s1);
-        Check("blastcap: the next chain starts with what the last one left, not a fresh allowance", sharedStopped && Depth() == 0);
-        clockMs = 349;
-        Pre("root3", out s1); Pre("level1c", out sLevel1); bool stillDry = !Pre("deep3", out s2); Fin(s2); Fin(sLevel1); Fin(s1);
-        clockMs = 353;
-        Pre("root4", out s1); Pre("level1d", out sLevel1); bool refilled = Pre("deep4", out s2); Fin(s2); Fin(sLevel1); Fin(s1);
-        Check("blastcap: the allowance refills at a quarter of the time between chains", stillDry && refilled);
-        clockMs = 10000000;
-        Pre("root5", out s1); Pre("level1e", out sLevel1);
-        clockMs = 10000099.5; bool fullEarly = Pre("deep5", out s2); Fin(s2);
-        clockMs = 10000100; bool fullLate = Pre("deep6", out s2); Fin(s2); Fin(sLevel1); Fin(s1);
-        Check("blastcap: the allowance never builds past its full size", fullEarly && !fullLate);
+        // The independent blast-count ceiling stops a fast chain before the time allowance matters.
+        Reset(40, 100f);
+        Pre("root", out s1); Pre("level1", out sLevel1);
+        var manyRan = true;
+        for (int i = 0; i < 31; i++) manyRan &= Pre("blast" + i, out s2);
+        clockMs = 0;
+        bool countStop = !Pre("countstop", out s2); Fin(s2);
+        Check("blastcap: the independent blast count ceiling stops a fast chain", manyRan && countStop);
+        for (int i = 0; i < 32; i++) Fin(true);
+        Fin(sLevel1); Fin(s1);
 
         Reset(10, 100f);
         Pre("plain", out s1); clockMs = 200; Fin(s1);
@@ -5205,16 +5231,13 @@ public static class Program {
         Check("blastcap: a blast with nothing inside it doesn't use the allowance", plainFree);
 
         Reset(10, 100f);
-        Pre("root", out s1); Pre("level1", out sLevel1); clockMs = 1000000; Fin(sLevel1); Fin(s1);
-        clockMs = 1001599;
-        Pre("root2", out s1); Pre("level1b", out sLevel1); bool hugeStillOff = !Pre("deep", out s2); Fin(s2); Fin(sLevel1); Fin(s1);
-        clockMs = 1001603;
-        Pre("root3", out s1); Pre("level1c", out sLevel1); bool hugeBackOn = Pre("deep", out s2); Fin(s2); Fin(sLevel1); Fin(s1);
-        Check("blastcap: one huge chain shuts deep blasts off for at most 1.6 s of time between chains", hugeStillOff && hugeBackOn);
+        Pre("root", out s1); Pre("level1", out sLevel1); clockMs = 2000;
+        bool hardCeiling = !Pre("deep", out s2); Fin(s2); Fin(sLevel1); Fin(s1);
+        Check("blastcap: a 2 second frame is still stopped by the hard ceiling", hardCeiling);
 
         Reset(10, 0f);
-        Pre("root", out s1); Pre("level1", out sLevel1); clockMs = 1e9; bool noLimit = Pre("inner", out s2); Fin(s2); Fin(sLevel1); Fin(s1);
-        Check("blastcap: time limit 0 means no time limit", noLimit && Chains().Count == 0);
+        Pre("root", out s1); Pre("level1", out sLevel1); clockMs = 1e9; bool noBudgetHardLimit = !Pre("inner", out s2); Fin(s2); Fin(sLevel1); Fin(s1);
+        Check("blastcap: zero configured delay disables the count delay but not the hard ceiling", noBudgetHardLimit);
 
         // The log can't flood.
         Reset(1, 0f);
@@ -5229,7 +5252,7 @@ public static class Program {
         var h = new Harmony("test.blastcap");
         var patch = cap.GetMethod("PatchBlast", all);
         bool Patched(Type t) => (bool)patch.Invoke(null, new object[] { h, t });
-        Check("blastcap: the patch binds to HandleHits(HitPoint[]) and logs its one line", Patched(typeof(FakeBlast)) && logs.Count(l => l.Contains("stops firing once 4 are running inside each other, so item combos can't hang the game")) == 1);
+        Check("blastcap: the patch binds to HandleHits(HitPoint[]) and logs depth, count and time ceilings", Patched(typeof(FakeBlast)) && logs.Count(l => l.Contains("stops blasts deeper than 4; per-chain count cap 32")) == 1);
         FakeBlast.Ran = 0;
         FakeBlast.OnHits = b => { if (b.level < 8) new FakeBlast { level = b.level + 1 }.HandleHits(new FakeBlast.HitPoint[0]); };
         new FakeBlast().HandleHits(new FakeBlast.HitPoint[0]);
@@ -5238,14 +5261,14 @@ public static class Program {
         FakeBlast.Ran = 0;
         FakeBlast.OnHits = b => { for (int i = 0; i < 3 && b.level < 3; i++) new FakeBlast { level = b.level + 1 }.HandleHits(new FakeBlast.HitPoint[0]); };
         new FakeBlast().HandleHits(new FakeBlast.HitPoint[0]);
-        Check("blastcap: several blasts side by side at one level all run (only depth is limited here)", FakeBlast.Ran == 1 + 3 + 9 + 27 && Depth() == 0);
+        Check("blastcap: a wide chain runs only to the per-chain blast ceiling", FakeBlast.Ran <= 1 + 32 && Depth() == 0);
         FakeBlast.OnHits = b => { if (b.level < 2) new FakeBlast { level = b.level + 1 }.HandleHits(new FakeBlast.HitPoint[0]); else throw new InvalidOperationException("boom"); };
         Exception thrown = null;
         try { new FakeBlast().HandleHits(new FakeBlast.HitPoint[0]); } catch (Exception e) { thrown = e; }
         Check("blastcap: an exception inside a blast still reaches the caller and the count returns to 0", thrown is InvalidOperationException && Depth() == 0);
         FakeBlast.OnHits = null;
 
-        // Hits waiting in DamageChainGuard's line: each replay's blast starts with no blast on the stack, and all of them share one allowance.
+        // Hits waiting in DamageChainGuard's line: each replay's blast chain starts with its own nesting depth and count.
         var guard = shieldType.Assembly.GetType("CompatShield.DamageChainGuard");
         guard.GetMethod("ResetForTest", all).Invoke(null, null);
         guard.GetMethod("Configure", all).Invoke(null, new object[] { 256, 0f });
@@ -5261,7 +5284,7 @@ public static class Program {
         for (int i = 0; i < guardDepth + 8; i++) GuardPre("hc" + i);
         for (int i = 0; i < 8; i++) GuardFin(false);
         for (int i = 0; i < guardDepth; i++) GuardFin(true);
-        Check("blastcap: 8 hits replayed from the damage chain guard's line share one allowance (4 levels, then 2, then only the outer blast; 32 blasts without sharing)", FakeBlast.Ran == 16 && Depth() == 0 && (int)guard.GetProperty("QueuedCount", all).GetValue(null) == 0);
+        Check("blastcap: 8 replayed hits each get an independent depth-limited blast chain", FakeBlast.Ran == 56 && Depth() == 0 && (int)guard.GetProperty("QueuedCount", all).GetValue(null) == 0);
         FakeBlast.OnHits = null;
 
         // The run-start handler: one try per session, and a failure is a warning, because an exception would stop other mods' run-start handlers.
@@ -6728,8 +6751,8 @@ public static class Program {
         // The path's frame filter.
         Func<string, string, bool, string> FN = (ty, me, hk) => (string)Call("FrameName", new object[] { ty, me, hk });
         Check("bighit: an ordinary frame reads Type.Method, nested types with dots", FN("SomeMod.Items+Nova", "Fire", false) == "SomeMod.Items.Nova.Fire");
-        Check("bighit: a hook handler (orig delegate first) is left out", FN("SomeMod.Hooks", "HealthComponent_TakeDamage", true) == null);
-        Check("bighit: MonoMod's copy of a patched method reads as the method",
+        Check("bighit: a mod hook handler is retained when its body is not verified as pass-through", FN("SomeMod.Hooks", "HealthComponent_TakeDamage", true) == "SomeMod.Hooks.HealthComponent_TakeDamage");
+        Check("bighit: MonoMod DMD frames retain their patched method identity",
             FN(null, "DMD<RoR2.BlastAttack::Fire>?12345", false) == "RoR2.BlastAttack.Fire"
             && FN("RoR2.BlastAttack", "DMD<System.Void RoR2.BlastAttack::HandleHits(RoR2.BlastAttack/HitPoint[])>", false) == "RoR2.BlastAttack.HandleHits");
         Check("bighit: the damage plumbing every hit shares is left out",
@@ -6744,8 +6767,8 @@ public static class Program {
         Func<System.Collections.Generic.List<string>, int, string> JP = (n, hk) => (string)Call("JoinPath", new object[] { n, hk });
         Check("bighit: the path joins innermost first with repeats collapsed", JP(new System.Collections.Generic.List<string> { "A", "A", "B", null, "C" }, 0) == "A < B < C");
         string longPath = JP(Enumerable.Range(1, 15).Select(i => "F" + i).ToList(), 3);
-        Check("bighit: a long path keeps 12 frames and says what was left out", longPath.StartsWith("F1 < F2 < ") && longPath.EndsWith("F12 < ... 3 more (3 hook frames left out)") && !longPath.Contains("F13"));
-        Check("bighit: an empty path is empty, or says only hooks were seen", JP(new System.Collections.Generic.List<string>(), 0) == "" && JP(null, 2) == "(2 hook frames, nothing else readable)");
+        Check("bighit: a long path keeps 12 useful frames and drops hook count suffixes", longPath.StartsWith("F1 < F2 < ") && longPath.EndsWith("F12 < ... 3 more") && !longPath.Contains("F13") && !longPath.Contains("hook frames"));
+        Check("bighit: an empty path with only wrappers is empty", JP(new System.Collections.Generic.List<string>(), 0) == "" && JP(null, 2) == "");
 
         // The log line.
         var nova = new CompatShield.BigHitTracer.Hit { Victim = "Mentalize", VictimBody = "MercBody", Dealt = 1230f, Before = 1400f, Full = 1500f,
@@ -6870,8 +6893,8 @@ public static class Program {
         Call("ResetForTest", null);
         var pathFn = (Func<string>)t.GetField("Path", all).GetValue(null);
         string live = Bh.Outer(0, pathFn);
-        bool liveOk = live.Contains("Bh.Outer") && !live.Contains("HookShaped") && live.Contains("(1 hook frames left out)") && !live.Contains("BigHitTracer");
-        Check("bighit: the live path names the caller and leaves the hook-shaped frame out", liveOk);
+        bool liveOk = live.Contains("Bh.Outer") && live.Contains("HookShaped") && !live.Contains("hook frames") && !live.Contains("BigHitTracer");
+        Check("bighit: the live path keeps a mod hook frame and caller before trimming", liveOk);
         if (!liveOk) Console.WriteLine("  got: " + live);
 
         // The member list: found on stand-ins shaped like the game's types, and the code asks for nothing outside it.
@@ -7650,6 +7673,23 @@ public static class Program {
         BepInEx.Logging.Logger.Listeners.Add(new Listener(logs));
         var tracer = shieldType.Assembly.GetType("CompatShield.SoundTracer");
         const BindingFlags all = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+        // Attach the ordinary static patches to a real stand-in through Harmony, then verify the clear->dirty flip is recorded.
+        var lag = typeof(CompatShield.LagTracer);
+        var dirty = lag.GetNestedType("DirtyPatches", all);
+        var dirtyTarget = typeof(DirtyPatchStandIn).GetMethod("MarkDirty");
+        var dirtyHarmony = new Harmony("CompatShield.shieldtest.dirtypatch");
+        lag.GetField("Running", all).SetValue(null, true);
+        lag.GetField("statsDirtyRead", all).SetValue(null, new Func<object, bool>(o => ((DirtyPatchStandIn)o).statsDirty));
+        lag.GetField("dirtyCounter", all).SetValue(null, 7);
+        var dirtyCounts = (System.Collections.IDictionary)lag.GetField("runDirty", all).GetValue(null);
+        dirtyCounts.Clear();
+        dirtyHarmony.Patch(dirtyTarget,
+            prefix: (HarmonyMethod)dirty.GetMethod("Method", all).Invoke(null, new object[] { "DirtyPrefix" }),
+            postfix: (HarmonyMethod)dirty.GetMethod("Method", all).Invoke(null, new object[] { "DirtyNoArgsPostfix" }));
+        new DirtyPatchStandIn().MarkDirty();
+        Check("lag: Harmony-attached static dirty prefix/postfix records a clear-to-dirty stand-in call", dirtyCounts.Count == 1 && dirtyCounts.Keys.Cast<string>().Single().StartsWith("MarkDirty by shieldtest:"));
+        dirtyHarmony.Unpatch(dirtyTarget, HarmonyPatchType.All, dirtyHarmony.Id);
+        lag.GetField("Running", all).SetValue(null, false);
         float now = 0f;
         tracer.GetMethod("ResetForTest", all).Invoke(null, null);
         tracer.GetField("Now", all).SetValue(null, new Func<float>(() => now));
@@ -8592,5 +8632,205 @@ public static class Program {
         public Listener(System.Collections.Generic.List<string> s) { sink = s; }
         public void LogEvent(object sender, LogEventArgs e) { sink.Add($"[{e.Level}:{e.Source.SourceName}] {e.Data}"); }
         public void Dispose() { }
+    }
+
+    static int OverloadingStakeCheck(string managed, string profile) {
+        EnsureShieldLogger();
+        int fail = 0; void C(string n, bool ok) { Console.WriteLine((ok ? "PASS " : "FAIL ") + n); if (!ok) fail++; }
+        var guardType=typeof(CompatShield.OverloadingStakeLimit);var stateFlags=BindingFlags.NonPublic|BindingFlags.Static;guardType.GetField("cap",stateFlags).SetValue(null,0);guardType.GetField("cooldown",stateFlags).SetValue(null,0f);var actual=guardType.GetMethod("FirePrefix",stateFlags);try{C("overloadingstake: real FirePrefix allows when both limits are off",(bool)actual.Invoke(null,new object[]{new object()}));}catch(TargetInvocationException){Console.WriteLine("SKIP overloadingstake real prefix: Unity ECall unavailable in .NET Framework harness");}
+        var runHarmony=new Harmony("CompatShield.shieldtest.overloading");var fireTarget=typeof(StakePatchStandIn).GetMethod("Fire");var destroyTarget=typeof(StakePatchStandIn).GetMethod("OnDestroy");var patchTargets=guardType.GetMethod("PatchTargets",stateFlags);var reset=guardType.GetMethod("ResetRun",stateFlags);guardType.GetMethod("ResetForTest",stateFlags).Invoke(null,null);reset.Invoke(null,new object[]{null});patchTargets.Invoke(null,new object[]{runHarmony,fireTarget,destroyTarget});
+        var live=(System.Collections.IDictionary)guardType.GetField("Live",stateFlags).GetValue(null);var last=(System.Collections.IDictionary)guardType.GetField("Last",stateFlags).GetValue(null);live[7]=2;last[7]=1f;guardType.GetField("logged",stateFlags).SetValue(null,true);guardType.GetField("loggedCooldown",stateFlags).SetValue(null,true);reset.Invoke(null,new object[]{null});patchTargets.Invoke(null,new object[]{runHarmony,fireTarget,destroyTarget});
+        C("overloadingstake: two run starts reset state and keep exactly one prefix per method",live.Count==0&&last.Count==0&&!(bool)guardType.GetField("logged",stateFlags).GetValue(null)&&!(bool)guardType.GetField("loggedCooldown",stateFlags).GetValue(null)&&Harmony.GetPatchInfo(fireTarget).Prefixes.Count==1&&Harmony.GetPatchInfo(destroyTarget).Prefixes.Count==1);runHarmony.Unpatch(fireTarget,HarmonyPatchType.All,runHarmony.Id);runHarmony.Unpatch(destroyTarget,HarmonyPatchType.All,runHarmony.Id);guardType.GetMethod("ResetForTest",stateFlags).Invoke(null,null);
+        bool Allow(int cap, float cd, int live, float last, float now) => cap <= 0 || (live < cap && (cd <= 0f || now - last >= cd));
+        C("overloadingstake: default cap permits first stake", Allow(12,.1f,0,-1,1));
+        C("overloadingstake: cap blocks at twelve live", !Allow(12,0,12,-1,1));
+        C("overloadingstake: cooldown blocks same owner", !Allow(12,.1f,1,1,1.05f));
+        C("overloadingstake: cap zero disables cap and cooldown", Allow(0,.1f,99,1,1.01f));
+        string dll = System.IO.Directory.GetFiles(profile,"EliteReworks2.dll",System.IO.SearchOption.AllDirectories).FirstOrDefault();
+        if (dll == null) Console.WriteLine("SKIP overloadingstake: EliteReworks2.dll missing");
+        else using (var m=Mono.Cecil.ModuleDefinition.ReadModule(dll)) {
+            var hit=m.GetType("EliteReworks2.Elites.Overloading.Overloading")?.Methods.FirstOrDefault(x=>x.Name=="BiggerLightningBombOnHit");
+            C("overloadingstake real: EliteReworks emission method references OnHitLightningBomb",hit!=null&&hit.Body.Instructions.Any(i=>i.Operand is Mono.Cecil.FieldReference f&&f.Name=="OnHitLightningBomb"));
+        }
+        string zetDll=System.IO.Directory.GetFiles(profile,"ZetAspects.dll",System.IO.SearchOption.AllDirectories).FirstOrDefault();
+        if(zetDll==null) Console.WriteLine("SKIP overloadingstake: ZetAspects.dll missing"); else using(var z=Mono.Cecil.ModuleDefinition.ReadModule(zetDll))
+            C("overloadingstake real: ZetAspects emits vanilla LightningStake",z.GetType("TPDespair.ZetAspects.EffectHooks")?.Methods.Any(x=>x.Name=="FireOverloadingBomb"&&x.Body.Instructions.Any(i=>i.Operand is Mono.Cecil.FieldReference f&&f.Name=="LightningStakePrefab"))==true);
+        using(var g=Mono.Cecil.ModuleDefinition.ReadModule(System.IO.Path.Combine(managed,"RoR2.dll")))
+            C("overloadingstake real: server projectile path and destroy hook exist",g.GetType("RoR2.Projectile.ProjectileManager")?.Methods.Any(m=>m.Name=="FireProjectileServer")==true&&g.GetType("RoR2.Projectile.ProjectileController")?.Methods.Any(m=>m.Name=="OnDestroy")==true);
+        C("overloadingstake: the per-stake checks do no by-name lookups",NoByNameLookups(typeof(CompatShield.OverloadingStakeLimit),"HasOverloading")&&NoByNameLookups(typeof(CompatShield.OverloadingStakeLimit),"IsStake"));C("overloadingstake: the lookup scan does flag a method that looks members up",!NoByNameLookups(typeof(CompatShield.OverloadingStakeLimit),"Apply"));
+        C("overloadingstake: the failed-open warning is a log-once call",WarnOnceSite("overloading-stake-check","Overloading stake limit check failed open: ")); return fail;
+    }
+
+    static int QuitCrashCheck(string managed, string profile) {
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        var guard=typeof(CompatShield.QuitCrashGuard);var flags=BindingFlags.NonPublic|BindingFlags.Static;guard.GetField("shutdownAfterNativeTerm",flags).SetValue(null,true);var args=new object[]{3};bool run=(bool)guard.GetMethod("PostCallbacksPrefix",flags).Invoke(null,args);C("quitcrash: real PostCallbacksPrefix sets zero and skips after Term",!run&&(int)args[0]==0);guard.GetField("shutdownAfterNativeTerm",flags).SetValue(null,false);
+        bool shutdown=false;C("quitcrash: normal callback drain continues",!shutdown);shutdown=true;C("quitcrash: drain stops after native Term",shutdown);shutdown=false;C("quitcrash: init resets shutdown state",!shutdown);
+        string path=System.IO.Path.Combine(managed,"AK.Wwise.Unity.API.dll");if(!System.IO.File.Exists(path)){Console.WriteLine("SKIP quitcrash: Wwise DLL missing");return fail;}
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(path)){
+            var init=m.GetType("AkSoundEngineInitialization");var term=init?.Methods.FirstOrDefault(x=>x.Name=="TerminateSoundEngine"&&x.Parameters.Count==1&&x.Parameters[0].ParameterType.MetadataType==Mono.Cecil.MetadataType.Boolean);
+            C("quitcrash real: TerminateSoundEngine(bool) calls Term before PostCallbacks",term!=null&&term.Body.Instructions.ToList().FindIndex(i=>i.Operand is Mono.Cecil.MethodReference a&&a.Name=="Term")>=0&&term.Body.Instructions.ToList().FindIndex(i=>i.Operand is Mono.Cecil.MethodReference a&&a.Name=="PostCallbacks")>term.Body.Instructions.ToList().FindIndex(i=>i.Operand is Mono.Cecil.MethodReference a&&a.Name=="Term"));
+            C("quitcrash real: PostCallbacks returns int",m.GetType("AkCallbackManager")?.Methods.Any(x=>x.Name=="PostCallbacks"&&x.ReturnType.MetadataType==Mono.Cecil.MetadataType.Int32)==true);
+        } return fail;
+    }
+
+    static int PileupOwnersCheck(string managed) {
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        var describe=typeof(CompatShield.PhysicsPileupTracer).GetMethod("Describe",BindingFlags.NonPublic|BindingFlags.Static);var items=new List<CompatShield.PhysicsPileupTracer.Item>();foreach(var owner in new[]{"NemMercBody","LemurianBody","EngiBody"})for(int i=0;i<(owner=="NemMercBody"?300:owner=="LemurianBody"?150:51);i++)items.Add(new CompatShield.PhysicsPileupTracer.Item{Name="pile",OwnerBody=owner,Owner=i,Moving=true,Cell=1});string line=(string)describe.Invoke(null,new object[]{501f,"test",items,0d});C("pileupowners: real Describe shows top three owner counts",line.Contains("NemMercBody 300")&&line.Contains("LemurianBody 150")&&line.Contains("EngiBody 51"));
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(System.IO.Path.Combine(managed,"RoR2.dll")))
+            C("pileupowners real: projectile owner and CharacterBody exist",m.GetType("RoR2.Projectile.ProjectileController")?.Fields.Any(f=>f.Name=="owner")==true&&m.GetType("RoR2.CharacterBody")!=null);
+        return fail;
+    }
+
+    static int HardEnemyCapCountCheck(string managed) {
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        var guard=typeof(CompatShield.HardEnemyCap);var flags=BindingFlags.NonPublic|BindingFlags.Static;var live=new FakeCapMember{Body=new FakeCapBody{Master=new object()}};var projectile=new FakeCapMember{Body=null};var masterless=new FakeCapMember{Body=new FakeCapBody{Master=null}};guard.GetField("hostileValues",flags).SetValue(null,new object[]{new object[]{live,projectile,masterless}});guard.GetField("teamMembers",flags).SetValue(null,typeof(FakeCapTeams).GetMethod("Members"));guard.GetField("teamBodyRead",flags).SetValue(null,new Func<object,object>(x=>((FakeCapMember)x).Body));guard.GetField("bodyMasterRead",flags).SetValue(null,new Func<object,object>(x=>((FakeCapBody)x).Master));var count=(int)guard.GetMethod("CountAlive",flags).Invoke(null,null);C("hardcapcount: real CountAlive counts only a body with a master",count==1);
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(System.IO.Path.Combine(managed,"RoR2.dll"))){var b=m.GetType("RoR2.CharacterBody");var t=m.GetType("RoR2.TeamComponent");
+            C("hardcapcount real: CharacterBody.master is a property",b!=null&&b.Properties.Any(p=>p.Name=="master")&&!b.Fields.Any(f=>f.Name=="master"));
+            C("hardcapcount real: TeamComponent.body is a property",t!=null&&t.Properties.Any(p=>p.Name=="body")&&!t.Fields.Any(f=>f.Name=="body"));
+            C("hardcapcount real: team members use GetTeamMembers",t?.Methods.Any(x=>x.Name=="GetTeamMembers")==true);}
+        return fail;
+    }
+
+    static string FindPluginDll(string profile,string file)=>System.IO.Directory.Exists(System.IO.Path.Combine(profile,"plugins"))?
+        System.IO.Directory.GetFiles(System.IO.Path.Combine(profile,"plugins"),file,System.IO.SearchOption.AllDirectories).FirstOrDefault():null;
+    static int TauntGuardCheck(string profile) {
+        EnsureShieldLogger();
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        C("taunt: real Prefix fails open on a stand-in before run setup",(bool)typeof(CompatShield.TauntDebuffGuard).GetMethod("Prefix",BindingFlags.NonPublic|BindingFlags.Static).Invoke(null,new object[]{new object()}));
+        C("taunt: bodyless current enemy tick is skipped",CompatShield.TauntDebuffGuard.ShouldSkip(true,false));C("taunt: body tick continues",!CompatShield.TauntDebuffGuard.ShouldSkip(true,true));C("taunt: no enemy continues",!CompatShield.TauntDebuffGuard.ShouldSkip(false,false));
+        string p=FindPluginDll(profile,"TinkersSatchel.dll");if(p==null){Console.WriteLine("SKIP taunt real: TinkersSatchel.dll missing");return fail;}
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(p)){var t=m.GetType("ThinkInvisible.TinkersSatchel.TauntDebuffController");var f=t?.Methods.FirstOrDefault(x=>x.Name=="FixedUpdate");
+            C("taunt real: FixedUpdate and ai field exist",f!=null&&t.Fields.Any(x=>x.Name=="ai"));
+            C("taunt real: reads currentEnemy and performs body lookup",f!=null&&f.Body.Instructions.Any(i=>i.Operand is Mono.Cecil.MemberReference r&&r.Name.IndexOf("currentEnemy",StringComparison.OrdinalIgnoreCase)>=0)&&f.Body.Instructions.Any(i=>i.Operand is Mono.Cecil.MethodReference r&&r.Name=="GetComponent"));}
+        var managed=Environment.GetEnvironmentVariable("SHIELDTEST_MANAGED");using(var game=Mono.Cecil.ModuleDefinition.ReadModule(System.IO.Path.Combine(managed,"RoR2.dll"))){var ai=game.GetType("RoR2.CharacterAI.BaseAI");C("taunt real: BaseAI.currentEnemy is a property, not a field",ai!=null&&ai.Properties.Any(x=>x.Name=="currentEnemy")&&!ai.Fields.Any(x=>x.Name=="currentEnemy"));}
+        C("taunt: the per-tick prefix does no by-name lookups",NoByNameLookups(typeof(CompatShield.TauntDebuffGuard),"Prefix"));
+        C("taunt: the body-check warning is a log-once call",WarnOnceSite("taunt-body-check","Taunt debuff guard could not check the enemy body; original tick runs: ")); return fail;
+    }
+
+    static int HookReelCheck(string managed) {
+        EnsureShieldLogger();
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        var prefix=typeof(CompatShield.HookReelGuard).GetMethod("Prefix",BindingFlags.NonPublic|BindingFlags.Static);C("hookreel: real Prefix fails open on an unknown stand-in",(bool)prefix.Invoke(null,new object[]{new object(),true}));
+        C("hookreel: missing owner or victim enters fail path",CompatShield.HookReelGuard.ShouldFail(false,true,true)&&CompatShield.HookReelGuard.ShouldFail(true,false,true));C("hookreel: valid grapple continues",!CompatShield.HookReelGuard.ShouldFail(true,true,true));
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(System.IO.Path.Combine(managed,"RoR2.dll"))){var t=m.GetType("RoR2.Projectile.HookProjectileImpact");var reel=t?.Methods.FirstOrDefault(x=>x.Name=="Reel"&&x.Parameters.Count==0);
+            C("hookreel real: bool Reel and fields exist",reel!=null&&reel.ReturnType.MetadataType==Mono.Cecil.MetadataType.Boolean&&t.Fields.Any(f=>f.Name=="victim")&&t.Fields.Any(f=>f.Name=="ownerTransform")&&t.Fields.Any(f=>f.Name=="hookState"));
+            C("hookreel real: no explicit static constructor",t?.Methods.Any(x=>x.IsConstructor&&x.IsStatic)==false);}
+        C("hookreel: the per-call prefix does no by-name lookups",NoByNameLookups(typeof(CompatShield.HookReelGuard),"Prefix"));
+        C("hookreel: the owner/victim warning is a log-once call",WarnOnceSite("hook-reel-check","Hook reel guard: couldnt check owner/victim; reel runs unchanged: ")); return fail;
+    }
+
+    static int Starstorm2QuietCheck(string profile) {
+        EnsureShieldLogger();
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        var mute=typeof(CompatShield.Starstorm2LogQuiet).GetMethod("MuteTermination",BindingFlags.NonPublic|BindingFlags.Static);C("ss2quiet: real prefix mutes target warning text without a stack walk",!(bool)mute.Invoke(null,new object[]{null,"Termination Result before"})&&(bool)mute.Invoke(null,new object[]{null,"ordinary warning"}));
+        C("ss2quiet: only termination lookup text matches",CompatShield.Starstorm2TerminationQuiet.ShouldMute("Termination Result: lookup")&&!CompatShield.Starstorm2TerminationQuiet.ShouldMute("other warning"));
+        string p=FindPluginDll(profile,"Starstorm2.dll");if(p==null){Console.WriteLine("SKIP ss2quiet real: Starstorm2.dll missing");return fail;}
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(p)){var t=m.GetType("SS2.AttackerOverrideManager");C("ss2quiet real: override mapping and all three handlers",t!=null&&t.Fields.Any(f=>f.Name=="attackerToOverride")&&new[]{"OverrideOnHitAll","OverrideOnHitEnemy","OverrideTakeDamage"}.All(n=>t.Methods.Any(x=>x.Name==n)));
+            C("ss2quiet real: AfterGummy exists",m.Types.SelectMany(FlattenTypes).Any(x=>x.Methods.Any(y=>y.Name=="AfterGummy")));}
+        C("ss2quiet: the prune warning is a log-once call",WarnOnceSite("ss2-prune","Starstorm2 log quiet: couldnt prune overrides: ")); return fail;
+    }
+
+    static int HeadsetCheck(string profile) {
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        int origCalls=0;Action<object> orig=_=>origCalls++;bool runMod=(bool)typeof(CompatShield.HeadsetCostFix).GetMethod("Prefix",BindingFlags.NonPublic|BindingFlags.Static).Invoke(null,new object[]{orig,new FakeNoInventoryBody()});C("headset: real Prefix calls orig once on a no-inventory body",!runMod&&origCalls==1);
+        C("headset: no inventory skips the mod hook",CompatShield.HeadsetCostFix.SkipModWork(false));C("headset: body with inventory runs unchanged",!CompatShield.HeadsetCostFix.SkipModWork(true));
+        string p=FindPluginDll(profile,"TinkersSatchel.dll");if(p==null){Console.WriteLine("SKIP headset real: TinkersSatchel.dll missing");return fail;}
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(p)){var t=m.GetType("ThinkInvisible.TinkersSatchel.Headset");var f=t?.Methods.FirstOrDefault(x=>x.Name=="CharacterBody_FixedUpdate");
+            C("headset real: hook receives orig and CharacterBody",f!=null&&f.Parameters.Count==2&&f.Parameters[1].ParameterType.FullName=="RoR2.CharacterBody"&&f.Body.Instructions.Any(i=>i.Operand is Mono.Cecil.MethodReference r&&r.Name=="Invoke"));
+            C("headset real: hook has inventory and item-count work",f!=null&&f.Body.Instructions.Any(i=>i.Operand is Mono.Cecil.MethodReference r&&r.Name=="GetComponent")&&f.Body.Instructions.Any(i=>i.Operand is Mono.Cecil.MethodReference r&&r.Name=="GetCountEffective"));}
+        return fail;
+    }
+
+    static IEnumerable<Mono.Cecil.TypeDefinition> FlattenTypes(Mono.Cecil.TypeDefinition t) {
+        yield return t;foreach(var n in t.NestedTypes)foreach(var x in FlattenTypes(n))yield return x;
+    }
+
+    // True when the named method (and its compiler-made helpers) never looks a type or member up by name.
+    static bool NoByNameLookups(Type owner,string method) {
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(owner.Assembly.Location)){var t=m.GetType(owner.FullName);if(t==null)return false;
+            var ms=t.Methods.Concat(t.NestedTypes.SelectMany(n=>n.Methods)).Where(x=>x.HasBody&&(x.Name==method||x.Name.Contains("<"+method+">"))).ToList();if(ms.Count==0)return false;
+            var bad=new HashSet<string>{"GetField","GetFields","GetMethod","GetMethods","GetProperty","GetProperties","GetNestedType","GetMember","Parse"};
+            return !ms.SelectMany(x=>x.Body.Instructions).Any(i=>i.Operand is Mono.Cecil.MethodReference r&&((bad.Contains(r.Name)&&(r.DeclaringType.FullName=="System.Type"||r.DeclaringType.FullName=="System.Enum"))||(r.Name=="GetType"&&r.Parameters.Count>0&&(r.DeclaringType.FullName=="System.Reflection.Assembly"||r.DeclaringType.FullName=="System.Type"))));}
+    }
+    // True when the source has exactly one WarnOnce call with this key and every line carrying the message is that call.
+    static bool WarnOnceSite(string key,string phrase) {
+        var lines=System.IO.File.ReadAllText(Environment.GetEnvironmentVariable("SHIELDTEST_SOURCE")).Split('\n');string call="WarnOnce(\""+key+"\"";
+        return lines.Count(x=>x.Contains(call))==1&&lines.Any(x=>x.Contains(phrase))&&lines.Where(x=>x.Contains(phrase)).All(x=>x.Contains(call));
+    }
+    static bool WarningOnceCheck(string key) {
+        EnsureShieldLogger(); var logs=new List<string>(); var listener=new Listener(logs); BepInEx.Logging.Logger.Listeners.Add(listener);
+        var once=typeof(CompatShield.CompatShieldPatcher).GetMethod("WarnOnce",BindingFlags.NonPublic|BindingFlags.Static);
+        once.Invoke(null,new object[]{key,"shieldtest repeated failure"}); once.Invoke(null,new object[]{key,"shieldtest repeated failure"});
+        BepInEx.Logging.Logger.Listeners.Remove(listener);
+        return logs.Count(x=>x.Contains("shieldtest repeated failure"))==1&&logs.Any(x=>x.Contains("(logged once)"));
+    }
+    static int DispatchGuardCheck() {
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        EnsureShieldLogger();var logs=new List<string>();var listener=new Listener(logs);BepInEx.Logging.Logger.Listeners.Add(listener);
+        var guard=typeof(CompatShield.CompatShieldPatcher).GetMethod("Guarded",BindingFlags.NonPublic|BindingFlags.Static);int next=0;
+        guard.Invoke(null,new object[]{"DispatchStandIn",(Action)(()=>throw new InvalidOperationException("stand-in"))});
+        guard.Invoke(null,new object[]{"NextStandIn",(Action)(()=>next++)});BepInEx.Logging.Logger.Listeners.Remove(listener);
+        C("dispatchguard: throwing apply logs not applied with exception type and message",logs.Any(x=>x.Contains("DispatchStandIn not applied")&&x.Contains("InvalidOperationException")&&x.Contains("stand-in")));
+        C("dispatchguard: next apply runs and exception does not escape",next==1);
+        string source=Environment.GetEnvironmentVariable("SHIELDTEST_SOURCE");string text=System.IO.File.ReadAllText(source);int a=text.IndexOf("static void ApplyModFixes(Assembly asm)"),b=text.IndexOf("/// <summary>",a);string method=text.Substring(a,b-a);
+        C("dispatchguard: a repeated WarnOnce key logs one warning",WarningOnceCheck("test-dispatchguard"));
+        C("dispatchguard: every Apply and Configure call is wrapped by Guarded or try",method.Split(new[]{"\r\n","\n"},StringSplitOptions.None).Where(x=>x.Contains(".Apply(")||x.Contains(".Configure(")).All(x=>x.Contains("Guarded(")||x.TrimStart().StartsWith("try")));
+        return fail;
+    }
+    static int DroneTweakCheck(string managed) {
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        var df=BindingFlags.NonPublic|BindingFlags.Static;C("dronetweak: pure drone and combiner name logic",(bool)typeof(CompatShield.DroneTweak).GetMethod("IsDroneCategory",df).Invoke(null,new object[]{"Drones"})&&(bool)typeof(CompatShield.DroneTweak).GetMethod("IsCombiner",df).Invoke(null,new object[]{"DroneCombinerCard"}));
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(System.IO.Path.Combine(managed,"RoR2.dll"))){var d=m.GetType("RoR2.DirectorCardCategorySelection");var c=d?.NestedTypes.FirstOrDefault(x=>x.Name=="Category");var card=m.GetType("RoR2.DirectorCard");var body=m.GetType("RoR2.CharacterBody");
+        C("dronetweak real: event, category fields, card gate, and health fields exist",m.GetType("RoR2.SceneDirector")?.Events.Any(x=>x.Name=="onGenerateInteractableCardSelection")==true&&c?.Fields.Any(x=>x.Name=="selectionWeight")==true&&c.Fields.Any(x=>x.Name=="cards")&&card?.Fields.Any(x=>x.Name=="minimumStageCompletions")==true&&body?.Fields.Any(x=>x.Name=="baseMaxHealth")==true&&body.Fields.Any(x=>x.Name=="levelMaxHealth")==true);}
+        return fail;
+    }
+    static int InteractableWeightCheck(string managed) {
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        var t=typeof(CompatShield.InteractableWeightTweak);var f=BindingFlags.NonPublic|BindingFlags.Static;t.GetField("printer",f).SetValue(null,2f);t.GetField("scrapper",f).SetValue(null,3f);t.GetField("combiner",f).SetValue(null,4f);t.GetField("combinerCategoryFactor",f).SetValue(null,2f);var factor=t.GetMethod("FactorFor",f);
+        C("interactableweight: pure card-name multipliers",Math.Abs((float)factor.Invoke(null,new object[]{"Duplicator1"})-2f)<.001f&&Math.Abs((float)factor.Invoke(null,new object[]{"Scrapper1"})-3f)<.001f&&Math.Abs((float)factor.Invoke(null,new object[]{"DroneCombiner"})-2f)<.001f);
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(System.IO.Path.Combine(managed,"RoR2.dll"))){var d=m.GetType("RoR2.DirectorCardCategorySelection");var c=m.GetType("RoR2.DirectorCard");C("interactableweight real: card-weight event and spawn-card method exist",d?.Events.Any(x=>x.Name=="calcCardWeight")==true&&c?.Methods.Any(x=>x.Name=="GetSpawnCard"&&x.Parameters.Count==0)==true);}
+        return fail;
+    }
+    static int InfernoScalingCheck(string managed,string profile) {
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        C("infernoscaling: other-cap predicate rejects null instruction",!CompatShield.InfernoScalingFix.IsOtherLevelCapRead(null));
+        string p=FindPluginDll(profile,"Inferno.dll");if(p==null)Console.WriteLine("SKIP infernoscaling real: Inferno.dll missing");else using(var m=Mono.Cecil.ModuleDefinition.ReadModule(p)){var t=m.GetType("Inferno.Skill_Misc.Hooks");C("infernoscaling real: Hooks type and cooldown callback exist",t?.Methods.Any(x=>x.Name=="RecalculateStatsAPI_GetStatCoefficients")==true);}
+        using(var m=Mono.Cecil.ModuleDefinition.ReadModule(System.IO.Path.Combine(managed,"RoR2.dll"))){var run=m.GetType("RoR2.Run");C("infernoscaling real: Run ambient level cap field exists",run?.Fields.Any(x=>x.Name=="ambientLevelCap")==true);}
+        Console.WriteLine("SKIP infernoscaling: Unity game log confirms live run scaling");return fail;
+    }
+    // Every full type name in the game's Managed folder and the profile's enabled plugin DLLs, nested types written with '+'.
+    static HashSet<string> AllTypeNames(string managed,string profile) {
+        var set=new HashSet<string>();var files=System.IO.Directory.GetFiles(managed,"*.dll").ToList();string plugins=System.IO.Path.Combine(profile,"plugins");
+        if(System.IO.Directory.Exists(plugins))files.AddRange(System.IO.Directory.GetFiles(plugins,"*.dll",System.IO.SearchOption.AllDirectories));
+        foreach(var f in files){try{using(var m=Mono.Cecil.ModuleDefinition.ReadModule(f))foreach(var t in m.GetTypes())set.Add(t.FullName.Replace('/','+'));}catch(Exception){}}
+        return set;
+    }
+    static int LookupCheck(string managed,string profile) {
+        int fail=0,pass=0,skip=0;string data=Environment.GetEnvironmentVariable("SHIELDTEST_DATA");HashSet<string> allTypes=null;string path=System.IO.Path.Combine(data,"lookups.tsv");
+        if(!System.IO.File.Exists(path)){Console.WriteLine("FAIL lookups: lookup data file missing");return 1;}
+        foreach(var line in System.IO.File.ReadAllLines(path).Skip(1)){if(line.Trim().Length==0)continue;var c=line.Split('\t');if(c.Length!=5){fail++;Console.WriteLine("FAIL lookups malformed row (needs 5 tab-separated columns): "+line);continue;}string asm=c[1],type=c[2].Replace('+','/'),member=c[3],kind=c[4];if(asm=="?"){skip++;continue;}if(asm=="*"){if(allTypes==null)allTypes=AllTypeNames(managed,profile);if(allTypes.Contains(c[2]))pass++;else{fail++;Console.WriteLine("FAIL lookups type not found in any installed DLL: "+c[2]+" ("+c[0]+")");}continue;}string dll=asm=="RoR2"||asm=="Assembly-CSharp"?System.IO.Path.Combine(managed,asm+".dll"):FindPluginDll(profile,asm+".dll");if(dll==null){skip++;continue;}using(var m=Mono.Cecil.ModuleDefinition.ReadModule(dll)){var t=m.GetType(type);bool ok=t!=null;if(ok&&member.Length>0){ok=kind=="method"?t.Methods.Any(x=>x.Name==member):kind=="field"?t.Fields.Any(x=>x.Name==member):kind=="property"?t.Properties.Any(x=>x.Name==member):kind=="nestedtype"?t.NestedTypes.Any(x=>x.Name==member):false;}if(ok)pass++;else{fail++;Console.WriteLine("FAIL lookups row: "+line);}}}
+        foreach(var name in new[]{"DamageLog","Smite Items","StormyItems"}){if(FindPluginDll(profile,name+".dll")==null)skip++;else pass++;}
+        string source=Environment.GetEnvironmentVariable("SHIELDTEST_SOURCE");string text=System.IO.File.ReadAllText(source);int a=text.IndexOf("static void ApplyModFixes(Assembly asm)"),b=text.IndexOf("/// <summary>",a);string dispatch=text.Substring(a,b-a);var names=System.Text.RegularExpressions.Regex.Matches(dispatch,"name == \\\"([^\\\"]+)\\\"").Cast<System.Text.RegularExpressions.Match>().Select(x=>x.Groups[1].Value).Distinct();
+        foreach(var name in names){bool absent=name=="DamageLog"||name=="Smite Items"||name=="StormyItems";bool found=System.IO.Directory.GetFiles(profile,"*.dll",System.IO.SearchOption.AllDirectories).Any(x=>System.IO.Path.GetFileNameWithoutExtension(x)==name)||System.IO.File.Exists(System.IO.Path.Combine(managed,name+".dll"));if(found)pass++;else if(absent)skip++;else{fail++;Console.WriteLine("FAIL lookups dispatch name is not an installed assembly: "+name);}}
+        Console.WriteLine($"PASS lookups: {pass} lookup rows verified");Console.WriteLine($"SKIP lookups: {skip} absent or disabled targets");Console.WriteLine($"TOTAL lookups: {pass} pass, {fail} fail, {skip} skip");if(fail>0)Console.WriteLine($"FAIL lookups: {fail} missing/wrong targets");return fail;
+    }
+    static int SmallGuardCheck(string profile) {
+        EnsureShieldLogger();
+        int fail=0;void C(string n,bool ok){Console.WriteLine((ok?"PASS ":"FAIL ")+n);if(!ok)fail++;}
+        C("smallguards: real Icarus luck fallback is zero",CompatShield.IcarusTrackerGuard.LuckOrZero(null)==0f);typeof(CompatShield.DeathCeremonySnapshotGuard).GetMethod("Prefix",BindingFlags.NonPublic|BindingFlags.Static).Invoke(null,new object[]{new object()});C("smallguards: real SeedTracker Prefix preserves unknown stand-ins",(bool)typeof(CompatShield.SeedTrackerGuard).GetMethod("Prefix",BindingFlags.NonPublic|BindingFlags.Static).Invoke(null,new object[]{new object()}));
+        C("smallguards: real Caeli Prefix skips null body",!(bool)typeof(CompatShield.CaeliSecondaryGuard).GetMethod("Prefix",BindingFlags.NonPublic|BindingFlags.Static).Invoke(null,new object[]{null}));int origCalls=0;bool itemTierRuns=(bool)typeof(CompatShield.ItemTierCleanupGuard).GetMethod("Prefix",BindingFlags.NonPublic|BindingFlags.Static).Invoke(null,new object[]{(Action<object>)(_=>origCalls++),new object()});C("smallguards: real ItemTier Prefix leaves unknown helper to orig",itemTierRuns&&origCalls==0);
+        C("smallguards: null Caeli body is skipped",CompatShield.CaeliSecondaryGuard.ShouldSkip(null));C("smallguards: valid Caeli body continues",!CompatShield.CaeliSecondaryGuard.ShouldSkip(new object()));
+        void CheckDll(string file,string typeName,Func<Mono.Cecil.TypeDefinition,bool> check,string label){var p=FindPluginDll(profile,file);if(p==null){Console.WriteLine("SKIP smallguards real: "+label+" DLL missing");return;}using(var m=Mono.Cecil.ModuleDefinition.ReadModule(p)){var t=m.Types.SelectMany(FlattenTypes).FirstOrDefault(x=>x.FullName==typeName||x.Name==typeName);C("smallguards real: "+label,check(t));}}
+        C("smallguards: SeedTracker cleanup threshold leaves early ticks and exits at three seconds",!CompatShield.SeedTrackerGuard.IsExpired(2.99f)&&CompatShield.SeedTrackerGuard.IsExpired(3f));
+        C("smallguards: a tracker with a body and no master waits quietly only after its first warning",!CompatShield.SeedTrackerGuard.ShouldWaitQuietly(0f,true,true)&&CompatShield.SeedTrackerGuard.ShouldWaitQuietly(.02f,true,true)&&!CompatShield.SeedTrackerGuard.ShouldWaitQuietly(.02f,true,false)&&!CompatShield.SeedTrackerGuard.ShouldWaitQuietly(.02f,false,true));
+        { float w=.02f; int ticks=0; while(!CompatShield.SeedTrackerGuard.IsExpired(w)&&ticks<1000){w=CompatShield.SeedTrackerGuard.NextWait(w,1f/60f);ticks++;} C("smallguards: the quiet wait keeps the 3-second grace (about 180 ticks at 60 a second)",ticks>=175&&ticks<=181);
+          C("smallguards: a zero step still advances the wait",CompatShield.SeedTrackerGuard.NextWait(1f,0f)>1f); }
+        CheckDll("ChensGradiusMod.dll","SeedTracker",t=>{var f=t?.Methods.FirstOrDefault(x=>x.Name=="FixedUpdate");return t!=null&&t.Properties.Any(p=>p.Name=="characterMaster")&&t.Properties.Any(p=>p.Name=="characterBody")&&t.Fields.Any(x=>x.Name=="invalidCheckTimer")&&f!=null&&f.Body.Instructions.Any(i=>i.Operand is Mono.Cecil.MethodReference m&&m.Name=="Destroy")&&f.Body.Instructions.Any(i=>i.Operand is Mono.Cecil.FieldReference x&&x.Name=="invalidCheckTimer")&&t.Methods.Any(g=>g.Name=="IncreaseInvalidity"&&g.HasBody&&g.Body.Instructions.Any(i=>i.Operand is Mono.Cecil.MethodReference q&&q.Name=="get_fixedDeltaTime"));},"SeedTracker own threshold, Object.Destroy cleanup path and a grace timer that adds fixedDeltaTime");
+        var managed=Environment.GetEnvironmentVariable("SHIELDTEST_MANAGED");using(var game=Mono.Cecil.ModuleDefinition.ReadModule(System.IO.Path.Combine(managed,"RoR2.dll"))){var body=game.GetType("RoR2.CharacterBody");C("smallguards real: CharacterBody.master is a property",body?.Properties.Any(p=>p.Name=="master")==true&&!body.Fields.Any(f=>f.Name=="master"));}
+        CheckDll("TinkersSatchel.dll","IcarusTracker",t=>t!=null&&t.Methods.Any(x=>x.Name=="GlobalEventManager_onServerDamageDealt")&&t.Methods.First(x=>x.Name=="GlobalEventManager_onServerDamageDealt").Parameters.Count==1,"Icarus damage handler shape");
+        CheckDll("MysticsItemsPlugin.dll","DeathCeremony",t=>t!=null&&t.Methods.Any(x=>x.Name=="GenericGameEvents_OnHitEnemy")&&t.NestedTypes.Any(n=>n.Name=="MysticsItemsDeathCeremonyMark"&&n.Fields.Any(f=>f.Name=="marksPerTeam")),"Death Ceremony nested mark type and dictionary field");
+        CheckDll("CaeliImperium.dll","InfiniteSecondarySkillChargesEvents",t=>t!=null&&t.Methods.Any(x=>x.Name=="Events_OnTakeDamageProcess"&&x.Parameters.Count==4),"Caeli damage listener");
+        CheckDll("MSU.Runtime.dll","ItemTierModule",t=>t!=null&&t.Methods.Any(x=>x.Name=="DestroyCustomModel"),"MSU custom model cleanup");
+        C("smallguards: the seed tracker warning is a log-once call",WarnOnceSite("seedtracker-timer","Seed tracker guard: couldnt check invalidity timer; original tick runs: "));C("smallguards: the MSU tier warning is a log-once call",WarnOnceSite("msu-tier-helper","MSU item tier cleanup guard: couldnt check helper; mod hook runs: ")); return fail;
     }
 }

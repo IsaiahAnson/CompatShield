@@ -23,9 +23,9 @@ SECTIONS = {
     2: ("Artifact of Sacrifice", "sacrifice", "Drop chance, which interactables stay under Sacrifice, the ShareSuite credit fix"),
     3: ("Balance", "balance", "Acolyte attack speed, ItemRoulette spin cost, Artifact of Genetics, locked items"),
     4: ("Lag and Hang Protection", "lag", "Limits on physics catch-up, stat updates, damage chains and blast chains"),
-    5: ("Error and Crash Protection", "crash", "Guards for error loops, outdated hooks, broken handlers, moved assets and stuck sounds"),
+    5: ("Error and Crash Protection", "crash", "Guards for error loops, outdated hooks, broken handlers, moved assets, stuck sounds and the crash on quit"),
     6: ("Item Mod Fixes", "items", "Bubbets Items, TinkersSatchel, ZetAspects, Hypercrit, PrintToInventory and other item mods"),
-    7: ("Enemy and Survivor Mod Fixes", "enemies", "Inferno, Sandswept, EnemiesReturns, REX, Shaman, Paladin and more"),
+    7: ("Enemy and Survivor Mod Fixes", "enemies", "Inferno, Sandswept, EnemiesReturns, REX, Shaman, Paladin, Overloading stake limits and more"),
     8: ("Diagnostics", "diagnostics", "Tracers for lag, sound, physics pile-ups and big hits, and a hook timer"),
 }
 
@@ -47,31 +47,31 @@ def heading(icon, title):
 headings = re.findall(r"(?m)^(#{2,3}) (.+)$", ref)
 by_anchor = {anchor(re.sub(r"`", "", title)) for _, title in headings}
 fix_block = ref.split("\n## What it fixes", 1)[1].split("\n## ", 1)[0]
-# The first cell is a bold title, sometimes followed by a note in brackets: keep both, drop the bold marks.
-fixes = list(dict.fromkeys(cell.replace("**", "") for cell in re.findall(r"(?m)^\| (\*\*.+?) \|", fix_block)))
-assert len(fixes) == len(re.findall(r"(?m)^\| \*\*", fix_block)), "a fix row was not read"
+# Since 1.4.56 the list is one bullet per fix, "- **Title**: what broke. Who needs it": keep the title.
+fixes = list(dict.fromkeys(re.findall(r"(?m)^- \*\*(.+?)\*\*", fix_block)))
+assert fixes and len(fixes) == len(re.findall(r"(?m)^- \*\*", fix_block)), "a fix line was not read"
 
+# Since 1.4.56 each settings section is a collapsed table under "## Settings", headed
+# "<summary>N. Name (K settings)</summary>". The summaries are not headings, so they have no anchor to link to.
 rows, counts = [], []
-found =re.findall(r"(?m)^### (\d+)\. (.+)$", ref)
-assert [int(n) for n, _ in found] == sorted(SECTIONS), found
-for number, name in found:
+found = re.findall(r"(?m)^<summary>(\d+)\. (.+?) \((\d+) settings\)</summary>$", ref)
+assert [int(n) for n, _, _ in found] == sorted(SECTIONS), found
+for number, name, stated in found:
     want, icon, about = SECTIONS[int(number)]
     assert name.strip() == want, (name, want)
-    body = ref.split("\n### %s. %s" % (number, name), 1)[1]
-    body = re.split(r"(?m)^#{2,3} ", body, maxsplit=1)[0]
+    body = ref.split("<summary>%s. %s (" % (number, name), 1)[1].split("</details>", 1)[0]
     count = len(re.findall(r"(?m)^\| `[A-Za-z0-9]+` \|", body))
-    assert count, name
+    assert count and count == int(stated), (name, count, stated)
     title = "%s. %s" % (number, name.strip())
-    assert anchor(title) in by_anchor, title
     counts.append(count)
     # An HTML table, because the icon column needs a fixed width (GitHub shrinks an image in an auto-sized cell).
     # GitHub counts the cell's 26px of padding and its border inside that width, so 50 leaves room for a 20px icon.
-    rows.append('  <tr><td align="center">%s</td><td><a href="%s#%s">%s</a></td><td>%s</td><td align="right">%d</td></tr>' % (
-        themed("mini-" + icon, 'width="20" height="20" alt=""'), REF, anchor(title), title.replace(" ", "&nbsp;"),
-        about, count))
+    rows.append('  <tr><td align="center">%s</td><td>%s</td><td>%s</td><td align="right">%d</td></tr>' % (
+        themed("mini-" + icon, 'width="20" height="20" alt=""'), title.replace(" ", "&nbsp;"), about, count))
 total_settings = sum(counts)
+assert total_settings == len(re.findall(r"(?m)^\| `[A-Za-z0-9]+` \|", ref)), "a settings row sits outside the eight sections"
 
-for needed in ("what-it-fixes", "multiplayer", "known-limits", "what-it-logs-source-compatshield"):
+for needed in ("what-it-fixes", "settings", "multiplayer", "known-limits", "reference"):
     assert needed in by_anchor, needed
 
 listed = re.findall(r"(?m)^\| \[\**([\d.]+)\**(?: \(latest\))?\]", catalog)
@@ -127,7 +127,7 @@ As of {latest}, the fix list has {len(fixes)} entries. Some fix one mod: Tinkers
 
 </details>
 
-Each entry in the [full reference]({REF}#what-it-fixes) says what broke and what CompatShield does about it.
+The [full reference]({REF}#what-it-fixes) gives each one a line. Its [Reference section]({REF}#reference) says in full what broke and what CompatShield does about it.
 
 {heading("install", "Install")}
 
@@ -152,7 +152,7 @@ All {total_settings} settings live in one file, `BepInEx\\config\\local.compatsh
 
 Most fixes are on by default. The spawn, drone and Sacrifice drop multipliers start at 1, which means off. A few gameplay changes are on from the start, such as the hard enemy cap of 80 and the Acolyte attack speed multiplier of 1.5.
 
-The [full reference]({REF}) lists every setting with its default, the [known limits]({REF}#known-limits) and [what CompatShield writes to the log]({REF}#what-it-logs-source-compatshield).
+The [full reference]({REF}#settings) lists every setting with its default. It also has the [known limits]({REF}#known-limits) and, under [Reference]({REF}#reference), the lines CompatShield writes to the log.
 
 {heading("multiplayer", "Multiplayer")}
 
@@ -170,7 +170,11 @@ The build that ships is `bin\\Release\\netstandard2.1\\CompatShield.dll`. To use
 
 {heading("versions", "Versions")}
 
-{len(listed)} packaged builds are kept, from {first} to {latest}, each with its zip: see [VERSIONS.md](VERSIONS.md) or the [releases page]({BASE}/releases). The source code here is the latest version. Each older version has a tag that holds the README shipped with that build.
+{len(listed)} packaged builds are kept, from {first} to {latest}, each with its zip: see [VERSIONS.md](VERSIONS.md) or the [releases page]({BASE}/releases). What changed in each version is in [CHANGELOG.md](CHANGELOG.md). The source code here is the latest version. Each older version has a tag that holds the README shipped with that build.
+
+## License
+
+[PolyForm Noncommercial 1.0.0](LICENSE). You can use, change and share CompatShield for free, for any purpose that does not make money. Selling it, or using it in paid work, needs my written permission.
 
 {DIVIDER}
 

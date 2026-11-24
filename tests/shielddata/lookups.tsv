@@ -1,0 +1,125 @@
+class	assembly	type	member	kind
+OverloadingStakeLimit	RoR2	RoR2.Projectile.FireProjectileInfo	projectilePrefab	field
+OverloadingStakeLimit	RoR2	RoR2.Projectile.ProjectileController	OnDestroy	method
+HookReelGuard	RoR2	RoR2.Projectile.HookProjectileImpact	Reel	method
+TauntDebuffGuard	RoR2	RoR2.CharacterAI.BaseAI	currentEnemy	property
+TauntDebuffGuard	RoR2	RoR2.CharacterBody	HasBuff	method
+SeedTrackerGuard	ChensGradiusMod	Chen.GradiusMod.Items.OptionSeed.Components.SeedTracker	characterBody	property
+SeedTrackerGuard	ChensGradiusMod	Chen.GradiusMod.Items.OptionSeed.Components.SeedTracker	FixedUpdate	method
+Starstorm2LogQuiet	Starstorm2	SS2.AttackerOverrideManager	attackerToOverride	field
+SharpAnchorZoneFix	StormyItems	StormyItems.Items.SharpAnchorZone	BuffOccupants	method
+SharpAnchorZoneFix	StormyItems	StormyItems.Items.SharpAnchor	Zones	field
+SharpAnchorZoneFix	StormyItems	StormyItems.Main	CharBodies	field
+DroneTweak	RoR2	RoR2.DirectorCardCategorySelection+Category	selectionWeight	field
+InteractableWeightTweak	RoR2	RoR2.DirectorCard	GetSpawnCard	method
+InfernoScalingFix	Inferno	Inferno.Skill_Misc.Hooks	RecalculateStatsAPI_GetStatCoefficients	method
+QuitCrashGuard	*	AkCallbackManager		type
+CompatShieldPatcher	*	AkSoundEngine		type
+ScepterFlowerFix	*	AncientScepter.TreebotFlower2_2		type
+StopSoundFix	*	AudioOverlapFix.Main		type
+StopSoundFix	*	AudioOverlapFix.SoundEnginePatcher		type
+CaeliSecondaryGuard	*	CaeliImperium.Items.InfiniteSecondarySkillChargesEvents		type
+SeedTrackerGuard	*	Chen.GradiusMod.Items.OptionSeed.Components.SeedTracker		type
+FlowerRootFix	*	EntityStates.Treebot.TreebotFlower.TreebotFlower2Projectile		type
+SkillSlotsHudFix	*	ExtraSkillSlots.ExtraHud		type
+SkillSlotsHudFix	*	ExtraSkillSlots.SkillInputDisplaySwitch		type
+SoundTracer	*	HG.AkGameObjManager		type
+InfernoHookChurnFix	*	Inferno.Main		type
+InfernoMithrixFix	*	Inferno.Skill_Misc.HookBehavior		type
+InfernoMithrixFix	*	Inferno.Skill_Misc.Hooks		type
+DeathCeremonySnapshotGuard	*	MysticsItems.Items.DeathCeremony		type
+HypercritNullFix	*	NotHypercrit.Crit		type
+PaladinFix	*	PaladinMod.Modules.Asset		type
+RespawnHookChurnFix	*	PlayerRespawnSystem.PlayerRespawnSystem		type
+RespawnHookChurnFix	*	PlayerRespawnSystem.PlayerRespawnSystemPlugin		type
+RespawnHookChurnFix	*	PlayerRespawnSystem.RespawnController		type
+RespawnHookChurnFix	*	PlayerRespawnSystem.TimedRespawnController		type
+RespawnHookChurnFix	*	PlayerRespawnSystem.UIDeathTimerController		type
+PrintToInventoryScrapperFix	*	PrintToInventory.PrintToInventory		type
+AcolyteTweak	*	RoR2.AcolyteBodySwapController		type
+StunDurationFix	*	RoR2.AlterBuffDuration		type
+ArtifactDisabler	*	RoR2.ArtifactCatalog		type
+ArtifactDisabler	*	RoR2.ArtifactDef		type
+SacrificeKeepTweak	*	RoR2.Artifacts.SacrificeArtifactManager		type
+BlastChainCap	*	RoR2.BlastAttack		type
+DroneTweak	*	RoR2.BodyCatalog		type
+StatsRetryGuard	*	RoR2.BuffCatalog		type
+FlowerRootFix	*	RoR2.BuffDef		type
+LagTracer	*	RoR2.BuffIndex		type
+BulletHitGuard	*	RoR2.BulletAttack		type
+LagTracer	*	RoR2.CharacterAI.BaseAI		type
+DroneTweak	*	RoR2.CharacterBody		type
+TinkersAutoConfigFix	*	RoR2.CharacterMaster		type
+ShamanModelFix	*	RoR2.CharacterModel		type
+NullDccsPoolEntryFix	*	RoR2.ClassicStageInfo		type
+SpawnCreditTweak	*	RoR2.CombatDirector		type
+BubbetsFix	*	RoR2.CostTypeCatalog		type
+DamageChainGuard	*	RoR2.DamageInfo		type
+SacrificeDropTweak	*	RoR2.DamageReport		type
+InteractableWeightTweak	*	RoR2.DirectorCard		type
+InteractableWeightTweak	*	RoR2.DirectorCardCategorySelection		type
+DroneTweak	*	RoR2.DirectorCardCategorySelection+Category		type
+SpawnCreditTweak	*	RoR2.DirectorCore		type
+MonsterLimitTweak	*	RoR2.DirectorSpawnRequest		type
+DotTickGuard	*	RoR2.DotController		type
+DroneTweak	*	RoR2.DroneCatalog		type
+DroneTweak	*	RoR2.DroneDef		type
+LagTracer	*	RoR2.EntityStateMachine		type
+BubbetsFix	*	RoR2.EquipmentLocation		type
+BubbetsFix	*	RoR2.EquipmentSlot		type
+ThetaShieldLoopFix	*	RoR2.GenericSkill		type
+DamageChainGuard	*	RoR2.GlobalEventManager		type
+DamageChainGuard	*	RoR2.HealthComponent		type
+SkillSlotsHudFix	*	RoR2.InputBindingDisplayController		type
+DirtyPatches	*	RoR2.InstanceTracker		type
+SacrificeKeepTweak	*	RoR2.InteractableSpawnCard		type
+CompatShieldPatcher	*	RoR2.Inventory		type
+StatsRetryGuard	*	RoR2.ItemCatalog		type
+TinkersAutoConfigFix	*	RoR2.Language		type
+MonsterLimitTweak	*	RoR2.MasterSummon		type
+OverlapHitGuard	*	RoR2.OverlapAttack		type
+LagTracer	*	RoR2.ProcChainMask		type
+LagTracer	*	RoR2.Projectile.FireProjectileInfo		type
+HookReelGuard	*	RoR2.Projectile.HookProjectileImpact		type
+DirtyPatches	*	RoR2.Projectile.ProjectileController		type
+LagTracer	*	RoR2.Projectile.ProjectileManager		type
+TinkersAutoConfigFix	*	RoR2.RoR2Application		type
+FlowerRootFix	*	RoR2.RoR2Content+Buffs		type
+ArtifactDisabler	*	RoR2.RuleCatalog		type
+ArtifactDisabler	*	RoR2.RuleChoiceDef		type
+TinkersAutoConfigFix	*	RoR2.Run		type
+ArtifactDisabler	*	RoR2.RunArtifactManager		type
+SpawnCreditTweak	*	RoR2.SceneDirector		type
+StunDurationFix	*	RoR2.SetStateOnHurt		type
+LunarPoolLoopStopFix	*	RoR2.ShopTerminalBehavior		type
+ThetaShieldLoopFix	*	RoR2.SkillLocator		type
+DroneTweak	*	RoR2.SpawnCard		type
+HookTimer	*	RoR2.Stage		type
+DroneTweak	*	RoR2.SummonMasterBehavior		type
+MonsterLimitTweak	*	RoR2.TeamCatalog		type
+MonsterLimitTweak	*	RoR2.TeamComponent		type
+MonsterLimitTweak	*	RoR2.TeamDef		type
+MonsterLimitTweak	*	RoR2.TeamIndex		type
+LagTracer	*	RoR2.UI.HUD		type
+SkillSlotsHudFix	*	RoR2.UI.MPEventSystemLocator		type
+LunarPoolLoopStopFix	*	RoR2.Util		type
+Starstorm2LogQuiet	*	SS2.AttackerOverrideManager		type
+Starstorm2LogQuiet	*	SS2.SS2Log		type
+ShamanModelFix	*	ShamanMod.Modules.Characters.CharacterBase		type
+ShamanModelFix	*	ShamanMod.Modules.Prefabs		type
+MonsterLimitTweak	*	SnoresvilleMultitudes.MultitudesNoPriceScale		type
+ZetAspectsDropFix	*	TPDespair.ZetAspects.DropHooks+<>c		type
+TinkersAutoConfigFix	*	ThinkInvisible.TinkersSatchel.AutoConfigModule		type
+HeadsetCostFix	*	ThinkInvisible.TinkersSatchel.Headset		type
+IcarusTrackerGuard	*	ThinkInvisible.TinkersSatchel.IcarusTracker		type
+CompatShieldPatcher	*	ThinkInvisible.TinkersSatchel.Module		type
+TauntDebuffGuard	*	ThinkInvisible.TinkersSatchel.TauntDebuffController		type
+TinkersAutoConfigFix	*	ThinkInvisible.TinkersSatchel.TinkersSatchelPlugin		type
+AssetRedirect	*	UnityEngine.AddressableAssets.AddressablesImpl		type
+RespawnHookChurnFix	*	UnityEngine.Networking.ClientScene		type
+RespawnHookChurnFix	*	UnityEngine.Networking.NetworkBehaviour		type
+RespawnHookChurnFix	*	UnityEngine.Networking.NetworkInstanceId		type
+RespawnHookChurnFix	*	UnityEngine.Networking.NetworkServer		type
+SkillSlotsHudFix	*	UnityEngine.UI.LayoutElement		type
+SkillSlotsHudFix	*	UnityEngine.UI.LayoutGroup		type
+SkillSlotsHudFix	*	UnityEngine.UI.LayoutRebuilder		type

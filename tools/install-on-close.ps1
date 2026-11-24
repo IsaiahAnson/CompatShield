@@ -5,7 +5,9 @@ param([string]$Label = "")
 $shield = Split-Path -Parent $PSScriptRoot
 $src = "$shield\bin\Release\netstandard2.1\CompatShield.dll"
 $srcCs = "$shield\CompatShield.cs"
-$dst = "$env:APPDATA\Thunderstore Mod Manager\DataFolder\RiskOfRain2\profiles\Default\BepInEx\patchers\Local-CompatShield\CompatShield.dll"
+# Since 2026-11-12 the profile's one copy is the Thunderstore install; the old Local-CompatShield copy is disabled (.old).
+# Installing a build there again would make BepInEx load the patcher twice. A mod manager update replaces a dev build here.
+$dst = "$env:APPDATA\Thunderstore Mod Manager\DataFolder\RiskOfRain2\profiles\Default\BepInEx\patchers\Mentalize-CompatShield\CompatShield.dll"
 "waiting for Risk of Rain 2 to close (started $(Get-Date -Format 'HH:mm:ss'))..."
 while (Get-Process "Risk of Rain 2" -ErrorAction SilentlyContinue) { Start-Sleep -Seconds 2 }
 "game closed at $(Get-Date -Format 'HH:mm:ss')"

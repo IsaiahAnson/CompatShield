@@ -3,6 +3,7 @@
 // Delete the DLL to undo everything; no mod files are modified.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,9 +27,7 @@ namespace CompatShield
         public static IEnumerable<string> TargetDLLs { get; } = new[] { "RoR2.dll" };
 
         /// <summary>
-        /// Adds Inventory.RemoveItem(ItemDef, int), which game 1.5.0 renamed RemoveItem2, back to the game in memory: Bubbets Items
-        /// calls it once a stage for every player, and a method with a dead reference can't be repaired from outside. Runs before
-        /// Finish, so it has no config switch; the method only forwards, and nothing calls it unless a mod still uses the old name.
+        /// Adds the legacy Inventory.RemoveItem(ItemDef, int) only when an installed plugin still references it.
         /// </summary>
         public static void Patch(AssemblyDefinition assembly)
         {
@@ -40,6 +39,12 @@ namespace CompatShield
                     && m.Parameters[0].ParameterType.FullName == "RoR2.ItemDef" && m.Parameters[1].ParameterType.FullName == "System.Int32";
                 var renamed = inventory?.Methods.FirstOrDefault(m => Takes(m, "RemoveItem2"));
                 if (renamed == null || inventory.Methods.Any(m => Takes(m, "RemoveItem"))) return;
+                string needingMod = FindLegacyRemoveItemCaller();
+                if (needingMod == null)
+                {
+                    preloadNote = "Game: Inventory.RemoveItem(ItemDef, int) shim not needed (no plugin calls it)";
+                    return;
+                }
                 var shim = new MethodDefinition("RemoveItem", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.HideBySig, assembly.MainModule.TypeSystem.Void);
                 shim.Parameters.Add(new ParameterDefinition("itemDef", Mono.Cecil.ParameterAttributes.None, renamed.Parameters[0].ParameterType));
                 shim.Parameters.Add(new ParameterDefinition("count", Mono.Cecil.ParameterAttributes.None, renamed.Parameters[1].ParameterType));
@@ -50,10 +55,39 @@ namespace CompatShield
                 il.Emit(Mono.Cecil.Cil.OpCodes.Call, renamed);
                 il.Emit(Mono.Cecil.Cil.OpCodes.Ret);
                 inventory.Methods.Add(shim);
-                preloadNote = "Game: Inventory.RemoveItem(ItemDef, int) added back in memory for mods built before 1.5.0";
+                preloadNote = "Game: Inventory.RemoveItem(ItemDef, int) added back in memory for " + needingMod;
             }
-            catch (Exception e) { preloadNote = "Couldn't add Inventory.RemoveItem(ItemDef, int): " + e.Message; }
+            catch (Exception e) { preloadNote = "Could not add Inventory.RemoveItem(ItemDef, int): " + e.Message; }
         }
+
+        static string FindLegacyRemoveItemCaller()
+        {
+            try
+            {
+                string root = PluginDllRoot();
+                if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) return "scan incomplete: plugin folder missing";
+                foreach (string path in Directory.GetFiles(root, "*.dll", SearchOption.AllDirectories))
+                {
+                    string file = Path.GetFileName(path);
+                    if (file.StartsWith("MMHOOK_", StringComparison.OrdinalIgnoreCase)) continue;
+                    try
+                    {
+                        using (var candidate = AssemblyDefinition.ReadAssembly(path, new ReaderParameters { ReadSymbols = false }))
+                        {
+                            bool calls = candidate.MainModule.GetMemberReferences().OfType<MethodReference>().Any(r =>
+                                r.Name == "RemoveItem" && r.DeclaringType.FullName == "RoR2.Inventory" && r.HasThis &&
+                                r.ReturnType.FullName == "System.Void" && r.Parameters.Count == 2 &&
+                                r.Parameters[0].ParameterType.FullName == "RoR2.ItemDef" && r.Parameters[1].ParameterType.FullName == "System.Int32");
+                            if (calls) return candidate.Name.Name;
+                        }
+                    }
+                    catch (Exception e) { return "scan incomplete: unreadable DLL " + Path.GetFileName(path) + " (" + e.GetType().Name + ")"; }
+                }
+            }
+            catch (Exception e) { return "scan incomplete: " + e.GetType().Name; }
+            return null;
+        }
+        internal static Func<string> PluginDllRoot = () => Paths.PluginPath;
         static string preloadNote;
 
         internal static ManualLogSource Log;
@@ -61,6 +95,9 @@ namespace CompatShield
         static readonly HashSet<string> appliedFixes = new HashSet<string>();
 
         static bool paladinFixEnabled;
+        static bool quitCrashGuard, quitCrashGuardApplied, starstorm2LogQuiet, errorLoopGuards, hookReelGuardApplied, headsetCostFix;
+        static int overloadingStakeCap;
+        static float overloadingStakeCooldown;
 
         public static void Finish()
         {
@@ -79,7 +116,11 @@ namespace CompatShield
             monsterLimit = cfg.Bind(ConfigMigration.Cat.Spawns, "MonsterLimit", 0,
                 "Most enemies alive at once while Multitudes No Price Scale is installed. The game's own limit is 40; 0 leaves the game and Multitudes alone. Multitudes' copies stop at this number, and normal spawns do too when Multitudes' Lift Monster Limit is false. Boss parts and scripted encounters still spawn. Host only.").Value;
             hardEnemyCap = cfg.Bind(ConfigMigration.Cat.Spawns, "HardEnemyCap", 80,
-                "The most enemies alive at once, counting every enemy team. Unlike MonsterLimit this also stops summons that ignore the game's team limit, such as death effects, clones and mods' minions, which can otherwise multiply until the game hangs. Boss characters and scripted boss parts still spawn. It only stops new spawns; nothing already alive is removed. 0 = off. Host only.").Value;
+                "The most hostile team members alive at once with a CharacterBody and live master. Unlike MonsterLimit this also stops summons that ignore the games team limit, such as death effects, clones and mods minions, which can otherwise multiply until the game hangs. Projectiles and non-character team objects do not count. Boss characters and scripted boss parts still spawn. It only stops new spawns; nothing already alive is removed. 0 = off. Host only.").Value;
+            overloadingStakeCap = cfg.Bind(ConfigMigration.Cat.Enemies, "OverloadingStakeCap", 12,
+                "Maximum live EliteReworks Overloading stakes per owner. 0 disables the cap. Host only.").Value;
+            overloadingStakeCooldown = cfg.Bind(ConfigMigration.Cat.Enemies, "OverloadingStakeCooldown", 0.1f,
+                "Minimum seconds between Overloading stakes from one owner. Host only.").Value;
             printerWeight = cfg.Bind(ConfigMigration.Cat.Spawns, "PrinterSpawnMultiplier", 1f,
                 "How likely each stage spawn pick is a 3D printer (white, green, red, overgrown). 1 = game default, 4 = four times as likely. Host only.").Value;
             scrapperWeight = cfg.Bind(ConfigMigration.Cat.Spawns, "ScrapperSpawnMultiplier", 1f,
@@ -95,7 +136,7 @@ namespace CompatShield
 
             // 2. Artifact of Sacrifice
             sacrificeDropMult = cfg.Bind(ConfigMigration.Cat.Sacrifice, "DropChanceMultiplier", 1f,
-                "Multiplies each kill's item drop chance under Artifact of Sacrifice. 1 = game or mod default, 0.7 = 30% fewer drops, 0 = none; below 0 is ignored. Works with RiskyMod's flat chance and ShareSuite's SacrificeFix on or off. Host only.").Value;
+                "Multiplies each kills item drop chance under Artifact of Sacrifice. 1 = game or mod default, 0.7 = 30% fewer drops, 0 = none; below 0 is ignored. Applies after other installed drop chance changes. Host only.").Value;
             sacrificeKeepList = cfg.Bind(ConfigMigration.Cat.Sacrifice, "KeepInteractables", "",
                 "Interactables that still spawn under Artifact of Sacrifice, as a comma-separated list of spawn card names. A name also covers longer ones starting with it, so iscShrineChance covers the Sandy and Snowy versions. Empty = the game's normal rules. " +
                 "iscShrineChance = Shrine of Chance, iscCasinoChest = Adaptive Chest, iscEquipmentBarrel = Equipment Barrel, iscLunarChest = Lunar Pod. With at least one name set, the log lists every card Sacrifice blocks, so the other names are there to copy. Host only.").Value;
@@ -127,15 +168,19 @@ namespace CompatShield
             damageChainDrainMs = cfg.Bind(ConfigMigration.Cat.Lag, "DamageChainDrainMs", DamageChainGuard.DefaultDrainMs,
                 "Goes with DamageChainGuard. Milliseconds of waiting hits that may run per physics tick, so a huge chain lands over a few seconds instead of freezing the game. 0 = no limit, the whole line runs in one frame. Host only.").Value;
             blastChainCap = cfg.Bind(ConfigMigration.Cat.Lag, "BlastChainCap", true,
-                "Stops item combos with exploding on-hit effects (such as Marwan's Ash and Fire Shield) from hanging the game. A blast set off inside other blasts stops firing at BlastChainMaxDepth or when BlastChainBudgetMs runs out. A blast that isn't inside another one always fires. Host only.").Value;
+                "Stops item combos with exploding on-hit effects (such as Marwans Ash and Fire Shield) from hanging the game. A blast set off inside other blasts stops firing at BlastChainMaxDepth; elapsed time only applies after 32 nested blasts, with a 2 second hard ceiling. A blast that isnt inside another one always fires. Host only.").Value;
             blastChainMaxDepth = cfg.Bind(ConfigMigration.Cat.Lag, "BlastChainMaxDepth", BlastChainCap.DefaultMaxDepth,
                 "Goes with BlastChainCap. How many blasts may run inside each other at once. A deeper one deals no damage and sets off nothing. Minimum 1. Host only.").Value;
             blastChainBudgetMs = cfg.Bind(ConfigMigration.Cat.Lag, "BlastChainBudgetMs", BlastChainCap.DefaultBudgetMs,
-                "Goes with BlastChainCap. Time allowance in milliseconds for blasts inside blasts, shared by every chain and refilled between chains. A big one-level explosion is not cut. 0 = no time limit. Host only.").Value;
+                "Goes with BlastChainCap. Minimum elapsed milliseconds before the nested-blast count limit can stop a chain. A 2 second hard ceiling still applies. Host only.").Value;
 
             // 5. Error and Crash Protection
-            blastTargetGuard = statsRetryGuard = overlapHitGuard = dotTickGuard = bulletHitGuard = totemTetherGuard = cfg.Bind(ConfigMigration.Cat.Errors, "ErrorLoopGuards", true,
+            blastTargetGuard = statsRetryGuard = overlapHitGuard = dotTickGuard = bulletHitGuard = totemTetherGuard = errorLoopGuards = cfg.Bind(ConfigMigration.Cat.Errors, "ErrorLoopGuards", true,
                 "Stops one error repeating every physics tick. Without these, an error inside a blast, melee hit or damage zone, damage-over-time tick, bullet, stat update or sacrifice totem's tether makes the game run that code again and again. Each new kind of failure logs one line naming what broke. Host for hits; each PC for its own stat updates and totem tethers.").Value;
+            quitCrashGuard = cfg.Bind(ConfigMigration.Cat.Errors, "QuitCrashGuard", true,
+                "Skips Wwise callback draining after native sound-engine shutdown to prevent a quit crash. Every PC.").Value;
+            starstorm2LogQuiet = cfg.Bind(ConfigMigration.Cat.Errors, "Starstorm2LogQuiet", true,
+                "Prunes destroyed Starstorm2 attacker overrides and mutes its AfterGummy termination lookup warning. Every PC.").Value;
             bool hookGuard = cfg.Bind(ConfigMigration.Cat.Errors, "OutdatedHookGuard", true,
                 "Skips hooks a game update broke so the mod keeps loading, and ignores removing a hook that was never added. Every PC.").Value;
             assetRedirect = cfg.Bind(ConfigMigration.Cat.Errors, "MovedAssetRedirect", true,
@@ -158,6 +203,8 @@ namespace CompatShield
                 "Sandswept: stops Hallowed Ichor throwing an error every frame and freezing the run timer once anyone picks it up, on a HUD without its text effect. Every PC.").Value;
             tinkersIsolationEnabled = TinkersLanguageFixEnabled = cfg.Bind(ConfigMigration.Cat.Items, "TinkersSatchelFixes", true,
                 "Sets up each TinkersSatchel item on its own, so one broken item doesn't stop the rest, and shows its item names and descriptions as text instead of TINKERSSATCHEL_..._RENDERED. Every PC.").Value;
+            headsetCostFix = cfg.Bind(ConfigMigration.Cat.Items, "HeadsetCostFix", false,
+                "Skips TinkersSatchel Headset work for bodies without an inventory. Every PC.").Value;
             linearDamageFix = cfg.Bind(ConfigMigration.Cat.Items, "LinearDamageFocusCrystalFix", true,
                 "Stops Focus Crystal counting twice when Bubbets Items and LinearDamage are both installed. Host only.").Value;
             daggerOfFrenzyGuard = cfg.Bind(ConfigMigration.Cat.Items, "DaggerOfFrenzyGuard", true,
@@ -216,6 +263,7 @@ namespace CompatShield
                         $"MovedAssetRedirect={assetRedirect}, ZetAspectsDropFix={zetDropFix}, BrokenHandlerGuard={handlerGuard}, StunDurationFix={stunDurationFix}, " +
                         $"PrintToInventoryScrappers={printToInventoryFix}, InfernoMithrixFix={infernoMithrixFix}, InfernoLevelBoostFix={infernoBoostFix}, " +
                         $"InfernoCooldownScalingFix={infernoCooldownFix}, ShamanModelFix={shamanModelFix}, SwiftImpactFix={swiftImpactFix}, ShareSuiteSacrificeCreditFix={shareSuiteSacrificeFix}, MonsterLimit={monsterLimit}, HardEnemyCap={hardEnemyCap}, " +
+                        $"OverloadingStakeCap={overloadingStakeCap}, OverloadingStakeCooldown={overloadingStakeCooldown}, QuitCrashGuard={quitCrashGuard}, Starstorm2LogQuiet={starstorm2LogQuiet}, HeadsetCostFix={headsetCostFix}, " +
                         $"SpawnCreditMultiplier={spawnCredits}, PrinterSpawnMultiplier={printerWeight}, ScrapperSpawnMultiplier={scrapperWeight}, DroneCombinerSpawnMultiplier={combinerWeight}, DroneNoMinimumStage={droneNoMinStage}, DroneSpawnMultiplier={droneSpawnWeight}, DroneHealthMultiplier={droneHealth}, AcolyteAttackSpeedMultiplier={acolyteAttackSpeed}, SacrificeDropChanceMultiplier={sacrificeDropMult}, DropChanceMultiplier={sacrificeDropMult}, KeepInteractables=[{sacrificeKeepList}], KeptInteractableWeight={sacrificeKeptWeight}, DamageChainGuard={damageChainGuard}, BlastChainCap={blastChainCap}, RouletteSpinCost={rouletteSpinCost}, NullDccsPoolEntryFix={nullDccsPoolEntryFix}, HypercritNullFix={hypercritNullFix}, DisableGenetics={disableGenetics}, LockedItems=[{lockedItems}], SoundTracer={soundTracer}, LagTracer={lagTracer}, BigHitTracer={bigHitTracer}, PhysicsPileupTracer={physicsPileupTracer}, HookTimer={hookTimer}, PhysicsCatchUpCap={physicsCatchUpCap}, StatUpdateInterval={statUpdateInterval}, DamageChainQueueLimit={damageChainQueueLimit}, DamageChainDrainMs={damageChainDrainMs}, BlastChainMaxDepth={blastChainMaxDepth}, BlastChainBudgetMs={blastChainBudgetMs}");
 
             if (hookGuard)
@@ -235,7 +283,7 @@ namespace CompatShield
             if (paladinFixEnabled || tinkersIsolationEnabled || monsterLimit > 0 || SpawnTweakWanted || InteractableTweakWanted || assetRedirect || stopSoundFix || zetDropFix || gasolineFix || handlerGuard || printToInventoryFix
                 || flowerRootFix || scepterFlowerFix || stunDurationFix || SacrificeTweakWanted || SacrificeKeepWanted || infernoMithrixFix
                 || infernoBoostFix || infernoCooldownFix || infernoHookChurnFix || respawnHookChurnFix || lunarPoolLoopStopFix
-                || shamanModelFix || bubbetsFix || linearDamageFix || skillSlotsHudFix || daggerOfFrenzyGuard || thetaShieldLoopFix || hallowedIchorTimerFix || paladinShockwaveFix || fireTrailFix || sharpAnchorFix || swiftImpactFix || shareSuiteSacrificeFix || soundTracer || orphanLoopGuard || lagTracer || physicsPileupTracer || bigHitTracer || hookTimer || damageChainGuard || blastChainCap || blastTargetGuard || statsRetryGuard || overlapHitGuard || dotTickGuard || bulletHitGuard || totemTetherGuard || rouletteSpinCost|| acolyteAttackSpeed != 1f || nullDccsPoolEntryFix || hypercritNullFix || disableGenetics || !string.IsNullOrWhiteSpace(lockedItems) || physicsCatchUpCap > 0f || statUpdateInterval > 0f || hardEnemyCap > 0)
+                || shamanModelFix || bubbetsFix || linearDamageFix || skillSlotsHudFix || daggerOfFrenzyGuard || thetaShieldLoopFix || hallowedIchorTimerFix || paladinShockwaveFix || fireTrailFix || sharpAnchorFix || swiftImpactFix || shareSuiteSacrificeFix || soundTracer || orphanLoopGuard || lagTracer || physicsPileupTracer || bigHitTracer || hookTimer || damageChainGuard || blastChainCap || blastTargetGuard || statsRetryGuard || overlapHitGuard || dotTickGuard || bulletHitGuard || totemTetherGuard || errorLoopGuards || quitCrashGuard || starstorm2LogQuiet || headsetCostFix || overloadingStakeCap > 0 || overloadingStakeCooldown > 0f || rouletteSpinCost|| acolyteAttackSpeed != 1f || nullDccsPoolEntryFix || hypercritNullFix || disableGenetics || !string.IsNullOrWhiteSpace(lockedItems) || physicsCatchUpCap > 0f || statUpdateInterval > 0f || hardEnemyCap > 0)
             {
                 AppDomain.CurrentDomain.AssemblyLoad += (_, e) => ApplyModFixes(e.LoadedAssembly);
                 foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
@@ -320,6 +368,20 @@ namespace CompatShield
             catch { return false; }   // dynamic assemblies have no location
         }
 
+        static readonly HashSet<string> warnedOnce = new HashSet<string>();
+        internal static void WarnOnce(string key, string message)
+        {
+            lock (warnedOnce)
+            {
+                if (!warnedOnce.Add(key)) return;
+                Log.LogWarning(message + " (logged once)");
+            }
+        }
+        static void Guarded(string fix, Action apply)
+        {
+            try { apply(); }
+            catch (Exception e) { Log.LogWarning(fix + " not applied: " + e.GetType().Name + ": " + e.Message); }
+        }
         static void ApplyModFixes(Assembly asm)
         {
             string name;
@@ -329,78 +391,82 @@ namespace CompatShield
             if ((paladinFixEnabled || paladinShockwaveFix) && name == "PaladinMod" && appliedFixes.Add(name))
             {
                 if (paladinFixEnabled)
-                    PaladinFix.Apply(harmony, asm);
+                    Guarded("PaladinFix", () => PaladinFix.Apply(harmony, asm));
                 if (paladinShockwaveFix)
                 {
                     var ror2ForPaladin = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2");
-                    if (ror2ForPaladin != null) PaladinShockwaveFix.Apply(harmony, asm, ror2ForPaladin);
+                    if (ror2ForPaladin != null) Guarded("PaladinShockwaveFix", () => PaladinShockwaveFix.Apply(harmony, asm, ror2ForPaladin));
                     else Log.LogWarning("Paladin shockwave fix: RoR2 isn't loaded yet, not applied");
                 }
             }
-            if (tinkersIsolationEnabled && name == "TinkersSatchel" && appliedFixes.Add(name))
+            if ((tinkersIsolationEnabled || errorLoopGuards || headsetCostFix) && name == "TinkersSatchel" && appliedFixes.Add(name))
             {
-                const BindingFlags any = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
-                var module = asm.GetType("ThinkInvisible.TinkersSatchel.Module");
-                ModuleIsolation.Apply(harmony, "TinkersSatchel", module, module?.GetMethod("SetupAll_PluginAwake", any),
-                    "SetupConfig", "SetupAttributes", "SetupBehavior");
-                ModuleIsolation.Apply(harmony, "TinkersSatchel", module, module?.GetMethod("SetupAll_PluginStart", any),
-                    "SetupLate", "Install");
-                // Once setup completes, the plugin's per-frame Update runs AutoConfigModule.Update, which still calls
-                // the removed Language.SetCurrentLanguage(string) and so throws every frame. Replace it.
-                TinkersAutoConfigFix.Apply(harmony, asm);
+                if (tinkersIsolationEnabled)
+                {
+                    const BindingFlags any = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+                    var module = asm.GetType("ThinkInvisible.TinkersSatchel.Module");
+                    Guarded("ModuleIsolation", () => ModuleIsolation.Apply(harmony, "TinkersSatchel", module, module?.GetMethod("SetupAll_PluginAwake", any), "SetupConfig", "SetupAttributes", "SetupBehavior"));
+                    Guarded("ModuleIsolation", () => ModuleIsolation.Apply(harmony, "TinkersSatchel", module, module?.GetMethod("SetupAll_PluginStart", any), "SetupLate", "Install"));
+                    Guarded("TinkersAutoConfigFix", () => TinkersAutoConfigFix.Apply(harmony, asm));
+                }
+                if (errorLoopGuards)
+                {
+                    Guarded("TauntDebuffGuard", () => TauntDebuffGuard.Apply(harmony, asm, AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2")));
+                    Guarded("IcarusTrackerGuard", () => IcarusTrackerGuard.Apply(harmony, asm));
+                }
+                if (headsetCostFix) Guarded("HeadsetCostFix", () => HeadsetCostFix.Apply(harmony, asm));
             }
             if (monsterLimit > 0 && name == "MultitudesNoPriceScale" && appliedFixes.Add(name))
-                MonsterLimitTweak.Apply(harmony, AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2"),
-                    asm, monsterLimit);
+                Guarded("MonsterLimitTweak", () => MonsterLimitTweak.Apply(harmony, AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2"),
+                    asm, monsterLimit));
             // On its assembly load, so the patches are in before AudioOverlapFix's Awake hooks PostEvent.
-            if (handlerGuard && name == "Starstorm2" && appliedFixes.Add(name))
+            if ((handlerGuard || starstorm2LogQuiet) && name == "Starstorm2" && appliedFixes.Add(name))
             {
-                HandlerGuard.Apply(harmony, asm, "SS2.Items.StrangeCan", "OnCharacterDeathGlobal", typeof(KeyNotFoundException),
-                    "Strange Can skipped a kill whose Intoxicated attacker is gone");
-                // Called straight from HealthComponent.TakeDamageProcess, before HandleCharacterDeath: a throw here means a
-                // killing blow gives no gold, XP or on-kill procs (the body still dies via ManagedFixedUpdate). It throws
-                // reading the attacker's already-destroyed inventory.
-                HandlerGuard.Apply(harmony, asm, "SS2.Items.RelicOfForce+Behavior", "OnDamageDealtServer", typeof(NullReferenceException),
-                    "Relic of Force skipped a hit whose attacker's inventory is gone");
+                if (handlerGuard)
+                {
+                    Guarded("HandlerGuard", () => HandlerGuard.Apply(harmony, asm, "SS2.Items.StrangeCan", "OnCharacterDeathGlobal", typeof(KeyNotFoundException), "Strange Can skipped a kill whose Intoxicated attacker is gone"));
+                    Guarded("HandlerGuard", () => HandlerGuard.Apply(harmony, asm, "SS2.Items.RelicOfForce+Behavior", "OnDamageDealtServer", typeof(NullReferenceException), "Relic of Force skipped a hit whose attackers inventory is gone"));
+                }
+                if (starstorm2LogQuiet) Guarded("Starstorm2LogQuiet", () => Starstorm2LogQuiet.Apply(harmony, asm));
             }
             if (handlerGuard && name == "DamageLog" && appliedFixes.Add(name))
-                HandlerGuard.Apply(harmony, asm, "DamageLog.DamageLog", "Record", typeof(NullReferenceException),
-                    "DamageLog skipped a hit it couldn't find an attacker portrait for");
+                Guarded("HandlerGuard", () => HandlerGuard.Apply(harmony, asm, "DamageLog.DamageLog", "Record", typeof(NullReferenceException),
+                    "DamageLog skipped a hit it couldn't find an attacker portrait for"));
             if (handlerGuard && name == "GeneticsArtifact" && appliedFixes.Add(name))
-                AfterOrigGuard.Apply(harmony, asm, "GeneticsArtifact.GeneEngineDriver", "HealthComponent_TakeDamage", typeof(NullReferenceException),
-                    "Artifact of Genetics skipped tracking a hit it crashed on (the damage itself already landed)");
+                Guarded("AfterOrigGuard", () => AfterOrigGuard.Apply(harmony, asm, "GeneticsArtifact.GeneEngineDriver", "HealthComponent_TakeDamage", typeof(NullReferenceException),
+                    "Artifact of Genetics skipped tracking a hit it crashed on (the damage itself already landed)"));
             if (zetDropFix && name == "ZetAspects" && appliedFixes.Add(name))
-                ZetAspectsDropFix.Apply(harmony, ZetAspectsDropFix.FindHook(asm));
+                Guarded("ZetAspectsDropFix", () => ZetAspectsDropFix.Apply(harmony, ZetAspectsDropFix.FindHook(asm)));
             // On its assembly load, so the patch is in before its Awake checks for ShareSuite.
             if (printToInventoryFix && name == "PrintToInventory" && appliedFixes.Add(name))
-                PrintToInventoryScrapperFix.Apply(harmony, asm);
+                Guarded("PrintToInventoryScrapperFix", () => PrintToInventoryScrapperFix.Apply(harmony, asm));
             // appliedFixes is keyed by assembly name: any future AncientScepter fix belongs inside this same if.
             if (scepterFlowerFix && name == "AncientScepter" && appliedFixes.Add(name))
-                ScepterFlowerFix.Apply(harmony, asm);
+                Guarded("ScepterFlowerFix", () => ScepterFlowerFix.Apply(harmony, asm));
             // On its assembly load: long before its hooks go in at the first run start. appliedFixes is keyed by assembly
             // name: any future Inferno fix belongs inside this same if.
             if ((infernoMithrixFix || infernoBoostFix || infernoCooldownFix || infernoHookChurnFix) && name == "Inferno" && appliedFixes.Add(name))
             {
                 if (infernoMithrixFix)
-                    InfernoMithrixFix.Apply(harmony, asm);
+                    Guarded("InfernoMithrixFix", () => InfernoMithrixFix.Apply(harmony, asm));
                 if (infernoBoostFix || infernoCooldownFix)
-                    InfernoScalingFix.Apply(harmony, asm, infernoBoostFix, infernoCooldownFix);
+                    Guarded("InfernoScalingFix", () => InfernoScalingFix.Apply(harmony, asm, infernoBoostFix, infernoCooldownFix));
                 if (infernoHookChurnFix)
-                    InfernoHookChurnFix.Apply(harmony, asm);
+                    Guarded("InfernoHookChurnFix", () => InfernoHookChurnFix.Apply(harmony, asm));
             }
             // On its assembly load, before its plugin Awake subscribes the two Run hooks this patches. appliedFixes is keyed by
             // assembly name: any future PlayerRespawnSystem fix belongs inside this same if.
             if (respawnHookChurnFix && name == "PlayerRespawnSystem" && appliedFixes.Add(name))
-                RespawnHookChurnFix.Apply(harmony, asm);
+                Guarded("RespawnHookChurnFix", () => RespawnHookChurnFix.Apply(harmony, asm));
             // On WolfoFixes' assembly load: the patch is on a game method, but only WolfoFixes starts the hum. appliedFixes is
             // keyed by assembly name: any future WolfoFixes fix belongs inside this same if.
             if (lunarPoolLoopStopFix && name == "WolfoFixes" && appliedFixes.Add(name))
-                LunarPoolLoopStopFix.Apply(harmony);
-            if (skillSlotsHudFix && name == "ExtraSkillSlots" && appliedFixes.Add(name)) SkillSlotsHudFix.Apply(harmony, asm);
+                Guarded("LunarPoolLoopStopFix", () => LunarPoolLoopStopFix.Apply(harmony));
+            if (skillSlotsHudFix && name == "ExtraSkillSlots" && appliedFixes.Add(name)) Guarded("SkillSlotsHudFix", () => SkillSlotsHudFix.Apply(harmony, asm));
             if (daggerOfFrenzyGuard && name == "Smite Items" && appliedFixes.Add(name))
             {
                 var ror2ForDagger = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2");
-                if (ror2ForDagger != null) DaggerOfFrenzyFix.Apply(harmony, asm, ror2ForDagger);
+                if (ror2ForDagger != null) Guarded("DaggerOfFrenzyFix", () => DaggerOfFrenzyFix.Apply(harmony, asm, ror2ForDagger));
                 else Log.LogWarning("Dagger of Frenzy guard: RoR2 isn't loaded yet, not applied");
             }
             if ((thetaShieldLoopFix || hallowedIchorTimerFix || fireTrailFix) && name == "Sandswept" && appliedFixes.Add(name))
@@ -409,88 +475,108 @@ namespace CompatShield
                 if (ror2ForTheta == null) Log.LogWarning("Sandswept fixes: RoR2 isn't loaded yet, not applied");
                 else
                 {
-                    if (thetaShieldLoopFix) ThetaShieldLoopFix.Apply(harmony, asm, ror2ForTheta);
-                    if (hallowedIchorTimerFix) HallowedIchorTimerFix.Apply(harmony, asm, ror2ForTheta);
-                    if (fireTrailFix) SandsweptFireTrailFix.Apply(harmony, asm, ror2ForTheta);
+                    if (thetaShieldLoopFix) Guarded("ThetaShieldLoopFix", () => ThetaShieldLoopFix.Apply(harmony, asm, ror2ForTheta));
+                    if (hallowedIchorTimerFix) Guarded("HallowedIchorTimerFix", () => HallowedIchorTimerFix.Apply(harmony, asm, ror2ForTheta));
+                    if (fireTrailFix) Guarded("SandsweptFireTrailFix", () => SandsweptFireTrailFix.Apply(harmony, asm, ror2ForTheta));
                 }
             }
             // appliedFixes is keyed by assembly name: any future StormyItems fix belongs inside this same if.
             if (sharpAnchorFix && name == "StormyItems" && appliedFixes.Add(name))
             {
                 var ror2ForStormy = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2");
-                if (ror2ForStormy != null) SharpAnchorZoneFix.Apply(harmony, asm, ror2ForStormy);
+                if (ror2ForStormy != null) Guarded("SharpAnchorZoneFix", () => SharpAnchorZoneFix.Apply(harmony, asm, ror2ForStormy));
                 else Log.LogWarning("Sharp Anchor fix: RoR2 isn't loaded yet, not applied");
             }
             // On its assembly load, before its plugin Awake runs its Harmony patches. appliedFixes is keyed by assembly name: any
             // future Bubbets fix belongs inside this same if.
-            if (linearDamageFix && name == "LinearDamage" && appliedFixes.Add(name)) LinearDamageFix.Apply(harmony, asm);
+            if (linearDamageFix && name == "LinearDamage" && appliedFixes.Add(name)) Guarded("LinearDamageFix", () => LinearDamageFix.Apply(harmony, asm));
             if (bubbetsFix && name == "BubbetsItems" && appliedFixes.Add(name))
             {
                 var ror2ForBubbets = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2");
-                if (ror2ForBubbets != null) BubbetsFix.Apply(harmony, asm, ror2ForBubbets);
+                if (ror2ForBubbets != null) Guarded("BubbetsFix", () => BubbetsFix.Apply(harmony, asm, ror2ForBubbets));
                 else Log.LogWarning("Bubbets fix: RoR2 isn't loaded yet, not applied");
             }
             // On its assembly load, before its plugin Awake builds the survivor. appliedFixes is keyed by assembly name: any
             // future Shaman fix belongs inside this same if.
             if (shamanModelFix && name == "ShamanMod" && appliedFixes.Add(name))
-                ShamanModelFix.Apply(harmony, asm);
+                Guarded("ShamanModelFix", () => ShamanModelFix.Apply(harmony, asm));
             // On its assembly load, long before the first Swift dies. appliedFixes is keyed by assembly name: any future
             // EnemiesReturns fix belongs inside this same if.
             if (swiftImpactFix && name == "EnemiesReturns" && appliedFixes.Add(name))
-                SwiftImpactFix.Apply(harmony, asm);
+                Guarded("SwiftImpactFix", () => SwiftImpactFix.Apply(harmony, asm));
             // On its assembly load, before its plugin hooks anything. appliedFixes is keyed by assembly name: any future
             // ShareSuite fix belongs inside this same if.
             if (shareSuiteSacrificeFix && name == "ShareSuite" && appliedFixes.Add(name))
-                ShareSuiteSacrificeCreditFix.Apply(harmony, asm);
+                Guarded("ShareSuiteSacrificeCreditFix", () => ShareSuiteSacrificeCreditFix.Apply(harmony, asm));
             if (stopSoundFix && name == "AudioOverlapFix" && appliedFixes.Add(name))
-                StopSoundFix.Apply(harmony, asm, Type.GetType("AkSoundEngine, AK.Wwise.Unity.API")?.Assembly);
+                Guarded("StopSoundFix", () => StopSoundFix.Apply(harmony, asm, Type.GetType("AkSoundEngine, AK.Wwise.Unity.API")?.Assembly));
+            if ((overloadingStakeCap > 0 || overloadingStakeCooldown > 0f) && name == "EliteReworks2" && appliedFixes.Add(name))
+                Guarded("OverloadingStakeLimit", () => OverloadingStakeLimit.Apply(harmony, AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2"), overloadingStakeCap, overloadingStakeCooldown));
+            if (errorLoopGuards && name == "ChensGradiusMod" && appliedFixes.Add(name)) Guarded("SeedTrackerGuard", () => SeedTrackerGuard.Apply(harmony, asm));
+            if (errorLoopGuards && name == "MysticsItemsPlugin" && appliedFixes.Add(name)) Guarded("DeathCeremonySnapshotGuard", () => DeathCeremonySnapshotGuard.Apply(harmony, asm));
+            if (errorLoopGuards && name == "CaeliImperium" && appliedFixes.Add(name)) Guarded("CaeliSecondaryGuard", () => CaeliSecondaryGuard.Apply(harmony, asm));
+            if (errorLoopGuards && name == "MSU.Runtime" && appliedFixes.Add(name)) Guarded("ItemTierCleanupGuard", () => ItemTierCleanupGuard.Apply(harmony, asm));
             // At the first plugin, before any sound is posted (Wwise and RoR2.Run are loaded by then).
             if ((soundTracer || orphanLoopGuard) && !soundTracerApplied && IsPlugin(asm))
             {
                 soundTracerApplied = true;
-                SoundTracer.Apply(harmony, soundTracer, orphanLoopGuard);
+                Guarded("SoundTracer", () => SoundTracer.Apply(harmony, soundTracer, orphanLoopGuard));
+            }
+            if (quitCrashGuard && !quitCrashGuardApplied && IsPlugin(asm))
+            {
+                quitCrashGuardApplied = true;
+                var wwise = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "AK.Wwise.Unity.API");
+                if (wwise != null) Guarded("QuitCrashGuard", () => QuitCrashGuard.Apply(harmony, wwise));
+                else Log.LogWarning("Quit crash guard not applied: Wwise assembly isnt loaded");
+            }
+            if (errorLoopGuards && !hookReelGuardApplied && IsPlugin(asm))
+            {
+                hookReelGuardApplied = true;
+                var gameAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2");
+                if (gameAssembly != null) Guarded("HookReelGuard", () => HookReelGuard.Apply(harmony, gameAssembly));
+                else Log.LogWarning("Hook reel guard: RoR2 isnt loaded yet, not applied");
             }
             // At the first plugin too (RoR2.Run is loaded). Creates nothing of Unity's here: its ticker comes at the first run start.
             if (lagTracer && !lagTracerApplied && IsPlugin(asm))
             {
                 lagTracerApplied = true;
-                LagTracer.Apply(harmony);
+                Guarded("LagTracer", () => LagTracer.Apply(harmony));
             }
             // At the first plugin (RoR2.dll is loaded). The lock itself is set from the game's tick once the rule list exists.
             if (!string.IsNullOrWhiteSpace(lockedItems) && !lockedItemsApplied && IsPlugin(asm))
             {
                 lockedItemsApplied = true;
-                LockedItems.Apply(AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2"), lockedItems);
+                Guarded("LockedItems", () => LockedItems.Apply(AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2"), lockedItems));
             }
             // At the first plugin too (RoR2.Run is loaded). It only subscribes to run start and end here; the damage and death events are hooked at the first run start.
             if (bigHitTracer && !bigHitApplied && IsPlugin(asm))
             {
                 bigHitApplied = true;
-                BigHitTracer.Apply();
+                Guarded("BigHitTracer", () => BigHitTracer.Apply());
             }
             // At the first plugin too (RoR2.Run is loaded). It only subscribes to run start and end here; the timers go on at the first run start.
             if (hookTimer && !hookTimerApplied && IsPlugin(asm))
             {
                 hookTimerApplied = true;
-                HookTimer.Apply();
+                Guarded("HookTimer", () => HookTimer.Apply());
             }
             // At the first plugin too (RoR2.Run is loaded). Its ticker comes at the first run start, never here.
             if (physicsPileupTracer && !physicsPileupApplied && IsPlugin(asm))
             {
                 physicsPileupApplied = true;
-                PhysicsPileupTracer.Apply();
+                Guarded("PhysicsPileupTracer", () => PhysicsPileupTracer.Apply());
             }
             // At the first plugin (RoR2.Run is loaded); the cap itself is set at each run start, never here.
             if (physicsCatchUpCap > 0f && !physicsCapApplied && IsPlugin(asm))
             {
                 physicsCapApplied = true;
-                PhysicsCatchUpCap.Apply(physicsCatchUpCap);
+                Guarded("PhysicsCatchUpCap", () => PhysicsCatchUpCap.Apply(physicsCatchUpCap));
             }
             // Before the first plugin's Awake, so every mod's asset loads go through it.
             if (assetRedirect && !assetRedirectApplied && IsPlugin(asm))
             {
                 assetRedirectApplied = true;
-                AssetRedirect.Apply(harmony, AssetRedirect.FindEvaluateKey());
+                Guarded("AssetRedirect", () => AssetRedirect.Apply(harmony, AssetRedirect.FindEvaluateKey()));
             }
             // Same moment as the Gasoline chain fix (the first plugin, game code loaded): the general kill-chain guard.
             if (damageChainGuard && !damageChainGuardApplied && IsPlugin(asm))
@@ -499,8 +585,7 @@ namespace CompatShield
                 if (ror2ForGuard != null)
                 {
                     damageChainGuardApplied = true;
-                    DamageChainGuard.Configure(damageChainQueueLimit, damageChainDrainMs);
-                    DamageChainGuard.Apply(harmony, ror2ForGuard);
+                    Guarded("DamageChainGuard", () => { DamageChainGuard.Configure(damageChainQueueLimit, damageChainDrainMs); DamageChainGuard.Apply(harmony, ror2ForGuard); });
                 }
             }
             if (blastChainCap && !blastChainCapApplied && IsPlugin(asm))
@@ -509,8 +594,7 @@ namespace CompatShield
                 if (ror2ForBlast != null)
                 {
                     blastChainCapApplied = true;
-                    BlastChainCap.Configure(blastChainMaxDepth, blastChainBudgetMs);
-                    BlastChainCap.Apply(harmony, ror2ForBlast);
+                    Guarded("BlastChainCap", () => { BlastChainCap.Configure(blastChainMaxDepth, blastChainBudgetMs); BlastChainCap.Apply(harmony, ror2ForBlast); });
                 }
             }
             if (blastTargetGuard && !blastTargetGuardApplied && IsPlugin(asm))
@@ -519,7 +603,7 @@ namespace CompatShield
                 if (ror2ForGuard != null)
                 {
                     blastTargetGuardApplied = true;
-                    BlastTargetGuard.Apply(harmony, ror2ForGuard);
+                    Guarded("BlastTargetGuard", () => BlastTargetGuard.Apply(harmony, ror2ForGuard));
                 }
             }
             if (statUpdateInterval > 0f && !statLimitApplied && IsPlugin(asm))
@@ -528,7 +612,7 @@ namespace CompatShield
                 if (ror2ForLimit != null)
                 {
                     statLimitApplied = true;
-                    StatUpdateLimit.Apply(harmony, ror2ForLimit, statUpdateInterval);
+                    Guarded("StatUpdateLimit", () => StatUpdateLimit.Apply(harmony, ror2ForLimit, statUpdateInterval));
                 }
             }
             if (hardEnemyCap > 0 && !hardCapApplied && IsPlugin(asm))
@@ -537,7 +621,7 @@ namespace CompatShield
                 if (ror2ForCap != null)
                 {
                     hardCapApplied = true;
-                    HardEnemyCap.Apply(harmony, ror2ForCap, hardEnemyCap);
+                    Guarded("HardEnemyCap", () => HardEnemyCap.Apply(harmony, ror2ForCap, hardEnemyCap));
                 }
             }
             if (statsRetryGuard && !statsRetryGuardApplied && IsPlugin(asm))
@@ -546,7 +630,7 @@ namespace CompatShield
                 if (ror2ForStats != null)
                 {
                     statsRetryGuardApplied = true;
-                    StatsRetryGuard.Apply(harmony, ror2ForStats);
+                    Guarded("StatsRetryGuard", () => StatsRetryGuard.Apply(harmony, ror2ForStats));
                 }
             }
             if (overlapHitGuard && !overlapHitGuardApplied && IsPlugin(asm))
@@ -555,7 +639,7 @@ namespace CompatShield
                 if (ror2ForOverlap != null)
                 {
                     overlapHitGuardApplied = true;
-                    OverlapHitGuard.Apply(harmony, ror2ForOverlap);
+                    Guarded("OverlapHitGuard", () => OverlapHitGuard.Apply(harmony, ror2ForOverlap));
                 }
             }
             if (dotTickGuard && !dotTickGuardApplied && IsPlugin(asm))
@@ -564,7 +648,7 @@ namespace CompatShield
                 if (ror2ForDot != null)
                 {
                     dotTickGuardApplied = true;
-                    DotTickGuard.Apply(harmony, ror2ForDot);
+                    Guarded("DotTickGuard", () => DotTickGuard.Apply(harmony, ror2ForDot));
                 }
             }
             if (bulletHitGuard && !bulletHitGuardApplied && IsPlugin(asm))
@@ -573,7 +657,7 @@ namespace CompatShield
                 if (ror2ForBullet != null)
                 {
                     bulletHitGuardApplied = true;
-                    BulletHitGuard.Apply(harmony, ror2ForBullet);
+                    Guarded("BulletHitGuard", () => BulletHitGuard.Apply(harmony, ror2ForBullet));
                 }
             }
             if (totemTetherGuard && !totemTetherGuardApplied && IsPlugin(asm))
@@ -582,7 +666,7 @@ namespace CompatShield
                 if (ror2ForTotem != null)
                 {
                     totemTetherGuardApplied = true;
-                    TotemTetherGuard.Apply(harmony, ror2ForTotem);
+                    Guarded("TotemTetherGuard", () => TotemTetherGuard.Apply(harmony, ror2ForTotem));
                 }
             }
             if (rouletteSpinCost && !rouletteSpinCostApplied && IsPlugin(asm))
@@ -591,7 +675,7 @@ namespace CompatShield
                 if (ror2ForRoulette != null)
                 {
                     rouletteSpinCostApplied = true;
-                    RouletteSpinCost.Apply(harmony, ror2ForRoulette);
+                    Guarded("RouletteSpinCost", () => RouletteSpinCost.Apply(harmony, ror2ForRoulette));
                 }
             }
             if (acolyteAttackSpeed != 1f && !acolyteTweakApplied && IsPlugin(asm))
@@ -600,7 +684,7 @@ namespace CompatShield
                 if (ror2ForAcolyte != null)
                 {
                     acolyteTweakApplied = true;
-                    AcolyteTweak.Apply(ror2ForAcolyte, acolyteAttackSpeed);
+                    Guarded("AcolyteTweak", () => AcolyteTweak.Apply(ror2ForAcolyte, acolyteAttackSpeed));
                 }
             }
             if (nullDccsPoolEntryFix && !nullDccsPoolEntryFixApplied && IsPlugin(asm))
@@ -609,7 +693,7 @@ namespace CompatShield
                 if (ror2ForPools != null)
                 {
                     nullDccsPoolEntryFixApplied = true;
-                    NullDccsPoolEntryFix.Apply(harmony, ror2ForPools);
+                    Guarded("NullDccsPoolEntryFix", () => NullDccsPoolEntryFix.Apply(harmony, ror2ForPools));
                 }
             }
 
@@ -619,18 +703,18 @@ namespace CompatShield
                 if (ror2ForArtifacts != null)
                 {
                     disableGeneticsApplied = true;
-                    ArtifactDisabler.Apply(harmony, ror2ForArtifacts);
+                    Guarded("ArtifactDisabler", () => ArtifactDisabler.Apply(harmony, ror2ForArtifacts));
                 }
             }
             if (hypercritNullFix && name == "NotHypercrit" && appliedFixes.Add(name))
-                HypercritNullFix.Apply(harmony, asm);
+                Guarded("HypercritNullFix", () => HypercritNullFix.Apply(harmony, asm));
             if (gasolineFix && !gasolineApplied && IsPlugin(asm))
             {
                 var ror2 = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RoR2");
                 if (ror2 != null)
                 {
                     gasolineApplied = true;
-                    GasolineChainFix.Apply(harmony, ror2);
+                    Guarded("GasolineChainFix", () => GasolineChainFix.Apply(harmony, ror2));
                 }
             }
             if (flowerRootFix && !flowerRootApplied && IsPlugin(asm))
@@ -639,7 +723,7 @@ namespace CompatShield
                 if (ror2 != null)
                 {
                     flowerRootApplied = true;
-                    FlowerRootFix.Apply(harmony, ror2);
+                    Guarded("FlowerRootFix", () => FlowerRootFix.Apply(harmony, ror2));
                 }
             }
             if (stunDurationFix && !stunDurationApplied && IsPlugin(asm))
@@ -648,7 +732,7 @@ namespace CompatShield
                 if (ror2 != null)
                 {
                     stunDurationApplied = true;
-                    StunDurationFix.Apply(harmony, ror2);
+                    Guarded("StunDurationFix", () => StunDurationFix.Apply(harmony, ror2));
                 }
             }
             if (SpawnTweakWanted && !spawnTweakApplied && IsPlugin(asm))
@@ -657,7 +741,7 @@ namespace CompatShield
                 if (ror2 != null)
                 {
                     spawnTweakApplied = true;
-                    SpawnCreditTweak.Apply(harmony, ror2, spawnCredits);
+                    Guarded("SpawnCreditTweak", () => SpawnCreditTweak.Apply(harmony, ror2, spawnCredits));
                 }
             }
             if (InteractableTweakWanted && !interactableTweakApplied && IsPlugin(asm))
@@ -666,8 +750,8 @@ namespace CompatShield
                 if (ror2 != null)
                 {
                     interactableTweakApplied = true;
-                    InteractableWeightTweak.Apply(ror2, printerWeight, scrapperWeight, combinerWeight);
-                    DroneTweak.Apply(ror2, droneNoMinStage, droneSpawnWeight, droneHealth);
+                    Guarded("InteractableWeightTweak", () => InteractableWeightTweak.Apply(ror2, printerWeight, scrapperWeight, combinerWeight));
+                    Guarded("DroneTweak", () => DroneTweak.Apply(ror2, droneNoMinStage, droneSpawnWeight, droneHealth));
                 }
             }
             if (SacrificeTweakWanted && !sacrificeApplied && IsPlugin(asm))
@@ -676,7 +760,7 @@ namespace CompatShield
                 if (ror2 != null)
                 {
                     sacrificeApplied = true;
-                    SacrificeDropTweak.Apply(harmony, ror2, sacrificeDropMult);
+                    Guarded("SacrificeDropTweak", () => SacrificeDropTweak.Apply(harmony, ror2, sacrificeDropMult));
                 }
             }
             if (SacrificeKeepWanted && !sacrificeKeepApplied && IsPlugin(asm))
@@ -685,7 +769,7 @@ namespace CompatShield
                 if (ror2 != null)
                 {
                     sacrificeKeepApplied = true;
-                    SacrificeKeepTweak.Apply(harmony, ror2, sacrificeKeepList, sacrificeKeptWeight);
+                    Guarded("SacrificeKeepTweak", () => SacrificeKeepTweak.Apply(harmony, ror2, sacrificeKeepList, sacrificeKeptWeight));
                 }
             }
         }
@@ -814,8 +898,12 @@ namespace CompatShield
         static void Postfix()
         {
             var field = AccessTools.Field(asset, "matMercSwipe");
-            if (field == null || field.GetValue(null) as Material)
+            if (field == null) return;
+            if (field.GetValue(null) as Material)
+            {
+                CompatShieldPatcher.Log.LogDebug("PaladinMod: matMercSwipe already exists, nothing to change");
                 return;
+            }
             var mat = MercSwipeFromGhost();
             field.SetValue(null, mat);
             CompatShieldPatcher.Log.LogInfo(mat
@@ -1784,7 +1872,7 @@ namespace CompatShield
                 if (matched)
                     CompatShieldPatcher.Log.LogInfo("ZetAspects: elite kills without an equipment slot no longer crash its drop hook");
                 else if (alreadyFixed)
-                    CompatShieldPatcher.Log.LogInfo("ZetAspects: this version already fixes the slotless-elite kill crash, nothing to change");
+                    CompatShieldPatcher.Log.LogDebug("ZetAspects: this version already fixes the slotless-elite kill crash, nothing to change");
                 else
                     CompatShieldPatcher.Log.LogWarning("ZetAspects drop fix: unexpected IL (maybe a newer ZetAspects), left unchanged");
             }
@@ -2378,11 +2466,10 @@ namespace CompatShield
         const int MaxChainLines = 200;       // one log line per chain that lost blasts; a long run can't flood the log
         internal static int MaxDepth = DefaultMaxDepth;
         internal static double BudgetMs = DefaultBudgetMs;   // the time allowance when full, shared by every chain; 0 = no time limit
-        const double RefillShare = 0.25;     // the allowance refills at this share of the time that passes between chains
-        const double LevelOneOverdraft = 3;  // a blast directly inside the outermost one keeps going until the allowance is this many BudgetMs overdrawn
-        const double MaxOverdraft = 4;       // the most one chain can overdraw it, so one huge chain or a GC pause inside one can't shut blasts off for long
+        internal const int MaxBlastsPerChain = 32;
+        internal const double HardRunawayMs = 2000;
         static int depth, nestedRan, skippedDeep, skippedLate, chainLines;
-        static double chainStartMs, allowanceMs = DefaultBudgetMs, lastRefillMs;
+        static double chainStartMs;
         static string firstSkipped;
         static bool patched;
         static Harmony patcher;
@@ -2397,7 +2484,6 @@ namespace CompatShield
         {
             MaxDepth = Math.Max(1, maxDepth);
             BudgetMs = Math.Max(0f, budgetMs);
-            allowanceMs = BudgetMs;
         }
 
         public static void Apply(Harmony h, Assembly ror2)
@@ -2435,8 +2521,7 @@ namespace CompatShield
             }
             attackerField = blast.GetField("attacker", Any);
             h.Patch(handleHits, prefix: M(nameof(Prefix)), finalizer: M(nameof(Finalizer)));
-            CompatShieldPatcher.Log.LogInfo($"Blast chain cap: a blast set off from inside other blasts stops firing once {MaxDepth} are running inside each other" +
-                (BudgetMs > 0 ? $" or they have used up a shared {BudgetMs} ms allowance" : "") + ", so item combos can't hang the game");
+            CompatShieldPatcher.Log.LogInfo($"Blast chain cap: stops blasts deeper than {MaxDepth}; per-chain count cap {MaxBlastsPerChain}, plus a {HardRunawayMs:0} ms hard ceiling");
             return true;
         }
 
@@ -2449,13 +2534,15 @@ namespace CompatShield
             if (depth == 0)
             {
                 chainStartMs = NowMs();
-                allowanceMs = Math.Min(BudgetMs, allowanceMs + (chainStartMs - lastRefillMs) * RefillShare);
-                lastRefillMs = chainStartMs;
             }
             else
             {
                 bool tooDeep = depth >= MaxDepth;
-                bool tooLate = !tooDeep && BudgetMs > 0 && allowanceMs - (NowMs() - chainStartMs) <= (depth >= 2 ? 0 : -LevelOneOverdraft * BudgetMs);
+                double elapsed = NowMs() - chainStartMs;
+                bool runawayByCount = nestedRan >= MaxBlastsPerChain;
+                bool runawayByTime = nestedRan >= MaxBlastsPerChain && BudgetMs > 0 && elapsed >= BudgetMs;
+                bool runawayByHardCeiling = elapsed >= HardRunawayMs;
+                bool tooLate = !tooDeep && (runawayByCount || runawayByTime || runawayByHardCeiling);
                 if (tooDeep || tooLate)
                 {
                     if (tooDeep) skippedDeep++; else skippedLate++;
@@ -2478,8 +2565,6 @@ namespace CompatShield
             if (nestedRan + stopped > 0)   // a blast with nothing inside it isn't what the allowance is for
             {
                 double now = NowMs(), took = now - chainStartMs;
-                allowanceMs = Math.Max(-MaxOverdraft * BudgetMs, allowanceMs - took);
-                lastRefillMs = now;
                 if (stopped > 0 && chainLines++ < MaxChainLines)
                     CompatShieldPatcher.Log.LogInfo($"Blast chain: stopped {stopped} nested {(stopped == 1 ? "blast" : "blasts")} ({skippedDeep} too deep, {skippedLate} too late); " +
                         $"{nestedRan} ran, the chain took {took:0} ms, and the first one stopped came from {firstSkipped}");
@@ -2491,8 +2576,7 @@ namespace CompatShield
         internal static void ResetForTest()
         {
             depth = nestedRan = skippedDeep = skippedLate = chainLines = 0;
-            chainStartMs = lastRefillMs = 0;
-            allowanceMs = DefaultBudgetMs;
+            chainStartMs = 0;
             firstSkipped = null;
             patched = false;
             MaxDepth = DefaultMaxDepth;
@@ -4634,7 +4718,7 @@ namespace CompatShield
                 matched = false;
                 h.Patch(death, transpiler: new HarmonyMethod(typeof(SacrificeDropTweak).GetMethod(nameof(Transpiler), BindingFlags.NonPublic | BindingFlags.Static)));
                 if (matched)
-                    CompatShieldPatcher.Log.LogInfo($"Sacrifice: item drop chance per kill now x{mult} (after RiskyMod/ShareSuite)");
+                    CompatShieldPatcher.Log.LogInfo($"Sacrifice: item drop chance per kill now x{mult} (after other installed changes)");
                 else
                     CompatShieldPatcher.Log.LogWarning("Sacrifice drop chance: unexpected IL (maybe a game update), left unchanged");
             }
@@ -6452,7 +6536,7 @@ namespace CompatShield
         static Assembly mod, game;
         static bool done;
         static readonly HashSet<string> logged = new HashSet<string>();
-        internal static bool SolesRewritten;
+        internal static bool SolesRewritten, SolesAlreadyFits;
         internal static int PlateHooked, SlotCallsRedirected, StyleCallsRedirected;
         static MethodInfo doMk2;
 
@@ -6461,8 +6545,8 @@ namespace CompatShield
             harmony = h;
             mod = bubbets;
             game = ror2;
-            ApplySoles(h, bubbets.GetType(SolesName));
-            ApplyPlate(h, bubbets.GetType(PlateName));
+            ApplySoles(h, bubbets);
+            ApplyPlate(h, bubbets);
             try
             {
                 var ev = ror2.GetType("RoR2.Run")?.GetEvent("onRunStartGlobal", BindingFlags.Public | BindingFlags.Static);
@@ -6478,29 +6562,40 @@ namespace CompatShield
         static HarmonyMethod M(string name) => new HarmonyMethod(typeof(BubbetsFix).GetMethod(name, Any));
 
         // ---- Jellied Soles: must be in place before the plugin's Awake runs its Harmony patches ----
-        static void ApplySoles(Harmony h, Type soles)
+        static void ApplySoles(Harmony h, Assembly bubbets)
         {
-            var target = soles?.GetMethod("IlTakeDamage", Any);
-            if (target == null)
-            {
-                CompatShieldPatcher.Log.LogWarning("Bubbets fix: JelliedSoles.IlTakeDamage not found (mod updated?), not applied");
-                return;
-            }
-            SolesRewritten = false;
-            try { h.Patch(target, transpiler: M(nameof(SolesTranspiler))); }
-            catch (Exception e) { CompatShieldPatcher.Log.LogError("Bubbets fix: the Jellied Soles rewrite failed: " + e); }
-            if (SolesRewritten)
-            {
-                CompatShieldPatcher.Log.LogInfo("Bubbets Items: Jellied Soles' damage hook now fits game 1.5.0, so it no longer breaks every later damage hook");
-                return;
-            }
-            // Left as written it takes every later TakeDamageProcess hook down with it, so losing this one hook is the safe failure.
             try
             {
-                h.Patch(target, prefix: M(nameof(SkipPrefix)));
-                CompatShieldPatcher.Log.LogWarning("Bubbets fix: Jellied Soles' damage hook isn't the expected shape (mod updated?), not applied; the hook is switched off so it can't break other damage hooks");
+                var soles = bubbets?.GetType(SolesName);
+                var target = soles?.GetMethod("IlTakeDamage", Any);
+                if (target == null)
+                {
+                    CompatShieldPatcher.Log.LogWarning("Bubbets fix: JelliedSoles.IlTakeDamage not found (mod updated?), not applied");
+                    return;
+                }
+                SolesRewritten = false;
+                SolesAlreadyFits = false;
+                try { h.Patch(target, transpiler: M(nameof(SolesTranspiler))); }
+                catch (Exception e) { CompatShieldPatcher.Log.LogError("Bubbets fix: the Jellied Soles rewrite failed: " + e); }
+                if (SolesRewritten)
+                {
+                    CompatShieldPatcher.Log.LogInfo("Bubbets Items: Jellied Soles' damage hook now fits game 1.5.0, so it no longer breaks every later damage hook");
+                    return;
+                }
+                if (SolesAlreadyFits)
+                {
+                    CompatShieldPatcher.Log.LogInfo("BubbetsItems: Jellied Soles hook already fits this game, left alone");
+                    return;
+                }
+                // Left as written it takes every later TakeDamageProcess hook down with it, so losing this one hook is the safe failure.
+                try
+                {
+                    h.Patch(target, prefix: M(nameof(SkipPrefix)));
+                    CompatShieldPatcher.Log.LogWarning("Bubbets fix: Jellied Soles' damage hook isn't the expected shape (mod updated?), not applied; the hook is switched off so it can't break other damage hooks");
+                }
+                catch (Exception e) { CompatShieldPatcher.Log.LogError("Bubbets fix: couldn't switch off Jellied Soles' damage hook: " + e); }
             }
-            catch (Exception e) { CompatShieldPatcher.Log.LogError("Bubbets fix: couldn't switch off Jellied Soles' damage hook: " + e); }
+            catch (Exception e) { CompatShieldPatcher.Log.LogWarning("Bubbets fix: Jellied Soles lookup failed, not applied: " + e.Message); }
         }
 
         static bool SkipPrefix() => false;
@@ -6509,6 +6604,7 @@ namespace CompatShield
         {
             var code = instructions.ToList();
             if (RewriteSoles(code)) SolesRewritten = true;
+            else if (RecognizesCurrentSolesHook(code)) SolesAlreadyFits = true;
             return code;
         }
 
@@ -6526,6 +6622,21 @@ namespace CompatShield
 
         static bool IsCallNamed(CodeInstruction ci, string name) =>
             (ci.opcode == OpCodes.Call || ci.opcode == OpCodes.Callvirt) && ci.operand is MethodBase m && m.Name == name;
+
+        // BubbetsItems 1.8.21 uses MatchNearbyDamage, searches adaptiveArmor/ble and emits
+        // Func<float, HealthComponent, CharacterMaster, DamageInfo, float>; it no longer emits Dup.
+        // Keep that hook intact. Unknown layouts still take the fail-safe skip below.
+        internal static bool RecognizesCurrentSolesHook(List<CodeInstruction> code)
+        {
+            int arg0 = code.FindIndex(c=>c.operand is FieldInfo f&&f.Name=="Ldarg_0"), arg1 = code.FindIndex(c=>c.operand is FieldInfo f&&f.Name=="Ldarg_1"), local = code.FindIndex(c=>c.operand is FieldInfo f&&f.Name.StartsWith("Ldloc",StringComparison.Ordinal));
+            bool nearby = code.Any(c => c.operand is MethodBase m && m.Name == "MatchNearbyDamage");
+            bool emit = code.Any(c => c.operand is MethodBase m && m.Name == "EmitDelegate");
+            // The adaptiveArmor/ble/stloc anchors live in the ILManipulator's nested predicates. The harness checks them on both shipped DLLs;
+            // this wrapper method must carry MatchNearbyDamage plus the concrete five-argument float delegate and no old Dup.
+            bool signature=code.Any(c=>c.operand is MethodInfo m&&m.Name=="EmitDelegate"&&m.IsGenericMethod&&m.GetGenericArguments().Length==1&&m.GetGenericArguments()[0].Name=="Func`5");
+            bool hasNoDup = FindCecilOpCode(code, "Dup") < 0;
+            return nearby && emit && hasNoDup && signature && arg0>=0 && arg1>arg0 && local>arg0 && local<arg1;
+        }
 
         static bool LoadsInt(CodeInstruction ci, int value)
         {
@@ -6565,10 +6676,11 @@ namespace CompatShield
         }
 
         // ---- Repulsion Plate Mk2: 1.5.0 added a Mathf.Max ahead of the one the mod wants ----
-        static void ApplyPlate(Harmony h, Type plate)
+        static void ApplyPlate(Harmony h, Assembly bubbets)
         {
             try
             {
+                var plate = bubbets?.GetType(PlateName);
                 var target = plate?.GetMethod("TakeDamageHook", Any);
                 doMk2 = plate?.GetMethod("DoMk2ArmorPlates", Any);
                 if (target == null || doMk2 == null || !doMk2.IsStatic || doMk2.ReturnType != typeof(float))
@@ -7617,6 +7729,7 @@ namespace CompatShield
         static int dirtyCounter, recalcCounter;
         static readonly Dictionary<string, int> winDirty = new Dictionary<string, int>(), runDirty = new Dictionary<string, int>();
         static FieldInfo statsDirtyField;
+        static Func<object, bool> statsDirtyRead;
         static Func<int, string> buffNameOf;
         static readonly string[] gamePrefixes = { "RoR2", "UnityEngine", "Unity.", "com.unity", "mscorlib", "System", "netstandard", "MonoMod", "0Harmony",
             "BepInEx", "HGUnityUtils", "KinematicCharacterController", "Rewired", "Wwise", "Facepunch", "AK.", "Zio", "Mono." };
@@ -7731,6 +7844,9 @@ namespace CompatShield
                     CompatShieldPatcher.Log.LogWarning("Lag tracer: CharacterBody.statsDirty not found (game updated?), stats-dirty attribution off");
                     return;
                 }
+                var dirtyArg = System.Linq.Expressions.Expression.Parameter(typeof(object), "body");
+                var dirtyExpr = System.Linq.Expressions.Expression.Field(System.Linq.Expressions.Expression.Convert(dirtyArg, body), statsDirtyField);
+                statsDirtyRead = System.Linq.Expressions.Expression.Lambda<Func<object, bool>>(dirtyExpr, dirtyArg).Compile();
                 var getDef = buffIndex == null ? null : ror2.GetType("RoR2.BuffCatalog")?.GetMethod("GetBuffDef", BindingFlags.Public | BindingFlags.Static, null, new[] { buffIndex }, null);
                 if (getDef != null) buffNameOf = i => (getDef.Invoke(null, new[] { Enum.ToObject(buffIndex, i) }) as UnityEngine.Object)?.name;
                 var targets = new List<MethodInfo>
@@ -7746,7 +7862,13 @@ namespace CompatShield
                 foreach (var m in targets)
                 {
                     if (m == null) continue;
-                    try { harmony.Patch(m, prefix: DirtyPatches.Method(nameof(DirtyPatches.DirtyPrefix)), postfix: DirtyPatches.Method(nameof(DirtyPatches.DirtyPostfix))); ok++; }
+                    try
+                    {
+                        string postfix = m.Name == "SetBuffCount" ? nameof(DirtyPatches.DirtyBuffPostfix)
+                            : m.Name == "AddTimedBuffInternal" ? nameof(DirtyPatches.DirtyTimedBuffPostfix)
+                            : nameof(DirtyPatches.DirtyNoArgsPostfix);
+                        harmony.Patch(m, prefix: DirtyPatches.Method(nameof(DirtyPatches.DirtyPrefix)), postfix: DirtyPatches.Method(postfix)); ok++;
+                    }
                     catch (Exception e) { CompatShieldPatcher.Log.LogDebug($"Lag tracer: can't watch {m.Name}: {e.Message}"); }
                 }
                 var recalc = body.GetMethod("RecalculateStats", any, null, Type.EmptyTypes, null);
@@ -7763,10 +7885,7 @@ namespace CompatShield
             }
         }
 
-        static bool StatsDirty(object body)
-        {
-            try { return (bool)statsDirtyField.GetValue(body); } catch { return true; }
-        }
+        static bool StatsDirty(object body) { try { return statsDirtyRead(body); } catch { return true; } }
 
         // Their own class: Harmony keys a patch's __state by the patch's declaring type, and OnInventoryChanged already carries the
         // timing sink's long __state from LagTracer (bool vs long from one class = "IL Compile Error", 2026-10-19 22:54).
@@ -7776,17 +7895,20 @@ namespace CompatShield
 
             internal static void DirtyPrefix(object __instance, out bool __state) { __state = Running && StatsDirty(__instance); }
 
-            internal static void DirtyPostfix(object __instance, MethodBase __originalMethod, object[] __args, bool __state)
+            internal static void DirtyNoArgsPostfix(object __instance, MethodBase __originalMethod, bool __state) => DirtyPostfixCore(__instance, __originalMethod, __state, 0, 0, null);
+            internal static void DirtyBuffPostfix(object __instance, MethodBase __originalMethod, bool __state, object __0, int __1) => DirtyPostfixCore(__instance, __originalMethod, __state, 1, Convert.ToInt32(__0), null);
+            internal static void DirtyTimedBuffPostfix(object __instance, MethodBase __originalMethod, bool __state, object __0, float __1, float __2) => DirtyPostfixCore(__instance, __originalMethod, __state, 2, 0, __0);
+
+            static void DirtyPostfixCore(object __instance, MethodBase __originalMethod, bool __state, int kind, int value, object item)
             {
             if (!Running || __state) return;                 // not running, or already dirty before the call: not this call's doing
             try
             {
                 if (!StatsDirty(__instance)) return;         // no flip
                 if ((++dirtyCounter % DirtySampleEvery) != 0) return;
-                string what = __originalMethod.Name;
-                if (what == "SetBuffCount" && __args != null && __args.Length == 2) what = "buff " + (buffNameOf?.Invoke(Convert.ToInt32(__args[0])) ?? Convert.ToInt32(__args[0]).ToString());
-                else if (what == "AddTimedBuffInternal") what = "timed buff " + ((__args != null && __args.Length > 0 ? __args[0] as UnityEngine.Object : null)?.name ?? "?");
-                else if (what == "OnInventoryChanged") what = "inventory";
+                string what = kind == 1 ? "buff " + (buffNameOf?.Invoke(value) ?? value.ToString())
+                    : kind == 2 ? "timed buff " + ((item as UnityEngine.Object)?.name ?? "?") : __originalMethod.Name;
+                if (what == "OnInventoryChanged") what = "inventory";
                 else if (what == "UpdateOutOfCombatAndDanger") what = "combat state";
                 else if (what == "OnTeamLevelChanged") what = "team level";
                 var frames = new System.Diagnostics.StackTrace(1, false).GetFrames();
@@ -8480,7 +8602,7 @@ namespace CompatShield
     {
         internal const float TriggerMs = 500f, EverySeconds = 10f, SceneGraceSeconds = 6f, LoadFrameMs = 1000f, LoadPendingSeconds = 20f, CellMeters = 4f;
         internal const int TopGroups = 6;
-        public struct Item { public string Name; public int Owner; public bool Trigger; public bool Moving; public long Cell; }
+        public struct Item { public string Name; public string OwnerBody; public int Owner; public bool Trigger; public bool Moving; public long Cell; }
         // Swappable for the harness (no Unity there).
         internal static Func<float> Now = () => Time.unscaledTime;
         internal static Func<int> SceneId = () => UnityEngine.SceneManagement.SceneManager.GetActiveScene().handle;
@@ -8585,6 +8707,7 @@ namespace CompatShield
             public int Colliders, Triggers;
             public readonly HashSet<int> Owners = new HashSet<int>();
             public readonly Dictionary<long, int> Cells = new Dictionary<long, int>();
+            public readonly Dictionary<string, int> OwnerBodies = new Dictionary<string, int>(StringComparer.Ordinal);
         }
 
         /// <summary>The log line for one census (pure; the harness feeds it).</summary>
@@ -8604,9 +8727,19 @@ namespace CompatShield
                 g.Owners.Add(it.Owner);
                 g.Cells[it.Cell] = (g.Cells.TryGetValue(it.Cell, out var c) ? c : 0) + 1;
                 allCells[it.Cell] = (allCells.TryGetValue(it.Cell, out var a) ? a : 0) + 1;
+                if (!string.IsNullOrWhiteSpace(it.OwnerBody)) g.OwnerBodies[it.OwnerBody] = g.OwnerBodies.TryGetValue(it.OwnerBody, out var ownerCount) ? ownerCount + 1 : 1;
             }
             var top = groups.Values.OrderByDescending(g => g.Colliders).ThenBy(g => g.Name, StringComparer.Ordinal).Take(TopGroups)
-                .Select(g => $"{g.Name}: {g.Colliders} colliders on {g.Owners.Count} objects" + (g.Triggers > 0 ? $", {g.Triggers} triggers" : "") + $", {g.Cells.Values.Max()} in one spot");
+                .Select(g =>
+                {
+                    string line = $"{g.Name}: {g.Colliders} colliders on {g.Owners.Count} objects" + (g.Triggers > 0 ? $", {g.Triggers} triggers" : "") + $", {g.Cells.Values.Max()} in one spot";
+                    if (g.Colliders > 500)
+                    {
+                        var owners = g.OwnerBodies.OrderByDescending(x => x.Value).ThenBy(x => x.Key, StringComparer.Ordinal).Take(3).Select(x => $"{x.Key} {x.Value}");
+                        line += ", owners: " + (g.OwnerBodies.Count == 0 ? "unknown" : string.Join(", ", owners));
+                    }
+                    return line;
+                });
             int densest = allCells.Count == 0 ? 0 : allCells.Values.Max();
             return $"Physics pile-up: {ms:0} ms frame {where}; {moving} moving colliders of {groups.Count} kinds, {densest} in the most crowded {CellMeters:0} m spot, {still} static; most: " +
                    (moving == 0 ? "none" : string.Join("; ", top)) + $" (census {censusMs:0} ms)";
@@ -8626,6 +8759,11 @@ namespace CompatShield
             var colliders = UnityEngine.Object.FindObjectsOfType<Collider>();
             var list = new List<Item>(colliders.Length);
             var names = new Dictionary<int, string>();
+            var game = Type.GetType("RoR2.CharacterBody, RoR2")?.Assembly;
+            if(game==null) throw new InvalidOperationException("RoR2 assembly is not loaded");
+            var projectileType = game.GetType("RoR2.Projectile.ProjectileController");
+            var bodyType = game.GetType("RoR2.CharacterBody");
+            var projectileOwner = projectileType?.GetField("owner", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var c in colliders)
             {
                 if (c == null || !c.enabled) continue;
@@ -8639,7 +8777,15 @@ namespace CompatShield
                     names[id] = n;
                 }
                 var p = rb.position;
-                list.Add(new Item { Name = n, Owner = id, Trigger = c.isTrigger, Moving = true, Cell = CellOf(p.x, p.y, p.z) });
+                string ownerBody = null;
+                var controller = projectileType != null ? rb.GetComponent(projectileType) as Component : null;
+                if (controller != null && projectileOwner != null)
+                {
+                    var owner=projectileOwner.GetValue(controller) as GameObject;
+                    if (owner == null || !owner) ownerBody="gone";
+                    else { var body=bodyType==null?null:owner.GetComponent(bodyType) as Component; if(body==null||!body)ownerBody="gone";else{ownerBody=body.gameObject.name;if(ownerBody.EndsWith("(Clone)"))ownerBody=ownerBody.Substring(0,ownerBody.Length-7);} }
+                }
+                list.Add(new Item { Name = n, OwnerBody = ownerBody, Owner = id, Trigger = c.isTrigger, Moving = true, Cell = CellOf(p.x, p.y, p.z) });
             }
             return list;
         }
@@ -9110,7 +9256,7 @@ namespace CompatShield
             int total = seen.Values.Sum();
             var top = seen.OrderByDescending(p => p.Value).ThenBy(p => p.Key, StringComparer.Ordinal).Take(SummarySources).Select(p =>
             {
-                var k = p.Key.Split('|');
+            var k = p.Key.Split('|');
                 return $"{k[0]} via {(k.Length > 1 ? k[1] : "?")} ({(k.Length > 2 ? k[2] : "?")}) x{p.Value}";
             });
             return $"Big hits this run: {total} from {seen.Count} source(s), most first: " + string.Join("; ", top) + (seen.Count > SummarySources ? "; ..." : "");
@@ -9125,22 +9271,14 @@ namespace CompatShield
         internal static string FrameName(string type, string method, bool takesDelegateFirst)
         {
             if (string.IsNullOrEmpty(method)) return null;
-            int dmd = method.IndexOf("DMD<", StringComparison.Ordinal);
-            if (dmd >= 0)
+            if (method.StartsWith("DMD<", StringComparison.Ordinal))
             {
-                int end = method.LastIndexOf('>');
-                if (end <= dmd + 4) return null;
-                string inner = method.Substring(dmd + 4, end - dmd - 4);
-                int paren = inner.IndexOf('(');
-                if (paren >= 0) inner = inner.Substring(0, paren);
-                int space = inner.LastIndexOf(' ');
-                if (space >= 0) inner = inner.Substring(space + 1);
-                inner = inner.Replace("::", ".");
-                return inner.Length == 0 || Plumbing(inner) ? null : inner;
+                int open = method.IndexOf('<'), sep = method.IndexOf("::", StringComparison.Ordinal), close = method.LastIndexOf('>');
+                if (open >= 0 && sep > open && close > sep) { type = method.Substring(open + 1, sep - open - 1); int space=type.LastIndexOf(' '); if(space>=0)type=type.Substring(space+1); method = method.Substring(sep + 2, close - sep - 2); int args=method.IndexOf('('); if(args>=0)method=method.Substring(0,args); takesDelegateFirst = false; }
             }
             if (method.StartsWith("Hook<", StringComparison.Ordinal) || method.StartsWith("Trampoline<", StringComparison.Ordinal)
                 || method.StartsWith("Chain<", StringComparison.Ordinal) || method.StartsWith("Glue:", StringComparison.Ordinal)) return null;
-            if (type == null || takesDelegateFirst) return null;
+            if (type == null) return null;
             if (type.StartsWith("CompatShield.BigHitTracer", StringComparison.Ordinal) || type.StartsWith("System.", StringComparison.Ordinal)
                 || type.StartsWith("MonoMod.", StringComparison.Ordinal) || type.StartsWith("HarmonyLib.", StringComparison.Ordinal)
                 || type.StartsWith("On.", StringComparison.Ordinal) || type.StartsWith("IL.", StringComparison.Ordinal)) return null;
@@ -9163,9 +9301,9 @@ namespace CompatShield
                 if (n == null || (kept.Count > 0 && kept[kept.Count - 1] == n)) continue;
                 kept.Add(n);
             }
-            if (kept.Count == 0) return hooks > 0 ? $"({hooks} hook frames, nothing else readable)" : "";
+            if (kept.Count == 0) return "";
             int more = Math.Max(0, kept.Count - PathFrames);
-            return string.Join(" < ", kept.Take(PathFrames)) + (more > 0 ? $" < ... {more} more" : "") + (hooks > 0 ? $" ({hooks} hook frames left out)" : "");
+            return string.Join(" < ", kept.Take(PathFrames)) + (more > 0 ? $" < ... {more} more" : "");
         }
 
         // The code path that is dealing this hit, read off the live stack: innermost first, so the frame right after the game's
@@ -9174,6 +9312,7 @@ namespace CompatShield
         {
             var frames = new System.Diagnostics.StackTrace(false).GetFrames();
             var names = new List<string>();
+            var walked = new List<string>();
             int hooks = 0;
             if (frames == null) return "";
             foreach (var f in frames)
@@ -9190,13 +9329,15 @@ namespace CompatShield
                 catch { }
                 string type = null;
                 try { type = mb.DeclaringType?.FullName; } catch { }
+                string passthrough=hook?LagTracer.PassThroughOf(mb,walked):null;
+                if(passthrough!=null)continue;
                 string n = FrameName(type, mb.Name, hook);
                 if (n == null)
                 {
-                    if (hook && type != null && !type.StartsWith("System.", StringComparison.Ordinal)) hooks++;
                     continue;
                 }
                 names.Add(n);
+                if(type!=null)walked.Add(type+"::"+mb.Name);
             }
             return JoinPath(names, hooks);
         }
@@ -9323,7 +9464,7 @@ namespace CompatShield
                 h.Raw = (float)m.Damage.GetValue(h.Info);
                 h.Crit = (bool)m.Crit.GetValue(h.Info);
                 h.ProcCoefficient = (float)m.ProcCoefficient.GetValue(h.Info);
-                h.Procs = (m.Procs.GetValue(h.Info)?.ToString() ?? "").Trim('(', ')');
+                h.Procs = (m.Procs.GetValue(h.Info)?.ToString() ?? "").Trim(',', ' ');
                 object combo = m.DamageType.GetValue(h.Info);
                 h.DamageType = m.TypeBase.GetValue(combo)?.ToString();
                 string extended = m.TypeExtended.GetValue(combo)?.ToString();
@@ -10968,7 +11109,7 @@ namespace CompatShield
         static readonly Dictionary<string, int> stoppedCallers = new Dictionary<string, int>();
         static readonly Dictionary<string, int> letThrough = new Dictionary<string, int>();
 
-        static Func<object, object> ignoreRead, teamOverrideRead, summonerRead, prefabRead, bodyPrefabRead, masterTeamRead, championRead;
+        static Func<object, object> ignoreRead, teamOverrideRead, summonerRead, prefabRead, bodyPrefabRead, masterTeamRead, championRead, bodyMasterRead, teamBodyRead;
         static Type masterType, bodyType;
         static MethodInfo objectTeam, teamMembers;
         static PropertyInfo hostRead;
@@ -11055,6 +11196,8 @@ namespace CompatShield
             var summon = Need(ror2, "RoR2.MasterSummon");
             masterType = Need(ror2, "RoR2.CharacterMaster");
             bodyType = Need(ror2, "RoR2.CharacterBody");
+            bodyMasterRead = Reader(bodyType, "master");
+            var teamComponentType=Need(ror2,"RoR2.TeamComponent"); teamBodyRead=Reader(teamComponentType,"body");
             var teams = Need(ror2, "RoR2.TeamComponent");
             var teamIndex = Need(ror2, "RoR2.TeamIndex");
             ignoreRead = Reader(summon, "ignoreTeamMemberLimit");
@@ -11192,7 +11335,11 @@ namespace CompatShield
         {
             int total = 0;
             foreach (var team in hostileValues)
-                total += ((System.Collections.ICollection)teamMembers.Invoke(null, new[] { team })).Count;
+                foreach (var member in (System.Collections.IEnumerable)teamMembers.Invoke(null, new[] { team }))
+                {
+                    var body = member==null?null:teamBodyRead(member);
+                    if (IsUnityAlive(body) && IsUnityAlive(bodyMasterRead(body))) total++;
+                }
             return total;
         }
 
@@ -11201,7 +11348,10 @@ namespace CompatShield
             var names = new List<string>();
             foreach (var team in hostileValues)
                 foreach (var member in (System.Collections.IEnumerable)teamMembers.Invoke(null, new[] { team }))
-                    names.Add((member as UnityEngine.Object)?.name);
+                {
+                    var body = member==null?null:teamBodyRead(member);
+                    if (IsUnityAlive(body) && IsUnityAlive(bodyMasterRead(body))) names.Add((member as UnityEngine.Object)?.name);
+                }
             return names;
         }
 
@@ -11216,6 +11366,8 @@ namespace CompatShield
             }
             return Array.IndexOf(HostileTeams, team.ToString()) >= 0;
         }
+
+        static bool IsUnityAlive(object value) => value != null && (!(value is UnityEngine.Object unityObject) || unityObject != null);
 
         static bool IsSummonChampion(object summon)
         {
@@ -11811,4 +11963,309 @@ namespace CompatShield
 
         internal static void ResetForTest() { loggedFirst = warned = false; }
     }
+public static class OverloadingStakeLimit
+{
+    const BindingFlags Any = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+    const string PrefabName = "MoffeinEliteReworks_OverloadingStakeProjectile";
+    const string VanillaPrefabName = "LightningStake";
+    static readonly Dictionary<int, int> Live = new Dictionary<int, int>();
+    static readonly Dictionary<int, float> Last = new Dictionary<int, float>();
+    static Harmony harmony;
+    static Assembly game;
+    static int cap;
+    static float cooldown;
+    static FieldInfo prefabField, ownerField, controllerOwnerField, affixBlueField;
+    static Type infoType, managerType, controllerType, bodyType, buffDefType; static MethodInfo fireMethod, destroyMethod, hasBuffMethod;
+    static MethodInfo nameGetter;
+    static bool logged, loggedCooldown, tried, patched; static float lastPrune; internal static int lookupCount;
+
+    public static void Apply(Harmony h, Assembly ror2, int liveCap, float attackerCooldown)
+    {
+            if (tried) return; tried = true;
+        try
+        {
+            harmony = h; game = ror2; cap = Math.Max(0, liveCap); cooldown = Math.Max(0f, attackerCooldown);
+            var info = ror2.GetType("RoR2.Projectile.FireProjectileInfo");
+            var manager = ror2.GetType("RoR2.Projectile.ProjectileManager");
+            var controller = ror2.GetType("RoR2.Projectile.ProjectileController");
+            infoType=info; managerType=manager; controllerType=controller; bodyType=ror2.GetType("RoR2.CharacterBody"); buffDefType=ror2.GetType("RoR2.BuffDef"); var buffs=ror2.GetType("RoR2.RoR2Content+Buffs"); affixBlueField=buffs?.GetField("AffixBlue",Any); hasBuffMethod=bodyType?.GetMethod("HasBuff",Any,null,new[]{buffDefType},null);
+            if (info == null || manager == null || controller == null) throw new MissingMemberException("projectile types not found");
+            prefabField = info.GetField("projectilePrefab", Any); ownerField = info.GetField("owner", Any);
+            nameGetter = typeof(UnityEngine.Object).GetProperty("name", Any)?.GetGetMethod();
+            var fire = manager.GetMethods(Any).FirstOrDefault(m => m.Name == "FireProjectileServer" && m.ReturnType == typeof(void) && m.GetParameters().Length > 0 && m.GetParameters()[0].ParameterType == info);
+            var destroy = controller.GetMethod("OnDestroy", Any);
+            fireMethod=fire; destroyMethod=destroy;
+            controllerOwnerField = controller.GetField("owner", Any);
+            lookupCount++;
+            if (prefabField == null || ownerField == null || controllerOwnerField == null || nameGetter == null || fire == null || destroy == null)
+                throw new MissingMemberException("stake projectile members differ from the expected shape");
+            var run = ror2.GetType("RoR2.Run")?.GetEvent("onRunStartGlobal", BindingFlags.Public | BindingFlags.Static);
+            if (run == null) throw new MissingMemberException("Run.onRunStartGlobal");
+            run.AddEventHandler(null, Delegate.CreateDelegate(run.EventHandlerType, typeof(OverloadingStakeLimit).GetMethod(nameof(ResetRun), Any)));
+            run.AddEventHandler(null, Delegate.CreateDelegate(run.EventHandlerType, typeof(OverloadingStakeLimit).GetMethod(nameof(StartRun), Any)));
+        }
+        catch (Exception e) { CompatShieldPatcher.Log.LogWarning("Overloading stake limit not applied: " + e.Message); }
+    }
+
+    static void StartRun(object run)
+    {
+        if (patched) return;
+        try
+        {
+            var fire=fireMethod; var destroy=destroyMethod;
+            if(fire==null||destroy==null)throw new MissingMemberException("projectile emission/destruction methods");
+            PatchTargets(harmony, fire, destroy);
+            CompatShieldPatcher.Log.LogInfo($"EliteReworks Overloading stakes: per-owner live cap {cap} and cooldown {cooldown:0.###} s (0 cap disables the cap)");
+        }catch(Exception e){CompatShieldPatcher.Log.LogWarning("Overloading stake limit: run-start patch not applied: "+e.Message);}
+    }
+
+    static void PatchTargets(Harmony h, MethodInfo fire, MethodInfo destroy)
+    {
+        if (patched) return;
+        try
+        {
+            h.Patch(fire, prefix: new HarmonyMethod(typeof(OverloadingStakeLimit).GetMethod(nameof(FirePrefix), Any)));
+            h.Patch(destroy, prefix: new HarmonyMethod(typeof(OverloadingStakeLimit).GetMethod(nameof(ProjectileDestroying), Any)));
+            patched = true;
+        }
+        catch
+        {
+            try { h.Unpatch(fire, HarmonyPatchType.All, h.Id); } catch { }
+            try { h.Unpatch(destroy, HarmonyPatchType.All, h.Id); } catch { }
+            throw;
+        }
+    }
+
+    // Harmony boxes the FireProjectileInfo value type as object. The hook is on the server-only emission method.
+    static bool FirePrefix(object __0)
+    {
+        try
+        {
+            if ((cap == 0 && cooldown <= 0f) || __0 == null || !IsStake(prefabField.GetValue(__0))) return true;
+            var owner = ownerField.GetValue(__0) as UnityEngine.Object;
+            if (!owner) return true;
+            if (!HasOverloading(owner)) return true;
+            int id = owner.GetInstanceID(); float now = UnityEngine.Time.time;
+            int current; Live.TryGetValue(id, out current);
+            float last;
+            if (now-lastPrune>30f){foreach(var stale in Last.Where(x=>now-x.Value>30f).Select(x=>x.Key).ToArray())Last.Remove(stale);lastPrune=now;}
+            if (cooldown > 0f && Last.TryGetValue(id, out last) && now - last < cooldown) { if(!loggedCooldown){loggedCooldown=true;CompatShieldPatcher.Log.LogWarning("Overloading stake limit: cooldown blocked a stake (cooldown active)");} return false; }
+            if (cap > 0 && current >= cap)
+            {
+                if (!logged) { logged = true; CompatShieldPatcher.Log.LogWarning($"Overloading stake limit: blocked a stake (owner live count {current}, cap {cap})"); }
+                return false;
+            }
+            if (cooldown > 0f) Last[id] = now;
+            // Reserve at emission time so a burst in one frame cannot outrun Unity Start callbacks.
+            Live[id] = current + 1;
+        }
+        catch (Exception e) { CompatShieldPatcher.WarnOnce("overloading-stake-check", "Overloading stake limit check failed open: " + e.Message); }
+        return true;
+    }
+
+    static void ProjectileDestroying(object __instance)
+    {
+        try
+        {
+            var go = ((Component)__instance).gameObject;
+            if (!IsStake(go)) return;
+            var owner = (UnityEngine.Object)controllerOwnerField.GetValue(__instance);
+            if (ReferenceEquals(owner,null)) return;
+            int id = owner.GetInstanceID(), count;
+            if (Live.TryGetValue(id, out count)) { if (count <= 1) Live.Remove(id); else Live[id] = count - 1; }
+        }
+        catch { }
+    }
+
+    static bool IsStake(object prefabOrObject)
+    {
+        if (prefabOrObject == null) return false;
+        var unityObject = prefabOrObject as UnityEngine.Object;
+        if (!unityObject) return false;
+        var name = (string)nameGetter.Invoke(unityObject, null);
+        return name == PrefabName || name == PrefabName + "(Clone)" || name == VanillaPrefabName || name == VanillaPrefabName + "(Clone)";
+    }
+
+    static bool HasOverloading(UnityEngine.Object owner)
+    {
+        var body = (owner as GameObject)?.GetComponent(bodyType) as Component;
+        var buff = affixBlueField?.GetValue(null);
+        var hasBuff = hasBuffMethod;
+        return body != null && buff != null && hasBuff != null && (bool)hasBuff.Invoke(body, new[] { buff });
+    }
+
+    static void ResetRun(object run) { Live.Clear(); Last.Clear(); logged = loggedCooldown = false; lastPrune=0f; }
+    internal static void ResetForTest() { ResetRun(null); patched = false; }
+}
+
+
+public static class QuitCrashGuard
+{
+    const BindingFlags Any = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+    static bool shutdownAfterNativeTerm;
+    static void Rollback(Harmony h, IEnumerable<MethodBase> attempted) { foreach (var target in attempted.Reverse()) try { h.Unpatch(target, HarmonyPatchType.All, h.Id); } catch { } }
+
+    public static void Apply(Harmony h, Assembly wwise)
+    {
+        var attempted = new List<MethodBase>();
+        try
+        {
+            var engine = wwise.GetType("AkSoundEngine");
+            var callbacks = wwise.GetType("AkCallbackManager");
+            if (engine == null || callbacks == null) throw new MissingMemberException("Wwise callback types not found");
+            var term = engine.GetMethod("Term", Any, null, Type.EmptyTypes, null);
+            var drain = callbacks.GetMethod("PostCallbacks", Any, null, Type.EmptyTypes, null);
+            var init = callbacks.GetMethods(Any).FirstOrDefault(m => m.Name == "Init");
+            if (term == null || drain == null) throw new MissingMethodException("AkSoundEngine.Term or AkCallbackManager.PostCallbacks not found");
+            attempted.Add(term); h.Patch(term, postfix: new HarmonyMethod(typeof(QuitCrashGuard).GetMethod(nameof(Terminated), Any)));
+            attempted.Add(drain); h.Patch(drain, prefix: new HarmonyMethod(typeof(QuitCrashGuard).GetMethod(nameof(PostCallbacksPrefix), Any)));
+            if (init != null) { attempted.Add(init); h.Patch(init, postfix: new HarmonyMethod(typeof(QuitCrashGuard).GetMethod(nameof(Initialized), Any))); }
+            CompatShieldPatcher.Log.LogInfo("Quit crash guard: skips Wwise callback drain after native sound-engine termination; normal drains continue");
+        }
+        catch (Exception e) { Rollback(h, attempted); CompatShieldPatcher.Log.LogWarning("Quit crash guard not applied: " + e.Message); }
+    }
+
+    // The state flips only after the original native Term call returns. This leaves ordinary LateUpdate drains alone.
+    static void Terminated() { shutdownAfterNativeTerm = true; }
+    static void Initialized() { shutdownAfterNativeTerm = false; }
+    static bool PostCallbacksPrefix(ref int __result)
+    {
+        if (!shutdownAfterNativeTerm) return true;
+        __result = 0;
+        return false;
+    }
+}
+
+
+public static class TauntDebuffGuard
+{
+    const BindingFlags Any = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+    static Harmony harmony; static Assembly mod; static Assembly game; static bool tried; static FieldInfo aiField; static PropertyInfo enemyProperty, gameObjectProperty; static MethodInfo resetMethod, getComponent; static Type bodyType; internal static int lookupCount;
+    public static void Apply(Harmony h, Assembly a, Assembly ror2) { harmony=h; mod=a; game=ror2; try {
+        var ev=ror2.GetType("RoR2.Run")?.GetEvent("onRunStartGlobal",Any);
+        if(ev==null) throw new MissingMemberException("Run.onRunStartGlobal");
+        ev.AddEventHandler(null,Delegate.CreateDelegate(ev.EventHandlerType,typeof(TauntDebuffGuard).GetMethod(nameof(Start),Any)));
+    } catch(Exception e) { CompatShieldPatcher.Log.LogWarning("Taunt debuff guard: cant watch run starts, not applied: "+e.Message); } }
+    static void Start(object _) { if(tried)return; tried=true; try {
+        var t=mod.GetType("ThinkInvisible.TinkersSatchel.TauntDebuffController"); var m=t?.GetMethod("FixedUpdate",Any|BindingFlags.DeclaredOnly);
+        var ai=t?.GetField("ai",Any); var bt=game?.GetType("RoR2.CharacterAI.BaseAI"); aiField=ai; enemyProperty=bt?.GetProperty("currentEnemy",Any); bodyType=game?.GetType("RoR2.CharacterBody"); var tt=enemyProperty?.PropertyType; resetMethod=tt?.GetMethod("Reset",Any); gameObjectProperty=tt?.GetProperty("gameObject",Any); getComponent=typeof(GameObject).GetMethod("GetComponent",Any,null,new[]{typeof(Type)},null); if(m==null||ai==null||enemyProperty==null||resetMethod==null||gameObjectProperty==null||getComponent==null||bodyType==null) throw new MissingMemberException("Taunt controller/BaseAI shape changed");
+        lookupCount++; harmony.Patch(m,prefix:new HarmonyMethod(typeof(TauntDebuffGuard).GetMethod(nameof(Prefix),Any)));
+        CompatShieldPatcher.Log.LogInfo("TinkersSatchel: taunt ticks with a bodyless enemy now clear that stale target");
+    } catch(Exception e) { CompatShieldPatcher.Log.LogWarning("Taunt debuff guard: shape changed or patch failed, not applied: "+e.Message); } }
+    static bool Prefix(object __instance) { try {
+        var ai=aiField?.GetValue(__instance); var enemy=ai==null?null:enemyProperty.GetValue(ai,null); if(enemy==null)return true;
+        var go=gameObjectProperty.GetValue(enemy,null); if(!UnityAlive(go))return true;
+        var body=getComponent.Invoke(go,new object[]{bodyType}); if(body==null||body.Equals(null)) resetMethod.Invoke(enemy,null);
+        return true; // preserve the mod tick's timer, cleanup and taunt checks
+    } catch(Exception e) { CompatShieldPatcher.WarnOnce("taunt-body-check", "Taunt debuff guard could not check the enemy body; original tick runs: "+e.Message); return true; } }
+    static bool UnityAlive(object x) { return x!=null && !x.Equals(null); }
+    public static bool ShouldSkip(bool enemyExists,bool bodyExists) => enemyExists&&!bodyExists;
+}
+
+
+public static class HookReelGuard
+{
+ const BindingFlags Any=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance;
+ static Harmony harmony; static Assembly game; static bool tried; static FieldInfo victimField, ownerTransformField, hookStateField, projectileControllerField, controllerOwnerField; static object reelFailValue; internal static int lookupCount;
+ public static void Apply(Harmony h,Assembly ror2) { harmony=h; game=ror2; try {
+  var ev=ror2.GetType("RoR2.Run")?.GetEvent("onRunStartGlobal",Any); if(ev==null) throw new MissingMemberException("Run.onRunStartGlobal");
+  ev.AddEventHandler(null,Delegate.CreateDelegate(ev.EventHandlerType,typeof(HookReelGuard).GetMethod(nameof(Start),Any)));
+ } catch(Exception e) { CompatShieldPatcher.Log.LogWarning("Hook reel guard: cant watch run starts, not applied: "+e.Message); } }
+ static void Start(object _) { if(tried)return; tried=true; try {
+  var t=game.GetType("RoR2.Projectile.HookProjectileImpact"); var reel=t?.GetMethod("Reel",Any|BindingFlags.DeclaredOnly);
+  var victim=t?.GetField("victim",Any); var owner=t?.GetField("ownerTransform",Any); var state=t?.GetField("hookState",Any); var pc=t?.GetField("projectileController",Any); var ownerMember=pc?.FieldType.GetField("owner",Any); var failValue=state==null?null:Enum.Parse(state.FieldType,"ReelFail");
+  if(reel==null||reel.ReturnType!=typeof(bool)||victim==null||owner==null||state==null||pc==null||ownerMember==null||failValue==null) throw new MissingMemberException("HookProjectileImpact.Reel shape changed");
+  victimField=victim; ownerTransformField=owner; hookStateField=state; projectileControllerField=pc; controllerOwnerField=ownerMember; reelFailValue=failValue; lookupCount++; var cctor=t.TypeInitializer; // Do not patch at load: inspect and defer any Unity-touching initializer to run start.
+  harmony.Patch(reel,prefix:new HarmonyMethod(typeof(HookReelGuard).GetMethod(nameof(Prefix),Any)));
+  CompatShieldPatcher.Log.LogInfo("Game: a hook with a missing owner or victim now fails its reel cleanly");
+ } catch(Exception e) { CompatShieldPatcher.Log.LogWarning("Hook reel guard: shape changed or patch failed, not applied: "+e.Message); } }
+ static bool Prefix(object __instance,ref bool __result) { try {
+  var victim=victimField.GetValue(__instance); var owner=ownerTransformField.GetValue(__instance);
+  var pc=projectileControllerField.GetValue(__instance); var ownerObj=pc==null?null:controllerOwnerField.GetValue(pc);
+  if(Alive(victim)&&Alive(owner)&&Alive(ownerObj))return true;
+  hookStateField.SetValue(__instance,reelFailValue); victimField.SetValue(__instance,null); __result=false; return false;
+ } catch(Exception e) { CompatShieldPatcher.WarnOnce("hook-reel-check", "Hook reel guard: couldnt check owner/victim; reel runs unchanged: "+e.Message); return true; } }
+ static bool Alive(object x)=>x!=null&&!x.Equals(null);
+ public static bool ShouldFail(bool owner,bool victim,bool ownerTransform)=>!owner||!victim||!ownerTransform;
+}
+
+
+public static class Starstorm2LogQuiet
+{
+ const BindingFlags Any=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance;
+ static Harmony harmony; static Assembly mod; static bool loggedPrune; static FieldInfo map, attackerField;
+ static void Rollback(Harmony h,IEnumerable<MethodBase> attempted) { foreach(var target in attempted.Reverse()) try { h.Unpatch(target,HarmonyPatchType.All,h.Id); } catch { } }
+ public static void Apply(Harmony h,Assembly a) { harmony=h;mod=a;var attempted=new List<MethodBase>();try {
+  var manager=a.GetType("SS2.AttackerOverrideManager"); var dict=manager?.GetField("attackerToOverride",Any);
+  var names=new[]{"OverrideOnHitAll","OverrideOnHitEnemy","OverrideTakeDamage"};
+  var damage=AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x=>x.GetName().Name=="RoR2")?.GetType("RoR2.DamageInfo"); attackerField=damage?.GetField("attacker",Any);
+  if(dict==null||attackerField==null||names.Any(n=>manager.GetMethod(n,Any)==null)) throw new MissingMemberException("AttackerOverrideManager/DamageInfo shape changed"); map=dict;
+  foreach(var n in names) { var target=manager.GetMethod(n,Any); attempted.Add(target); harmony.Patch(target,prefix:new HarmonyMethod(typeof(Starstorm2LogQuiet).GetMethod(nameof(PruneIncoming),Any))); }
+  var logType=a.GetType("SS2.SS2Log"); var log=logType?.GetMethod("Log",Any);
+  if(log==null||log.GetParameters().Length!=4)throw new MissingMemberException("SS2Log.Log(LogLevel, object, int, string)");
+  attempted.Add(log); harmony.Patch(log,prefix:new HarmonyMethod(typeof(Starstorm2LogQuiet).GetMethod(nameof(MuteTermination),Any)));
+  CompatShieldPatcher.Log.LogInfo("Starstorm2: dead attacker overrides are pruned and the AfterGummy termination warning is muted");
+ } catch(Exception e) { Rollback(h,attempted); CompatShieldPatcher.Log.LogWarning("Starstorm2 log quiet: override shape changed or patch failed, not applied: "+e.Message); } }
+ static void PruneIncoming(object[] __args) { try { var d=map?.GetValue(null) as IDictionary; if(d==null)return; object info=__args?.FirstOrDefault(x=>x!=null&&x.GetType().FullName=="RoR2.DamageInfo"); var key=info==null?null:attackerField.GetValue(info); if(key==null||Alive(key)||!d.Contains(key))return; var value=d[key]; if(Alive(value))return; d.Remove(key);
+  if(!loggedPrune){loggedPrune=true;CompatShieldPatcher.Log.LogInfo("Starstorm2: pruned a dead incoming attacker override");}
+ } catch(Exception e) { CompatShieldPatcher.WarnOnce("ss2-prune", "Starstorm2 log quiet: couldnt prune overrides: "+e.Message); } }
+ static bool Alive(object o) { if(o==null)return false; return !(o is UnityEngine.Object unityObject)||unityObject!=null; }
+ static bool MuteTermination(object __0,object __1) { try { return !Starstorm2TerminationQuiet.ShouldMute(__1?.ToString()); } catch { return true; } }
+}
+
+public static class Starstorm2TerminationQuiet
+{
+ public static bool ShouldMute(string message)=>message!=null&&message.IndexOf("Termination Result",StringComparison.Ordinal)>=0;
+}
+
+
+public static class HeadsetCostFix
+{
+ const BindingFlags Any=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance;
+ static Harmony harmony; static Assembly mod;
+ public static void Apply(Harmony h,Assembly a){harmony=h;mod=a;try{var t=a.GetType("ThinkInvisible.TinkersSatchel.Headset");var m=t?.GetMethod("CharacterBody_FixedUpdate",Any);if(m==null||m.GetParameters().Length!=2||m.GetParameters()[1].ParameterType.FullName!="RoR2.CharacterBody")throw new MissingMemberException("Headset FixedUpdate hook shape");harmony.Patch(m,prefix:new HarmonyMethod(typeof(HeadsetCostFix).GetMethod(nameof(Prefix),Any)));CompatShieldPatcher.Log.LogInfo("TinkersSatchel: Headset skips item work for bodies with no inventory");}catch(Exception e){CompatShieldPatcher.Log.LogWarning("Headset cost fix: changed shape or patch failed, not applied: "+e.Message);}}
+ // Disabled by default: no safe frequent exit saves more than its lookup and delegate call cost.
+ static bool Prefix(Delegate orig,object __1){object inventory;try{inventory=__1?.GetType().GetProperty("inventory",Any)?.GetValue(__1,null);}catch(Exception e){CompatShieldPatcher.Log.LogWarning("Headset cost fix: couldnt check inventory; mod hook runs: "+e.Message);return true;}if(inventory!=null&&!inventory.Equals(null))return true;try{orig.DynamicInvoke(__1);}catch(Exception e){CompatShieldPatcher.Log.LogWarning("Headset cost fix: original body update threw after one call: "+e.Message);}return false;}
+ public static bool SkipModWork(bool hasInventory)=>!hasInventory;
+}
+
+
+public static class SeedTrackerGuard {
+ const BindingFlags A=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance; static FieldInfo timerField; static PropertyInfo bodyProperty, masterProperty; static MethodInfo destroy;
+ public static void Apply(Harmony p,Assembly a){try{var t=a.GetType("Chen.GradiusMod.Items.OptionSeed.Components.SeedTracker");var m=t?.GetMethod("FixedUpdate",A);var timer=t?.GetField("invalidCheckTimer",A);bodyProperty=t?.GetProperty("characterBody",A);var master=bodyProperty?.PropertyType.GetProperty("master",A);destroy=typeof(UnityEngine.Object).GetMethod("Destroy",new[]{typeof(UnityEngine.Object)});if(m==null||t.GetProperty("characterMaster",A)==null||bodyProperty==null||master==null||timer==null||timer.FieldType!=typeof(float)||destroy==null)throw new MissingMemberException("SeedTracker invalidity cleanup shape");timerField=timer;masterProperty=master;p.Patch(m,prefix:new HarmonyMethod(typeof(SeedTrackerGuard).GetMethod(nameof(Prefix),A)));CompatShieldPatcher.Log.LogInfo("ChensGradiusMod: a seed tracker whose body has no master warns once, then waits quietly for the mod's own 3-second timeout");}catch(Exception e){CompatShieldPatcher.Log.LogWarning("Seed tracker guard: changed shape or patch failed, not applied: "+e.Message);}}
+ static bool Prefix(object __instance){try{if(__instance==null||__instance.Equals(null))return false;float elapsed=(float)timerField.GetValue(__instance);if(IsExpired(elapsed)){destroy.Invoke(null,new object[]{__instance});return false;}if(elapsed>0f){var body=bodyProperty.GetValue(__instance,null);bool bodyAlive=body!=null&&!body.Equals(null);var master=bodyAlive?masterProperty.GetValue(body,null):null;if(ShouldWaitQuietly(elapsed,bodyAlive,master==null||master.Equals(null))){timerField.SetValue(__instance,NextWait(elapsed,Step()));return false;}}return true;}catch(Exception e){CompatShieldPatcher.WarnOnce("seedtracker-timer", "Seed tracker guard: couldnt check invalidity timer; original tick runs: "+e.Message);return true;}}
+ // The mod warns on every physics tick while the body has no master, for its own 3-second grace. After its first warning this
+ // counts the same grace time without running the tick, so the wait and the cleanup are unchanged and only the repeats are gone.
+ public static Func<float> Step=()=>Time.fixedDeltaTime;
+ public static bool ShouldWaitQuietly(float elapsed,bool bodyAlive,bool missingMaster)=>elapsed>0f&&bodyAlive&&missingMaster;
+ public static float NextWait(float elapsed,float step)=>elapsed+(step>0f?step:0.02f);
+ public static bool IsExpired(float elapsed)=>elapsed>=3f;
+}
+public static class IcarusTrackerGuard {
+ const BindingFlags A=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance;static Harmony h;static Assembly mod;static PropertyInfo luckProperty;
+ public static void Apply(Harmony p,Assembly a){h=p;mod=a;try{var t=a.GetType("ThinkInvisible.TinkersSatchel.IcarusTracker");var m=t?.GetMethod("GlobalEventManager_onServerDamageDealt",A);var master=AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x=>x.GetName().Name=="RoR2")?.GetType("RoR2.CharacterMaster");luckProperty=master?.GetProperty("luck",A);if(m==null||m.GetParameters().Length!=1||luckProperty==null||!m.GetMethodBody().GetILAsByteArray().Any())throw new MissingMemberException("Icarus damage handler/luck shape");h.Patch(m,transpiler:new HarmonyMethod(typeof(IcarusTrackerGuard).GetMethod(nameof(Transpiler),A)));CompatShieldPatcher.Log.LogInfo("TinkersSatchel: Icarus ignite checks use zero luck when the attacker master is missing");}catch(Exception e){CompatShieldPatcher.Log.LogWarning("Icarus tracker guard: changed shape or patch failed, not applied: "+e.Message);}}
+ static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions){var replacement=typeof(IcarusTrackerGuard).GetMethod(nameof(LuckOrZero),A);foreach(var i in instructions){if(i.operand is MethodInfo m&&m.Name=="get_luck"&&m.DeclaringType?.FullName=="RoR2.CharacterMaster"){i.opcode=OpCodes.Call;i.operand=replacement;}yield return i;}}
+ public static float LuckOrZero(object master){if(master==null||master.Equals(null))return 0f;return (float)luckProperty.GetValue(master,null);}
+}
+public static class DeathCeremonySnapshotGuard {
+ const BindingFlags A=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance;static Harmony h;static Assembly mod;
+ static Type markType; static FieldInfo marksField;
+ public static void Apply(Harmony p,Assembly a){h=p;mod=a;try{var t=a.GetType("MysticsItems.Items.DeathCeremony");var m=t?.GetMethod("GenericGameEvents_OnHitEnemy",A);markType=t?.GetNestedType("MysticsItemsDeathCeremonyMark",BindingFlags.Public|BindingFlags.NonPublic);marksField=markType?.GetField("marksPerTeam",A);if(m==null||marksField==null)throw new MissingMemberException("DeathCeremony marks shape");h.Patch(m,prefix:new HarmonyMethod(typeof(DeathCeremonySnapshotGuard).GetMethod(nameof(Prefix),A)));CompatShieldPatcher.Log.LogInfo("MysticsItems: Death Ceremony enumerates a filtered snapshot of marks");}catch(Exception e){CompatShieldPatcher.Log.LogWarning("Death Ceremony guard: changed shape or patch failed, not applied: "+e.Message);}}
+ static void Prefix(object victimInfo){try{var team=victimInfo.GetType().GetField("teamIndex",A)?.GetValue(victimInfo);if(team==null)return;var map=marksField.GetValue(null) as IDictionary;if(map==null||!map.Contains(team))return;var old=map[team] as IList;if(old==null)throw new InvalidOperationException("team marks is not IList");var copy=(IList)Activator.CreateInstance(old.GetType());foreach(var entry in old)if(entry!=null&&!entry.Equals(null))copy.Add(entry);map[team]=copy;}catch(Exception e){CompatShieldPatcher.Log.LogWarning("Death Ceremony guard: couldnt snapshot marks; original handler runs: "+e.Message);}}
+}
+public static class CaeliSecondaryGuard {
+ const BindingFlags A=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance;static Harmony h;
+ public static void Apply(Harmony p,Assembly a){h=p;try{var t=a.GetType("CaeliImperium.Items.InfiniteSecondarySkillChargesEvents");var m=t?.GetMethod("Events_OnTakeDamageProcess",A);var ps=m?.GetParameters();if(m==null||ps.Length!=4||ps[2].ParameterType.FullName!="RoR2.CharacterBody")throw new MissingMemberException("Caeli damage listener shape");h.Patch(m,prefix:new HarmonyMethod(typeof(CaeliSecondaryGuard).GetMethod(nameof(Prefix),A)));CompatShieldPatcher.Log.LogInfo("Caeli Imperium: secondary damage without a character body is skipped");}catch(Exception e){CompatShieldPatcher.Log.LogWarning("Caeli secondary guard: changed shape or patch failed, not applied: "+e.Message);}}
+ static bool Prefix(object __2)=>!ShouldSkip(__2);
+ public static bool ShouldSkip(object body)=>body==null||body.Equals(null);
+}
+public static class ItemTierCleanupGuard {
+ const BindingFlags A=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance;static Harmony h;
+ static Type moduleType, helperType; public static void Apply(Harmony p,Assembly a){h=p;try{var types=a.GetTypes();moduleType=types.FirstOrDefault(x=>x.Name=="ItemTierModule");helperType=types.FirstOrDefault(x=>x.Name=="ItemTierPickupDisplayHelper");var m=moduleType?.GetMethod("DestroyCustomModel",A);if(m==null||m.GetParameters().Length!=2||helperType==null)throw new MissingMemberException("MSU ItemTierModule/helper shape");h.Patch(m,prefix:new HarmonyMethod(typeof(ItemTierCleanupGuard).GetMethod(nameof(Prefix),A)));CompatShieldPatcher.Log.LogInfo("MSU: custom model cleanup skips a helper already destroyed by the pickup");}catch(Exception e){CompatShieldPatcher.Log.LogWarning("MSU item tier cleanup guard: changed shape or patch failed, not applied: "+e.Message);}}
+ static bool Prefix(Delegate orig,object __1){object helper=null;try{var go=__1?.GetType().GetProperty("gameObject",A)?.GetValue(__1,null);if(!Alive(go))return true;var get=go.GetType().GetMethod("GetComponent",A,null,new[]{typeof(Type)},null);helper=get?.Invoke(go,new object[]{helperType});if(!Alive(helper))return true;}catch(Exception e){CompatShieldPatcher.WarnOnce("msu-tier-helper", "MSU item tier cleanup guard: couldnt check helper; mod hook runs: "+e.Message);return true;}
+  try{orig.DynamicInvoke(__1);helperType.GetMethod("DestroyCustomModel",A)?.Invoke(helper,null);}catch(Exception e){CompatShieldPatcher.Log.LogWarning("MSU item tier cleanup guard: original hook path threw after one orig call: "+e.Message);}return false;}
+ static bool Alive(object o)=>o!=null&&!o.Equals(null);
+}
+
+
 }
